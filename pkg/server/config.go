@@ -1,7 +1,13 @@
 package server
 
 import (
+	"context"
+	"flag"
+	"os"
+
+	"github.com/go-kod/kod"
 	"github.com/rs/cors"
+	"gopkg.in/yaml.v2"
 )
 
 type Tls struct {
@@ -20,6 +26,8 @@ type Service struct {
 	ProtoFiles     []string        `json:"proto_files" yaml:"proto_files"`
 }
 type Config struct {
+	kod.Implements[ConfigComponent]
+
 	Grpc       *Grpc         `json:"grpc" yaml:"grpc"`
 	Cors       *cors.Options `json:"cors" yaml:"cors"`
 	Playground *bool         `json:"playground" yaml:"playground"`
@@ -35,4 +43,31 @@ func DefaultConfig() *Config {
 		Playground: &[]bool{true}[0],
 		Tls:        nil,
 	}
+}
+
+var configFile = flag.String("config", "", "The config file (if not set will use the default configuration)")
+
+func (c *Config) Init(ctx context.Context) error {
+	flag.Parse()
+
+	cfg := DefaultConfig()
+	if *configFile != "" {
+		f, err := os.Open(*configFile)
+		if err != nil {
+			return err
+		}
+
+		err = yaml.NewDecoder(f).Decode(cfg)
+		if err != nil {
+			return err
+		}
+
+		*c = *cfg
+	}
+
+	return nil
+}
+
+func (c *Config) Config() *Config {
+	return c
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 
+	"github.com/go-kod/kod"
 	"github.com/sysulq/graphql-gateway/pkg/protoparser"
 	"google.golang.org/grpc/credentials"
 
@@ -19,23 +20,29 @@ type Grpc struct {
 	ImportPaths []string
 }
 
-type Caller interface {
-	Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error)
-}
-
 type caller struct {
-	serviceStub map[*desc.ServiceDescriptor]grpcdynamic.Stub
+	kod.Implements[Caller]
+
+	config      kod.Ref[ConfigComponent]
+	serviceStub map[string]grpcdynamic.Stub
+
+	descs []*desc.FileDescriptor
 }
 
-func NewReflectCaller(config *Grpc) (_ Caller, descs []*desc.FileDescriptor, err error) {
-	c := &caller{serviceStub: map[*desc.ServiceDescriptor]grpcdynamic.Stub{}}
-	descsconn := map[*desc.FileDescriptor]*grpc.ClientConn{}
+func (c *caller) Init(ctx context.Context) (err error) {
+	config := c.config.Get().Config().Grpc
+
+	serviceStub := map[string]grpcdynamic.Stub{}
+	descs := make([]*desc.FileDescriptor, 0)
+	descsconn := map[string]*grpc.ClientConn{}
+
 	for _, e := range config.Services {
+
 		var options []grpc.DialOption
 		if e.Authentication != nil && e.Authentication.Tls != nil {
 			cred, err := credentials.NewServerTLSFromFile(e.Authentication.Tls.Certificate, e.Authentication.Tls.PrivateKey)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 			options = append(options, grpc.WithTransportCredentials(cred))
 		} else {
@@ -43,36 +50,48 @@ func NewReflectCaller(config *Grpc) (_ Caller, descs []*desc.FileDescriptor, err
 		}
 		conn, err := grpc.Dial(e.Address, options...)
 		if err != nil {
-			return nil, nil, err
+			return err
 		}
+
+		var newDescs []*desc.FileDescriptor
 		if e.Reflection {
-			newDescs, err := reflection.NewClientWithImportsResolver(conn).ListPackages()
+			newDescs, err = reflection.NewClientWithImportsResolver(conn).ListPackages()
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
-			descs = append(descs, newDescs...)
 		}
 		if e.ProtoFiles != nil {
-			newDescs, err := protoparser.Parse(config.ImportPaths, e.ProtoFiles)
+			descs, err := protoparser.Parse(config.ImportPaths, e.ProtoFiles)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
-			descs = append(descs, newDescs...)
+			newDescs = append(newDescs, descs...)
 		}
-		for _, d := range descs {
-			descsconn[d] = conn
-			for _, svc := range d.GetServices() {
-				c.serviceStub[svc] = grpcdynamic.NewStub(descsconn[d])
-			}
+		for _, d := range newDescs {
+			descsconn[d.GetFullyQualifiedName()] = conn
+		}
+		descs = append(descs, newDescs...)
+	}
+
+	for _, d := range descs {
+		for _, svc := range d.GetServices() {
+			serviceStub[svc.GetFullyQualifiedName()] = grpcdynamic.NewStub(descsconn[d.GetFullyQualifiedName()])
 		}
 	}
 
-	return c, descs, nil
+	c.descs = descs
+	c.serviceStub = serviceStub
+
+	return nil
 }
 
-func (c caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error) {
+func (c *caller) GetDescs() []*desc.FileDescriptor {
+	return c.descs
+}
+
+func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error) {
 	// startTime := time.Now()
-	res, err := c.serviceStub[rpc.GetService()].InvokeRpc(ctx, rpc, message)
+	res, err := c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
 	// log.Printf("[INFO] grpc call %q took: %fms", rpc.GetFullyQualifiedName(), float64(time.Since(startTime))/float64(time.Millisecond))
 	return res, err
 }

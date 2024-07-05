@@ -11,6 +11,11 @@
             "mode": "auto",
             "cwd": "${workspaceFolder}",
             "args":["-config", "example/gateway/config.yaml"],
+            "env":{
+                "OTEL_TRACES_EXPORTER": "console",
+                // "OTEL_LOGS_EXPORTER": "console",
+                // "OTEL_METRICS_EXPORTER": "console",
+            },
             "program": "./cmd/gateway"
         },
         {

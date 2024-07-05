@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/go-kod/kod"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/golang/protobuf/ptypes"
@@ -19,17 +20,15 @@ import (
 	"github.com/sysulq/graphql-gateway/pkg/generator"
 )
 
-type any = map[string]interface{}
-
-func NewQueryer(pm generator.Registry, caller Caller) graphql.Queryer {
-	return &queryer{pm: pm, c: caller}
-}
+type anyMap = map[string]interface{}
 
 type queryer struct {
-	pm generator.Registry
+	kod.Implements[Queryer]
 
-	c Caller
+	caller kod.Ref[Caller]
+	pm     generator.Registry
 }
+
 type QueryerLogger struct {
 	Next graphql.Queryer
 }
@@ -39,6 +38,10 @@ func (q QueryerLogger) Query(ctx context.Context, input *graphql.QueryInput, i i
 	err = q.Next.Query(ctx, input, i)
 	// log.Printf("[INFO] graphql call took: %fms", float64(time.Since(startTime))/float64(time.Millisecond))
 	return err
+}
+
+func (q *queryer) SetPM(pm generator.Registry) {
+	q.pm = pm
 }
 
 func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error {
@@ -83,7 +86,7 @@ func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result i
 	return nil
 }
 
-func (q *queryer) resolveMutation(ctx context.Context, selection ast.SelectionSet, res any, vars map[string]interface{}) (err error) {
+func (q *queryer) resolveMutation(ctx context.Context, selection ast.SelectionSet, res anyMap, vars map[string]interface{}) (err error) {
 	for _, ss := range selection {
 		field, ok := ss.(*ast.Field)
 		if !ok {
@@ -101,7 +104,7 @@ func (q *queryer) resolveMutation(ctx context.Context, selection ast.SelectionSe
 	return
 }
 
-func (q *queryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, res any, vars map[string]interface{}) (err error) {
+func (q *queryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, res anyMap, vars map[string]interface{}) (err error) {
 	type mapEntry struct {
 		key string
 		val interface{}
@@ -160,7 +163,7 @@ func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.
 		return nil, err
 	}
 
-	msg, err := q.c.Call(ctx, method, inputMsg)
+	msg, err := q.caller.Get().Call(ctx, method, inputMsg)
 	if err != nil {
 		return nil, err
 	}
@@ -350,8 +353,8 @@ func (q *queryer) pbValue(val interface{}, reqDesc *desc.FieldDescriptor) (_ int
 	return val, nil
 }
 
-func (q *queryer) pbDecodeOneofField(desc *desc.MessageDescriptor, dynamicMsg *dynamic.Message, selection ast.SelectionSet) (oneof any, err error) {
-	oneof = any{}
+func (q *queryer) pbDecodeOneofField(desc *desc.MessageDescriptor, dynamicMsg *dynamic.Message, selection ast.SelectionSet) (oneof anyMap, err error) {
+	oneof = anyMap{}
 	for _, f := range selection {
 		out, ok := f.(*ast.Field)
 		if !ok {
@@ -401,7 +404,7 @@ func (q *queryer) gqlValue(val interface{}, msgDesc *desc.MessageDescriptor, enu
 		res := make([]interface{}, len(v))
 		i := 0
 		for kk, vv := range v {
-			vals := any{}
+			vals := anyMap{}
 			for _, f := range field.SelectionSet {
 				out, ok := f.(*ast.Field)
 				if !ok {

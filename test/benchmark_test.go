@@ -8,9 +8,9 @@ import (
 )
 
 func BenchmarkGateway(b *testing.B) {
-	gatewayUrl := setupGateway()
+	SetupDeps()
 
-	querier := graphql.NewSingleRequestQueryer(gatewayUrl)
+	querier := graphql.NewSingleRequestQueryer("")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

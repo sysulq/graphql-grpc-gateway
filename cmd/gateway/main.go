@@ -1,41 +1,46 @@
 package main
 
 import (
-	"flag"
+	"context"
 	"log"
 	"net"
 	"net/http"
-	"os"
 
-	_ "net/http/pprof"
-
+	"github.com/go-kod/kod"
+	"github.com/go-kod/kod/interceptor/kmetric"
+	"github.com/go-kod/kod/interceptor/krecovery"
+	"github.com/go-kod/kod/interceptor/ktrace"
 	"github.com/sysulq/graphql-gateway/pkg/server"
-	"gopkg.in/yaml.v2"
 )
 
-var configFile = flag.String("config", "", "The config file (if not set will use the default configuration)")
+type gateway struct {
+	kod.Implements[kod.Main]
 
-func main() {
-	flag.Parse()
+	config kod.Ref[server.ConfigComponent]
+	server kod.Ref[server.ServerComponent]
+}
 
-	cfg := server.DefaultConfig()
-	if *configFile != "" {
-		f, err := os.Open(*configFile)
-		fatalOnErr(err)
-		err = yaml.NewDecoder(f).Decode(cfg)
-		fatalOnErr(err)
-	}
+func run(ctx context.Context, gw *gateway) error {
+	cfg := gw.config.Get().Config()
 
 	l, err := net.Listen("tcp", cfg.Address)
 	fatalOnErr(err)
 	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
-	handler, err := server.Server(cfg)
+	handler, err := gw.server.Get().BuildServer(ctx)
 	fatalOnErr(err)
 	if cfg.Tls != nil {
 		log.Fatal(http.ServeTLS(l, handler, cfg.Tls.Certificate, cfg.Tls.PrivateKey))
 	}
 
-	log.Fatal(http.Serve(l, handler))
+	fatalOnErr(http.Serve(l, handler))
+
+	return nil
+}
+
+func main() {
+	fatalOnErr(kod.Run(context.Background(), run,
+		kod.WithInterceptors(krecovery.Interceptor(), ktrace.Interceptor(), kmetric.Interceptor()),
+	))
 }
 
 func fatalOnErr(err error) {
