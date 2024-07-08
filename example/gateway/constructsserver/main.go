@@ -5,24 +5,38 @@ import (
 	"log"
 	"net"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	any "google.golang.org/protobuf/types/known/anypb"
 	empty "google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/go-kod/kod"
 	pb "github.com/sysulq/graphql-gateway/example/gateway/constructsserver/pb"
 )
 
-func main() {
-	l, err := net.Listen("tcp", ":8081")
-	if err != nil {
-		log.Fatal(err)
-	}
+type app struct {
+	kod.Implements[kod.Main]
+}
 
-	s := grpc.NewServer()
-	pb.RegisterConstructsServer(s, &service{})
-	reflection.Register(s)
-	log.Fatal(s.Serve(l))
+func main() {
+	kod.Run(context.Background(), func(ctx context.Context, app *app) error {
+		l, err := net.Listen("tcp", ":8081")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		s := grpc.NewServer(
+			grpc.ServerOption(
+				grpc.StatsHandler(otelgrpc.NewServerHandler()),
+			),
+		)
+		pb.RegisterConstructsServer(s, &service{})
+		reflection.Register(s)
+		log.Fatal(s.Serve(l))
+
+		return nil
+	})
 }
 
 type service struct {

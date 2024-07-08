@@ -1,0 +1,29 @@
+version: '3'
+env:
+  GOBIN: { sh: pwd }
+  # OTEL_TRACES_EXPORTER: console
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:14318"
+  OTEL_EXPORTER_OTLP_HEADERS: "uptrace-dsn=http://project2_secret_token@localhost:14318?grpc=14317"
+  OTEL_EXPORTER_OTLP_COMPRESSION: gzip
+  OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: BASE2_EXPONENTIAL_BUCKET_HISTOGRAM
+  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: DELTA
+  OTEL_TRACES_SAMPLER: parentbased_traceidratio
+  OTEL_TRACES_SAMPLER_ARG: 0.001
+
+tasks:
+  gateway:
+    cmds:
+      - go run ./cmd/gateway -config ./example/gateway/config.yaml
+
+  deps:
+    deps:
+      - constructsserver
+      - optionsserver
+
+  constructsserver:
+    cmds:
+      - go run ./example/gateway/constructsserver 
+  
+  optionsserver:
+    cmds:
+      - go run ./example/gateway/optionsserver  

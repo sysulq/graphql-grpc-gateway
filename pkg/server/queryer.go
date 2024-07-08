@@ -29,17 +29,6 @@ type queryer struct {
 	caller   kod.Ref[Caller]
 }
 
-type QueryerLogger struct {
-	Next graphql.Queryer
-}
-
-func (q QueryerLogger) Query(ctx context.Context, input *graphql.QueryInput, i interface{}) (err error) {
-	// startTime := time.Now()
-	err = q.Next.Query(ctx, input, i)
-	// log.Printf("[INFO] graphql call took: %fms", float64(time.Since(startTime))/float64(time.Millisecond))
-	return err
-}
-
 func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error {
 	res := map[string]interface{}{}
 	var err error

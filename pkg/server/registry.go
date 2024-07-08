@@ -101,21 +101,19 @@ func (r *repository) SchemaDescriptorList() generator.SchemaDescriptorList {
 func (r *repository) FindMethodByName(op ast.Operation, name string) *desc.MethodDescriptor {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	m, _ := r.methodsByName[op][name]
-	return m
+	return r.methodsByName[op][name]
 }
 
 func (r *repository) FindObjectByName(name string) *desc.MessageDescriptor {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	o, _ := r.objectsByName[name]
-	return o
+	return r.objectsByName[name]
 }
 
 func (r *repository) FindObjectByFullyQualifiedName(fqn string) (*desc.MessageDescriptor, *ast.Definition) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	o, _ := r.objectsByFQN[fqn]
+	o := r.objectsByFQN[fqn]
 	msg, _ := o.Descriptor.(*desc.MessageDescriptor)
 	return msg, o.Definition
 }
@@ -123,20 +121,17 @@ func (r *repository) FindObjectByFullyQualifiedName(fqn string) (*desc.MessageDe
 func (r *repository) FindFieldByName(msg desc.Descriptor, name string) *desc.FieldDescriptor {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	f, _ := r.graphqlFieldsByName[msg][name]
-	return f
+	return r.graphqlFieldsByName[msg][name]
 }
 
 func (r *repository) FindUnionFieldByMessageFQNAndName(fqn, name string) *desc.FieldDescriptor {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	f, _ := r.graphqlUnionFieldsByName[fqn][name]
-	return f
+	return r.graphqlUnionFieldsByName[fqn][name]
 }
 
 func (r *repository) FindGraphqlFieldByProtoField(msg *ast.Definition, name string) *ast.FieldDefinition {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	f, _ := r.protoFieldsByName[msg][name]
-	return f
+	return r.protoFieldsByName[msg][name]
 }

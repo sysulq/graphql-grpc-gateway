@@ -1,6 +1,8 @@
 docs: true
 cors:
 address: ":8080"
+pyroscope:
+  serverAddress: "http://localhost:4040"
 grpc:
   #  import_paths:
   #    - ./api

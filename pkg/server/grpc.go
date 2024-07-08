@@ -5,7 +5,9 @@ import (
 
 	"github.com/go-kod/kod"
 	"github.com/sysulq/graphql-gateway/pkg/protoparser"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
@@ -38,7 +40,9 @@ func (c *caller) Init(ctx context.Context) (err error) {
 
 	for _, e := range config.Services {
 
-		var options []grpc.DialOption
+		options := []grpc.DialOption{
+			grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+		}
 		if e.Authentication != nil && e.Authentication.Tls != nil {
 			cred, err := credentials.NewServerTLSFromFile(e.Authentication.Tls.Certificate, e.Authentication.Tls.PrivateKey)
 			if err != nil {
@@ -46,9 +50,9 @@ func (c *caller) Init(ctx context.Context) (err error) {
 			}
 			options = append(options, grpc.WithTransportCredentials(cred))
 		} else {
-			options = append(options, grpc.WithInsecure())
+			options = append(options, grpc.WithCredentialsBundle(insecure.NewBundle()))
 		}
-		conn, err := grpc.Dial(e.Address, options...)
+		conn, err := grpc.NewClient(e.Address, options...)
 		if err != nil {
 			return err
 		}
@@ -91,6 +95,9 @@ func (c *caller) GetDescs() []*desc.FileDescriptor {
 
 func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error) {
 	// startTime := time.Now()
+	// md := metadata.New(nil)
+	// otelgrpc.Extract(ctx, &md)
+	// ctx = metadata.NewOutgoingContext(ctx, md)
 	res, err := c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
 	// log.Printf("[INFO] grpc call %q took: %fms", rpc.GetFullyQualifiedName(), float64(time.Since(startTime))/float64(time.Millisecond))
 	return res, err

@@ -39,12 +39,12 @@ type client struct {
 // NewClient returns an instance of gRPC reflection client for gRPC protocol.
 func NewClient(conn grpc.ClientConnInterface) Client {
 	return &client{
-		client: gr.NewClient(context.Background(), grpcreflect.NewServerReflectionClient(conn)),
+		client: gr.NewClientAuto(context.Background(), conn),
 	}
 }
 
 func (c *client) ListPackages() ([]*desc.FileDescriptor, error) {
-	//c.client.FileContainingExtension()
+	// c.client.FileContainingExtension()
 	ssvcs, err := c.client.ListServices()
 	if err != nil {
 		msg := status.Convert(err).Message()
@@ -130,9 +130,9 @@ func (c *clientV2) ListPackages() (descriptors []*desc.FileDescriptor, err error
 			}
 
 			if res.GetListServicesResponse() != nil {
-				//TODO move this logic to the bus
+				// TODO move this logic to the bus
 				go func() {
-					//TODO stop signal when this for ends
+					// TODO stop signal when this for ends
 					for _, svc := range res.GetListServicesResponse().Service {
 						if svc.GetName() == reflectionServiceName {
 							continue
@@ -191,7 +191,6 @@ func (c *clientV2) processFile(file *descriptorpb.FileDescriptorProto, filebus F
 	_, ok := c.fileMap[file]
 	c.mu.RUnlock()
 	if ok {
-
 		return nil
 	}
 	c.mu.Lock()
@@ -220,7 +219,8 @@ func (c *clientV2) processFile(file *descriptorpb.FileDescriptorProto, filebus F
 	getFilesForOptions := func(op interface {
 		proto.Message
 		ProtoReflect() protoreflect.Message
-	}, dd string) error {
+	}, dd string,
+	) error {
 		exx, err := proto.ExtensionDescs(op)
 		if err != nil {
 			return nil

@@ -103,7 +103,6 @@ func init() {
 		Interface: reflect.TypeOf((*ServerComponent)(nil)).Elem(),
 		Impl:      reflect.TypeOf(server{}),
 		Refs: `⟦fa17661a:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/ConfigComponent⟧,
-⟦9bbf643d:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/Caller⟧,
 ⟦f1ffc65c:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/Queryer⟧,
 ⟦906c61f4:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/Registry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {

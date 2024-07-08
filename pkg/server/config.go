@@ -5,9 +5,11 @@ import (
 	"flag"
 	"os"
 
+	"dario.cat/mergo"
 	"github.com/go-kod/kod"
+	"github.com/go-kod/kod/ext/client/kpyroscope"
 	"github.com/rs/cors"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type Tls struct {
@@ -28,16 +30,20 @@ type Service struct {
 type Config struct {
 	kod.Implements[ConfigComponent]
 
-	Grpc       *Grpc         `json:"grpc" yaml:"grpc"`
-	Cors       *cors.Options `json:"cors" yaml:"cors"`
-	Playground *bool         `json:"playground" yaml:"playground"`
-	Address    string        `json:"address" yaml:"address"`
-	Tls        *Tls          `json:"tls" yaml:"tls"`
+	Pyroscope  *kpyroscope.Config `json:"pyroscope" yaml:"pyroscope"`
+	Grpc       *Grpc              `json:"grpc" yaml:"grpc"`
+	Cors       *cors.Options      `json:"cors" yaml:"cors"`
+	Playground *bool              `json:"playground" yaml:"playground"`
+	Address    string             `json:"address" yaml:"address"`
+	Tls        *Tls               `json:"tls" yaml:"tls"`
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		Address:    ":8080",
+		Address: ":8080",
+		Pyroscope: &kpyroscope.Config{
+			ServerAddress: "http://localhost:4040",
+		},
 		Cors:       &cors.Options{},
 		Grpc:       &Grpc{},
 		Playground: &[]bool{true}[0],
@@ -62,7 +68,7 @@ func (c *Config) Init(ctx context.Context) error {
 			return err
 		}
 
-		*c = *cfg
+		mergo.Merge(c, cfg)
 	}
 
 	return nil
