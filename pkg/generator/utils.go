@@ -10,7 +10,7 @@ import (
 	descriptor "google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
 
-	gqlpb "github.com/sysulq/graphql-gateway/pkg/graphqlpb"
+	gqlpb "github.com/sysulq/graphql-gateway/pkg/graphqlv1"
 )
 
 func GraphqlMethodOptions(opts proto.Message) *gqlpb.Rpc {
@@ -96,11 +96,11 @@ func GoCamelCase(s string) string {
 }
 
 func GetRequestType(rpcOpts *gqlpb.Rpc, svcOpts *gqlpb.Svc) gqlpb.Type {
-	if rpcOpts != nil && rpcOpts.Type != nil {
-		return *rpcOpts.Type
+	if rpcOpts != nil {
+		return rpcOpts.Type
 	}
-	if svcOpts != nil && svcOpts.Type != nil {
-		return *svcOpts.Type
+	if svcOpts != nil {
+		return svcOpts.Type
 	}
 	return gqlpb.Type_DEFAULT
 }

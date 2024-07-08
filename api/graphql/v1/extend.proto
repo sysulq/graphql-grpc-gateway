@@ -1,0 +1,63 @@
+syntax = "proto3";
+package api.graphql.v1;
+
+option go_package = "github.com/sysulq/graphql-gateway/pkg/graphqlv1";
+
+import "google/protobuf/descriptor.proto";
+
+// The options for the method
+extend google.protobuf.MethodOptions {
+    Rpc rpc = 65030;
+}
+
+// The options for the service
+extend google.protobuf.ServiceOptions {
+    Svc svc = 65030;
+}
+
+// The options for the field
+extend google.protobuf.FieldOptions {
+    Field field = 65030;
+}
+
+extend google.protobuf.OneofOptions {
+    Oneof oneof = 65030;
+}
+
+message Oneof {
+    bool ignore = 4;
+    string name = 5;
+}
+
+message Field {
+    bool required = 1;
+    string params = 2;
+    string dirs = 3;
+    bool ignore = 4;
+    string name = 5;
+}
+
+message Rpc {
+    Type type = 1;
+    bool ignore = 2;
+    string name = 3;
+}
+
+message Svc {
+    Type type = 1;
+    bool ignore = 2;
+    string name = 3;
+    Upstream upstream = 4;
+}
+
+enum Type {
+    DEFAULT = 0;
+    MUTATION = 1;
+    QUERY = 2;
+}
+
+enum Upstream {
+  UPSTREAM_UNSPECIFIED = 0;
+  UPSTREAM_SERVER = 1;
+  UPSTREAM_CLIENT = 2;
+}

@@ -2,7 +2,7 @@ syntax = "proto3";
 package options;
 option go_package = "github.com/sysulq/graphql-gateway/example;pb";
 
-import "api/danielvladco/protobuf/graphql.proto";
+import "api/graphql/graphql.proto";
 
 service Service {
     rpc Mutate1 (Data) returns (Data); // must be a mutation

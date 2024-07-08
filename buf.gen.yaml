@@ -1,0 +1,18 @@
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/go-kod/kod-mono/api/grpc
+    except:
+      - buf.build/googleapis/googleapis
+plugins:
+  - plugin: buf.build/protocolbuffers/go:v1.33.0
+    out: pkg/graphqlv1
+    opt:
+      - paths=source_relative
+
+  - plugin: buf.build/grpc/go:v1.3.0
+    out: pkg/graphqlv1
+    opt:
+      - require_unimplemented_servers=false
+      - paths=source_relative

@@ -7,7 +7,7 @@
 package optionsserver
 
 import (
-	_ "github.com/sysulq/graphql-gateway/pkg/graphqlpb"
+	_ "github.com/sysulq/graphql-gateway/pkg/graphqlv1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
