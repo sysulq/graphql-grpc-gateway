@@ -10,6 +10,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/nautilus/graphql"
 	"github.com/sysulq/graphql-gateway/pkg/generator"
+	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/runtime/protoiface"
 	"net/http"
 	"reflect"
@@ -60,7 +61,8 @@ func init() {
 		Name:      "github.com/sysulq/graphql-gateway/pkg/server/Queryer",
 		Interface: reflect.TypeOf((*Queryer)(nil)).Elem(),
 		Impl:      reflect.TypeOf(queryer{}),
-		Refs:      `⟦a8d89257:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/Queryer→github.com/sysulq/graphql-gateway/pkg/server/Caller⟧`,
+		Refs: `⟦80ad5dbf:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/Queryer→github.com/sysulq/graphql-gateway/pkg/server/Registry⟧,
+⟦a8d89257:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/Queryer→github.com/sysulq/graphql-gateway/pkg/server/Caller⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -77,12 +79,33 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-gateway/pkg/server/Registry",
+		Interface: reflect.TypeOf((*Registry)(nil)).Elem(),
+		Impl:      reflect.TypeOf(repository{}),
+		Refs:      `⟦81f122f0:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/Registry→github.com/sysulq/graphql-gateway/pkg/server/Caller⟧`,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			interceptors := info.Interceptors
+			if h, ok := info.Impl.(interface {
+				Interceptors() []interceptor.Interceptor
+			}); ok {
+				interceptors = append(interceptors, h.Interceptors()...)
+			}
+
+			return registry_local_stub{
+				impl:        info.Impl.(Registry),
+				interceptor: interceptor.Chain(interceptors),
+				name:        info.Name,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
 		Name:      "github.com/sysulq/graphql-gateway/pkg/server/ServerComponent",
 		Interface: reflect.TypeOf((*ServerComponent)(nil)).Elem(),
 		Impl:      reflect.TypeOf(server{}),
 		Refs: `⟦fa17661a:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/ConfigComponent⟧,
 ⟦9bbf643d:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/Caller⟧,
-⟦f1ffc65c:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/Queryer⟧`,
+⟦f1ffc65c:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/Queryer⟧,
+⟦906c61f4:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/ServerComponent→github.com/sysulq/graphql-gateway/pkg/server/Registry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -104,6 +127,7 @@ func init() {
 var _ kod.InstanceOf[Caller] = (*caller)(nil)
 var _ kod.InstanceOf[ConfigComponent] = (*Config)(nil)
 var _ kod.InstanceOf[Queryer] = (*queryer)(nil)
+var _ kod.InstanceOf[Registry] = (*repository)(nil)
 var _ kod.InstanceOf[ServerComponent] = (*server)(nil)
 
 // Local stub implementations.
@@ -194,9 +218,54 @@ func (s queryer_local_stub) Query(ctx context.Context, a1 *graphql.QueryInput, a
 	return
 }
 
-func (s queryer_local_stub) SetPM(a0 generator.Registry) {
+type registry_local_stub struct {
+	impl        Registry
+	name        string
+	interceptor interceptor.Interceptor
+}
+
+// Check that registry_local_stub implements the Registry interface.
+var _ Registry = (*registry_local_stub)(nil)
+
+func (s registry_local_stub) FindFieldByName(a0 desc.Descriptor, a1 string) (r0 *desc.FieldDescriptor) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
-	s.impl.SetPM(a0)
+	r0 = s.impl.FindFieldByName(a0, a1)
+	return
+}
+
+func (s registry_local_stub) FindGraphqlFieldByProtoField(a0 *ast.Definition, a1 string) (r0 *ast.FieldDefinition) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.FindGraphqlFieldByProtoField(a0, a1)
+	return
+}
+
+func (s registry_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 *desc.MethodDescriptor) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.FindMethodByName(a0, a1)
+	return
+}
+
+func (s registry_local_stub) FindObjectByFullyQualifiedName(a0 string) (r0 *desc.MessageDescriptor, r1 *ast.Definition) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0, r1 = s.impl.FindObjectByFullyQualifiedName(a0)
+	return
+}
+
+func (s registry_local_stub) FindObjectByName(a0 string) (r0 *desc.MessageDescriptor) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.FindObjectByName(a0)
+	return
+}
+
+func (s registry_local_stub) FindUnionFieldByMessageFQNAndName(a0 string, a1 string) (r0 *desc.FieldDescriptor) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.FindUnionFieldByMessageFQNAndName(a0, a1)
+	return
+}
+
+func (s registry_local_stub) SchemaDescriptorList() (r0 generator.SchemaDescriptorList) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.SchemaDescriptorList()
 	return
 }
 

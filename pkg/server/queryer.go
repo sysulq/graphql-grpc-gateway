@@ -25,8 +25,8 @@ type anyMap = map[string]interface{}
 type queryer struct {
 	kod.Implements[Queryer]
 
-	caller kod.Ref[Caller]
-	pm     generator.Registry
+	registry kod.Ref[Registry]
+	caller   kod.Ref[Caller]
 }
 
 type QueryerLogger struct {
@@ -38,10 +38,6 @@ func (q QueryerLogger) Query(ctx context.Context, input *graphql.QueryInput, i i
 	err = q.Next.Query(ctx, input, i)
 	// log.Printf("[INFO] graphql call took: %fms", float64(time.Since(startTime))/float64(time.Millisecond))
 	return err
-}
-
-func (q *queryer) SetPM(pm generator.Registry) {
-	q.pm = pm
 }
 
 func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error {
@@ -153,7 +149,7 @@ func (q *queryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, 
 }
 
 func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.Field, vars map[string]interface{}) (interface{}, error) {
-	method := q.pm.FindMethodByName(op, field.Name)
+	method := q.registry.Get().FindMethodByName(op, field.Name)
 	if method == nil {
 		return nil, errors.New("method not found")
 	}
@@ -197,7 +193,7 @@ func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars ma
 			return nil, errors.New("no '__typename' provided")
 		}
 
-		obj := q.pm.FindObjectByName(vvv)
+		obj := q.registry.Get().FindObjectByName(vvv)
 		if obj == nil {
 			return nil, errors.New("__typename should be a valid typename")
 		}
@@ -215,9 +211,9 @@ func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars ma
 
 		var reqDesc *desc.FieldDescriptor
 		if anyObj != nil {
-			reqDesc = q.pm.FindFieldByName(anyObj, arg.Name)
+			reqDesc = q.registry.Get().FindFieldByName(anyObj, arg.Name)
 		} else {
-			reqDesc = q.pm.FindFieldByName(in, arg.Name)
+			reqDesc = q.registry.Get().FindFieldByName(in, arg.Name)
 		}
 
 		if val, err = q.pbValue(val, reqDesc); err != nil {
@@ -312,7 +308,7 @@ func (q *queryer) pbValue(val interface{}, reqDesc *desc.FieldDescriptor) (_ int
 		var msg *dynamic.Message
 		protoDesc := msgDesc
 		if generator.IsAny(protoDesc) {
-			anyTypeDescriptor = q.pm.FindObjectByName(vvv)
+			anyTypeDescriptor = q.registry.Get().FindObjectByName(vvv)
 			if anyTypeDescriptor == nil {
 				return nil, errors.New("'__typename' must be a valid INPUT_OBJECT")
 			}
@@ -328,7 +324,7 @@ func (q *queryer) pbValue(val interface{}, reqDesc *desc.FieldDescriptor) (_ int
 			}
 			// plugType := q.pm.inputs[msgDesc]
 			// fieldDesc := q.pm.fields[q.p.FieldBack(plugType.DescriptorProto, kk)]
-			fieldDesc := q.pm.FindFieldByName(msgDesc, kk)
+			fieldDesc := q.registry.Get().FindFieldByName(msgDesc, kk)
 			oneof := fieldDesc.GetOneOf()
 			if oneof != nil {
 				_, ok := oneofValidate[oneof]
@@ -365,7 +361,7 @@ func (q *queryer) pbDecodeOneofField(desc *desc.MessageDescriptor, dynamicMsg *d
 			continue
 		}
 
-		fieldDesc := q.pm.FindUnionFieldByMessageFQNAndName(desc.GetFullyQualifiedName(), out.Name)
+		fieldDesc := q.registry.Get().FindUnionFieldByMessageFQNAndName(desc.GetFullyQualifiedName(), out.Name)
 		protoVal := dynamicMsg.GetField(fieldDesc)
 		oneof[nameOrAlias(out)], err = q.gqlValue(protoVal, fieldDesc.GetMessageType(), fieldDesc.GetEnumType(), out)
 		if err != nil {
@@ -457,7 +453,7 @@ func (q *queryer) gqlValue(val interface{}, msgDesc *desc.MessageDescriptor, enu
 			}
 
 			descMsg := v.GetMessageDescriptor()
-			fieldDesc := q.pm.FindFieldByName(descMsg, out.Name)
+			fieldDesc := q.registry.Get().FindFieldByName(descMsg, out.Name)
 			if fieldDesc == nil {
 				vals[nameOrAlias(out)], err = q.pbDecodeOneofField(descMsg, v, out.SelectionSet)
 				if err != nil {
@@ -491,7 +487,7 @@ func (q *queryer) anyMessageToMap(v *anypb.Any) (map[string]interface{}, error) 
 	if err != nil {
 		return nil, err
 	}
-	grpcType, definition := q.pm.FindObjectByFullyQualifiedName(fqn)
+	grpcType, definition := q.registry.Get().FindObjectByFullyQualifiedName(fqn)
 	outputMsg := dynamic.NewMessage(grpcType)
 	if err = outputMsg.Unmarshal(v.Value); err != nil {
 		return nil, err
@@ -504,7 +500,7 @@ func (q *queryer) protoMessageToMap(outputMsg *dynamic.Message, definition *ast.
 	vals := make(map[string]interface{}, len(fields))
 	vals["__typename"] = definition.Name
 	for _, field := range fields {
-		fieldDef := q.pm.FindGraphqlFieldByProtoField(definition, field.GetName())
+		fieldDef := q.registry.Get().FindGraphqlFieldByProtoField(definition, field.GetName())
 		// the field is probably invalid or ignored
 		if fieldDef == nil {
 			continue
@@ -523,7 +519,7 @@ func (q *queryer) protoMessageToMap(outputMsg *dynamic.Message, definition *ast.
 			}
 
 		case *dynamic.Message:
-			_, definition := q.pm.FindObjectByFullyQualifiedName(vv.GetMessageDescriptor().GetFullyQualifiedName())
+			_, definition := q.registry.Get().FindObjectByFullyQualifiedName(vv.GetMessageDescriptor().GetFullyQualifiedName())
 			val, err := q.protoMessageToMap(vv, definition)
 			if err != nil {
 				return nil, err
@@ -550,7 +546,7 @@ func (q *queryer) protoMessageToMap(outputMsg *dynamic.Message, definition *ast.
 					}
 
 				case *dynamic.Message:
-					_, definition := q.pm.FindObjectByFullyQualifiedName(vv.GetMessageDescriptor().GetFullyQualifiedName())
+					_, definition := q.registry.Get().FindObjectByFullyQualifiedName(vv.GetMessageDescriptor().GetFullyQualifiedName())
 					val, err := q.protoMessageToMap(vv, definition)
 					if err != nil {
 						return nil, err

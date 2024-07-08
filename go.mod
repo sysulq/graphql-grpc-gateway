@@ -3,6 +3,7 @@ module github.com/sysulq/graphql-gateway
 go 1.22.4
 
 require (
+	dario.cat/mergo v1.0.0
 	github.com/99designs/gqlgen v0.17.49
 	github.com/go-kod/kod v0.10.0
 	github.com/golang/protobuf v1.5.4
@@ -11,7 +12,6 @@ require (
 	github.com/nautilus/graphql v0.0.25
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 	github.com/rs/cors v1.11.0
-	github.com/samber/lo v1.39.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vektah/gqlparser/v2 v2.5.16
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0
@@ -52,6 +52,7 @@ require (
 	github.com/prometheus/procfs v0.15.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
+	github.com/samber/lo v1.39.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.7.0 // indirect

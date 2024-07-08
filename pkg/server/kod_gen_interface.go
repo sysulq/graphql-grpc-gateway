@@ -10,6 +10,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/nautilus/graphql"
 	"github.com/sysulq/graphql-gateway/pkg/generator"
+	"github.com/vektah/gqlparser/v2/ast"
 )
 
 // Config is a component that implements ConfigComponent.
@@ -30,6 +31,16 @@ type Caller interface {
 
 // queryer is a component that implements Queryer.
 type Queryer interface {
-	SetPM(pm generator.Registry)
 	Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error
+}
+
+// repository is a component that implements Registry.
+type Registry interface {
+	SchemaDescriptorList() generator.SchemaDescriptorList
+	FindMethodByName(op ast.Operation, name string) *desc.MethodDescriptor
+	FindObjectByName(name string) *desc.MessageDescriptor
+	FindObjectByFullyQualifiedName(fqn string) (*desc.MessageDescriptor, *ast.Definition)
+	FindFieldByName(msg desc.Descriptor, name string) *desc.FieldDescriptor
+	FindUnionFieldByMessageFQNAndName(fqn, name string) *desc.FieldDescriptor
+	FindGraphqlFieldByProtoField(msg *ast.Definition, name string) *ast.FieldDefinition
 }

@@ -61,7 +61,7 @@ func SetupDeps() DepsInfo {
 			log.Fatal(err)
 		}
 		go func() {
-			time.Sleep(time.Second)
+			time.Sleep(10 * time.Millisecond)
 			optionsServerCh <- l.Addr().String()
 		}()
 		s := grpc.NewServer()
@@ -75,7 +75,7 @@ func SetupDeps() DepsInfo {
 			log.Fatal(err)
 		}
 		go func() {
-			time.Sleep(time.Second)
+			time.Sleep(10 * time.Millisecond)
 			constructsServerCh <- l.Addr().String()
 		}()
 		s := grpc.NewServer()
