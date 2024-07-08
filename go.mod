@@ -5,8 +5,8 @@ go 1.22.4
 require (
 	dario.cat/mergo v1.0.0
 	github.com/99designs/gqlgen v0.17.49
-	github.com/go-kod/kod v0.10.1-0.20240708094346-93665f0fe68f
-	github.com/go-kod/kod/ext v0.10.1-0.20240708094346-93665f0fe68f
+	github.com/go-kod/kod v0.11.0
+	github.com/go-kod/kod/ext v0.11.0
 	github.com/golang/protobuf v1.5.4
 	github.com/grafana/pyroscope-go v1.1.1
 	github.com/jhump/protoreflect v1.16.0
