@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/go-kod/kod"
-	pb "github.com/sysulq/graphql-gateway/example/gateway/optionsserver/pb"
+	pb "github.com/sysulq/graphql-gateway/api/example/optionsserver"
 )
 
 type app struct {

@@ -19,7 +19,7 @@ func TestGraphql2Grpc(t *testing.T) {
 
 	mockConfig := server.NewMockConfigComponent(gomock.NewController(t))
 	mockConfig.EXPECT().Config().Return(&server.Config{
-		Grpc: &server.Grpc{
+		Grpc: server.Grpc{
 			Services: []*server.Service{
 				{
 					Address:    infos.ConstructsServerAddr,

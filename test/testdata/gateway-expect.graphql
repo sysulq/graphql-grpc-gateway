@@ -5,6 +5,10 @@ directive @Oneof_Oneof3 on INPUT_FIELD_DEFINITION
 directive @Query on FIELD_DEFINITION
 directive @Service on FIELD_DEFINITION
 directive @Test on FIELD_DEFINITION
+"""
+The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer.
+"""
+directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
 directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
 """
@@ -252,16 +256,6 @@ input Maps_Uint64Uint64EntryInput {
 	value: Int
 }
 type Mutation {
-	serviceMutate1(in: DataInput): Data
-	serviceMutate2(in: DataInput): Data
-	servicePublish(in: DataInput): Data
-	servicePubSub1(in: DataInput): Data
-	serviceInvalidSubscribe3(in: DataInput): Data
-	servicePubSub2(in: DataInput): Data
-	newName(in: DataInput): Data
-	name(in: DataInput): Data
-	newName0(in: DataInput): Data
-	queryMutate1(in: DataInput): Data
 	constructsScalars_(in: ScalarsInput): Scalars
 	constructsRepeated_(in: RepeatedInput): Repeated
 	constructsMaps_(in: MapsInput): Maps
@@ -272,6 +266,16 @@ type Mutation {
 	constructsRef_(in: RefInput): Ref
 	constructsOneof_(in: OneofInput): Oneof
 	constructsCallWithId: Boolean
+    serviceMutate1(in: DataInput): Data
+    serviceMutate2(in: DataInput): Data
+    servicePublish(in: DataInput): Data
+    servicePubSub1(in: DataInput): Data
+    serviceInvalidSubscribe3(in: DataInput): Data
+    servicePubSub2(in: DataInput): Data
+    newName(in: DataInput): Data
+    testName(in: DataInput): Data
+    testNewName(in: DataInput): Data
+    queryMutate1(in: DataInput): Data
 }
 interface Node {
 	id: ID!

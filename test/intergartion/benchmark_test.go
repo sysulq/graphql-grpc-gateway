@@ -25,7 +25,7 @@ func BenchmarkGateway(b *testing.B) {
 
 	mockConfig := server.NewMockConfigComponent(gomock.NewController(b))
 	mockConfig.EXPECT().Config().Return(&server.Config{
-		Grpc: &server.Grpc{
+		Grpc: server.Grpc{
 			Services: []*server.Service{
 				{
 					Address:    infos.ConstructsServerAddr,
@@ -37,7 +37,7 @@ func BenchmarkGateway(b *testing.B) {
 				},
 			},
 		},
-		Pyroscope: &kpyroscope.Config{
+		Pyroscope: kpyroscope.Config{
 			ServerAddress: "localhost:4040",
 		},
 	}).AnyTimes()

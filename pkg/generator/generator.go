@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	descriptor "google.golang.org/protobuf/types/descriptorpb"
 
-	gqlpb "github.com/sysulq/graphql-gateway/pkg/graphqlv1"
+	gqlpb "github.com/sysulq/graphql-gateway/api/graphql/v1"
 )
 
 const (
@@ -454,14 +454,10 @@ type ServiceAndMethod struct {
 func (r *RootDefinition) UniqueName(svc *descriptor.ServiceDescriptorProto, rpc *descriptor.MethodDescriptorProto) (name string) {
 	rpcOpts := GraphqlMethodOptions(rpc.GetOptions())
 	svcOpts := GraphqlServiceOptions(svc.GetOptions())
-	if rpcOpts != nil {
+	if rpcOpts != nil && rpcOpts.Name != "" {
 		name = rpcOpts.Name
-	} else if svcOpts != nil {
-		if svcOpts.Name == "" {
-			name = ToLowerFirst(rpc.GetName())
-		} else {
-			name = svcOpts.Name + strings.Title(rpc.GetName())
-		}
+	} else if svcOpts != nil && svcOpts.Name != "" {
+		name = svcOpts.Name + strings.Title(rpc.GetName())
 	} else {
 		name = ToLowerFirst(svc.GetName()) + strings.Title(rpc.GetName())
 	}
@@ -579,7 +575,9 @@ func (s *SchemaDescriptor) createField(field *desc.FieldDescriptor, obj *ObjectD
 	}
 	fieldOpts := GraphqlFieldOptions(field.AsFieldDescriptorProto().GetOptions())
 	if fieldOpts != nil {
-		fieldAst.Name = fieldOpts.Name
+		if fieldOpts.Name != "" {
+			fieldAst.Name = fieldOpts.Name
+		}
 		directive := &ast.DirectiveDefinition{
 			Name: goFieldDirective,
 			Arguments: []*ast.ArgumentDefinition{{

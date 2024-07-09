@@ -1,14 +1,17 @@
 syntax = "proto3";
-package options;
-option go_package = "github.com/sysulq/graphql-gateway/example;pb";
+package optionsserver;
+option go_package = "github.com/sysulq/graphql-gateway/gateway/optionsserver/pb;optionsserver";
 
-import "api/graphql/graphql.proto";
+import "graphql/v1/extend.proto";
 
 service Service {
     rpc Mutate1 (Data) returns (Data); // must be a mutation
     rpc Mutate2 (Data) returns (Data); // must be a mutation
     rpc Query1 (Data) returns (Data) {
-        option (danielvladco.protobuf.graphql.rpc) = {type: QUERY};
+        option (graphql.v1.rpc) = {type: QUERY};
+    } // must be a query
+    rpc Query2 (Data) returns (Data) {
+        option (graphql.v1.rpc) = {type: QUERY};
     } // must be a query
 
     rpc Publish (stream Data) returns (Data); // must be a mutation
@@ -16,24 +19,24 @@ service Service {
     rpc PubSub1 (stream Data) returns (stream Data); // must be a mutation and a subscription
 
     rpc InvalidSubscribe1 (stream Data) returns (Data) {
-        option (danielvladco.protobuf.graphql.rpc) = {type: QUERY};
+        option (graphql.v1.rpc) = {type: QUERY};
     }; // must ignore
     rpc InvalidSubscribe2 (Data) returns (stream Data) {
-        option (danielvladco.protobuf.graphql.rpc) = {type: MUTATION};
+        option (graphql.v1.rpc) = {type: MUTATION};
     }; // must ignore
     rpc InvalidSubscribe3 (stream Data) returns (stream Data) {
-        option (danielvladco.protobuf.graphql.rpc) = {type: QUERY};
+        option (graphql.v1.rpc) = {type: QUERY};
     }; // must ignore
     rpc PubSub2 (stream Data) returns (stream Data) {
-        option (danielvladco.protobuf.graphql.rpc) = {type: DEFAULT};
+        option (graphql.v1.rpc) = {type: DEFAULT};
     }; // must ignore
 
     rpc Ignore (Data) returns (Data) {
-        option (danielvladco.protobuf.graphql.rpc) = {ignore: true};
+        option (graphql.v1.rpc) = {ignore: true};
     }; // must ignore
 
     rpc Name (Data) returns (Data) {
-        option (danielvladco.protobuf.graphql.rpc) = {name: "newName"};
+        option (graphql.v1.rpc) = {name: "newName"};
     }; // method name should be "newName"
 }
 
@@ -41,29 +44,26 @@ service Test {
     rpc Name (Data) returns (Data); // expect service name to be "name"
     rpc NewName (Data) returns (Data); // expect service name to be "newName1" since it collides with a name from a different service
 
-    option (danielvladco.protobuf.graphql.svc) = {name: ""};
+    option (graphql.v1.svc) = {name: ""};
 }
 
 service Query {
-    option (danielvladco.protobuf.graphql.svc) = {type: QUERY};
+    option (graphql.v1.svc) = {type: QUERY};
     rpc Query1 (Data) returns (Data); // must be a query
     rpc Query2 (Data) returns (Data); // must be a query
     rpc Mutate1 (Data) returns (Data) {
-        option (danielvladco.protobuf.graphql.rpc) = {type: MUTATION};
+        option (graphql.v1.rpc) = {type: MUTATION};
     } // must be a mutation
     rpc Subscribe (Data) returns (stream Data); // must be a subscription
 }
 
 message Data {
-    string string_x = 1 [(danielvladco.protobuf.graphql.field) = {required: true}]; // must be required
-    Foo2 foo = 2 [(danielvladco.protobuf.graphql.field) = {required: true}]; // must be required
-    repeated double double = 3 [(danielvladco.protobuf.graphql.field) = {required: true}]; // must be required because its greater than 0
+    string string = 1 [(graphql.v1.field) = {required: true}]; // must be required
+    Foo2 foo = 2 [(graphql.v1.field) = {required: true}]; // must be required
+    repeated float float = 3 [(graphql.v1.field) = {required: true}]; // must be required because its greater than 0
     string string2 = 4; // simple
     Foo2 foo2 = 5; // simple
-    repeated double double2 = 6; // simple
-    string bar = 7 [(danielvladco.protobuf.graphql.field) = {name: "bars"}];
-    string string = 8 [(danielvladco.protobuf.graphql.field) = {name: "str"}];
-    string ignore = 9 [(danielvladco.protobuf.graphql.field) = {ignore: true}];
+    repeated float float2 = 6; // simple
 }
 
 message Foo2 {

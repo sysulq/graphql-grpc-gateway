@@ -28,7 +28,7 @@ func run(ctx context.Context, gw *gateway) error {
 	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
 	handler, err := gw.server.Get().BuildServer(ctx)
 	fatalOnErr(err)
-	if cfg.Tls != nil {
+	if cfg.Tls.Enable {
 		log.Fatal(http.ServeTLS(l, handler, cfg.Tls.Certificate, cfg.Tls.PrivateKey))
 	}
 

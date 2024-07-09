@@ -20,7 +20,7 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-const reflectionServiceName = "grpc.reflection.v1alpha.ServerReflection"
+const reflectionServiceName = "grpc.reflection.v1"
 
 var ErrTLSHandshakeFailed = errors.New("TLS handshake failed")
 
@@ -61,7 +61,7 @@ func (c *client) ListPackages() ([]*desc.FileDescriptor, error) {
 
 	var fds []*desc.FileDescriptor
 	for _, s := range ssvcs {
-		if s == reflectionServiceName {
+		if strings.Contains(s, reflectionServiceName) {
 			continue
 		}
 		svc, err := c.client.ResolveService(s)
@@ -134,7 +134,7 @@ func (c *clientV2) ListPackages() (descriptors []*desc.FileDescriptor, err error
 				go func() {
 					// TODO stop signal when this for ends
 					for _, svc := range res.GetListServicesResponse().Service {
-						if svc.GetName() == reflectionServiceName {
+						if strings.Contains(svc.GetName(), reflectionServiceName) {
 							continue
 						}
 						files, err := filebus.GetFilesForSymbol(svc.GetName())

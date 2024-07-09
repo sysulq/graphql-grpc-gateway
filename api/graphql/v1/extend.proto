@@ -1,7 +1,8 @@
 syntax = "proto3";
-package api.graphql.v1;
 
-option go_package = "github.com/sysulq/graphql-gateway/pkg/graphqlv1";
+package graphql.v1;
+
+option go_package = "github.com/sysulq/graphql-gateway/api/graphql/v1;graphqlv1";
 
 import "google/protobuf/descriptor.proto";
 

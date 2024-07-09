@@ -23,14 +23,12 @@ type server struct {
 }
 
 func (ins *server) Init(ctx context.Context) error {
-	if ins.config.Get().Config().Pyroscope != nil {
-		profiler, err := ins.config.Get().Config().Pyroscope.Build(ctx)
-		if err != nil {
-			return err
-		}
-
-		ins.profiler = profiler
+	profiler, err := ins.config.Get().Config().Pyroscope.Build(ctx)
+	if err != nil {
+		return err
 	}
+
+	ins.profiler = profiler
 
 	return nil
 }
@@ -60,16 +58,12 @@ func (s *server) BuildServer(ctx context.Context) (http.Handler, error) {
 	mux.HandleFunc("/query", g.GraphQLHandler)
 
 	cfg := s.config.Get().Config()
-	if cfg.Playground != nil && *cfg.Playground {
+	if cfg.Playground {
 		mux.HandleFunc("/playground", g.PlaygroundHandler)
 	}
 
 	var handler http.Handler = mux
 	handler = otelhttp.NewMiddleware("graphql-gateway")(handler)
 
-	if cfg.Cors == nil {
-		return cors.Default().Handler(handler), nil
-	}
-
-	return cors.New(*cfg.Cors).Handler(handler), nil
+	return cors.New(cfg.Cors).Handler(handler), nil
 }

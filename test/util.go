@@ -10,7 +10,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pmezard/go-difflib/difflib"
-	pb "github.com/sysulq/graphql-gateway/test/testdata"
+	pb "github.com/sysulq/graphql-gateway/api/test"
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/formatter"
 	"google.golang.org/grpc"
