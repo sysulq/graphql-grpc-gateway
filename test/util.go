@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pmezard/go-difflib/difflib"
 	pb "github.com/sysulq/graphql-gateway/api/test"
@@ -15,7 +16,9 @@ import (
 	"github.com/vektah/gqlparser/v2/formatter"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 type (
@@ -94,8 +97,35 @@ type constructsServiceMock struct {
 	pb.ConstructsServer
 }
 
+// FilterMessageFields 根据 FieldMask 过滤并返回指定字段的消息
+func FilterMessageFields(original proto.Message, mask *fieldmaskpb.FieldMask) proto.Message {
+	if mask == nil {
+		return original
+	}
+
+	// 创建一个新的空消息，用于存储筛选后的字段
+	filtered := proto.Clone(original)
+	filteredReflect := proto.MessageReflect(filtered)
+
+	maskMap := make(map[string]struct{})
+	for _, path := range mask.GetPaths() {
+		maskMap[path] = struct{}{}
+	}
+
+	// 清空不在mask的字段
+	filteredReflect.Range(func(fd protoreflect.FieldDescriptor, _ protoreflect.Value) bool {
+		if _, ok := maskMap[fd.JSONName()]; !ok {
+			filteredReflect.Clear(fd)
+		}
+		return true
+	})
+
+	return filtered
+}
+
 func (c constructsServiceMock) Scalars_(ctx context.Context, scalars *pb.Scalars) (*pb.Scalars, error) {
-	return scalars, nil
+	newScalers := FilterMessageFields(scalars, scalars.GetPaths())
+	return newScalers.(*pb.Scalars), nil
 }
 
 func (c constructsServiceMock) Repeated_(ctx context.Context, repeated *pb.Repeated) (*pb.Repeated, error) {

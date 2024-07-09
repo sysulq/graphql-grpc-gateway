@@ -18,6 +18,7 @@ import (
 	"github.com/nautilus/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/sysulq/graphql-gateway/pkg/generator"
 )
@@ -97,6 +98,27 @@ func (q *queryer) resolveMutation(ctx context.Context, selection ast.SelectionSe
 		}
 	}
 	return
+}
+
+func getSelectionSet(selections ast.SelectionSet, prefix string) []string {
+	var fields []string
+	for _, selection := range selections {
+		field, ok := selection.(*ast.Field)
+		if !ok {
+			continue
+		}
+		fullName := field.Name
+		if prefix != "" {
+			fullName = fmt.Sprintf("%s.%s", prefix, field.Name)
+		}
+		if len(field.SelectionSet) > 0 {
+			subFields := getSelectionSet(field.SelectionSet, fullName)
+			fields = append(fields, subFields...)
+		} else {
+			fields = append(fields, fullName)
+		}
+	}
+	return fields
 }
 
 func (q *queryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, res anyMap, vars map[string]interface{}) (err error) {
@@ -199,6 +221,7 @@ func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars ma
 		anyObj = obj
 		inputMsg = dynamic.NewMessage(anyObj)
 	}
+
 	for _, arg := range inArg.Value.Children {
 		val, err := arg.Value.Value(vars)
 		if err != nil {
@@ -223,6 +246,16 @@ func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars ma
 			inputMsg.AddRepeatedField(reqDesc, val)
 		} else {
 			inputMsg.SetField(reqDesc, val)
+		}
+	}
+
+	// set fieldmask based on the selection set
+	for _, v := range inputMsg.GetKnownFields() {
+		if v.GetMessageType() != nil && v.UnwrapField().Message().FullName() == "google.protobuf.FieldMask" {
+			fm := &fieldmaskpb.FieldMask{
+				Paths: getSelectionSet(field.SelectionSet, ""),
+			}
+			inputMsg.SetField(v, fm)
 		}
 	}
 
