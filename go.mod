@@ -9,8 +9,8 @@ require (
 	github.com/go-kod/kod/ext v0.11.0
 	github.com/golang/protobuf v1.5.4
 	github.com/grafana/pyroscope-go v1.1.1
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jhump/protoreflect v1.16.0
-	github.com/k0kubun/pp v2.4.0+incompatible
 	github.com/nautilus/gateway v0.3.17
 	github.com/nautilus/graphql v0.0.25
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
@@ -44,12 +44,9 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/klauspost/compress v1.17.3 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240513124658-fba389f38bae // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
