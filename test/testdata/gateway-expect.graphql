@@ -53,12 +53,6 @@ input DataInput {
 	bars: String
 	str: String
 }
-type FieldMask {
-	paths: [String!]
-}
-input FieldMaskInput {
-	paths: [String!]
-}
 type Foo {
 	param1: String
 	param2: String
@@ -449,7 +443,6 @@ type Scalars {
 	bool: Boolean
 	stringX: String
 	bytes: Bytes
-	paths: FieldMask
 }
 input ScalarsInput {
 	double: Float
@@ -467,7 +460,6 @@ input ScalarsInput {
 	bool: Boolean
 	stringX: String
 	bytes: Bytes
-	paths: FieldMaskInput
 }
 type Subscription {
 	serviceSubscribe(in: DataInput): Data

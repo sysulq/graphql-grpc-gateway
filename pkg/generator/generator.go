@@ -259,9 +259,10 @@ func (s *SchemaDescriptor) uniqueName(d desc.Descriptor, input bool) (name strin
 
 func (s *SchemaDescriptor) CreateObjects(d desc.Descriptor, input bool) (obj *ObjectDescriptor, err error) {
 	// the case if trying to resolve a primitive as a object. In this case we just return nil
-	if d == nil {
+	if d == nil || d.GetName() == "FieldMask" {
 		return
 	}
+
 	if obj, ok := s.createdObjects[createdObjectKey{d, input}]; ok {
 		return obj, nil
 	}
@@ -347,6 +348,9 @@ func (s *SchemaDescriptor) CreateObjects(d desc.Descriptor, input bool) (obj *Ob
 				return nil, err
 			}
 			if fieldObj == nil && df.GetMessageType() != nil {
+				continue
+			}
+			if df.GetMessageType() != nil && df.UnwrapField().Message().FullName() == "google.protobuf.FieldMask" {
 				continue
 			}
 			f, err := s.createField(df, fieldObj)
