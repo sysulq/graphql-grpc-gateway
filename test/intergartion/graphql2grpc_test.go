@@ -78,6 +78,7 @@ func TestGraphql2Grpc(t *testing.T) {
 
 			req := httptest.NewRequest("POST", "/query", bytes.NewBuffer(payload))
 			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer token")
 
 			handler.ServeHTTP(record, req)
 
