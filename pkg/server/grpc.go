@@ -2,12 +2,14 @@ package server
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
 	"github.com/sysulq/graphql-gateway/pkg/protoparser"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -26,6 +28,8 @@ type Grpc struct {
 
 type caller struct {
 	kod.Implements[Caller]
+
+	singleflight singleflight.Group
 
 	config      kod.Ref[ConfigComponent]
 	serviceStub map[string]grpcdynamic.Stub
@@ -96,6 +100,22 @@ func (c *caller) GetDescs() []*desc.FileDescriptor {
 }
 
 func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error) {
+	if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
+		hash := Hash64.Get()
+		defer Hash64.Put(hash)
+		// generate hash based on rpc pointer
+		hash.Sum([]byte(rpc.GetFullyQualifiedName()))
+		hash.Sum([]byte(message.String()))
+		sum := hash.Sum64()
+		key := strconv.FormatUint(sum, 10)
+
+		res, err, _ := c.singleflight.Do(key, func() (interface{}, error) {
+			return c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
+		})
+
+		return res.(proto.Message), err
+	}
+
 	res, err := c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
 	return res, err
 }
@@ -105,3 +125,5 @@ func (c *caller) Interceptors() []interceptor.Interceptor {
 		kcircuitbreaker.Interceptor(),
 	}
 }
+
+var allowSingleFlightKey struct{}

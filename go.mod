@@ -5,6 +5,7 @@ go 1.22.4
 require (
 	dario.cat/mergo v1.0.0
 	github.com/99designs/gqlgen v0.17.49
+	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/go-kod/kod v0.11.0
 	github.com/go-kod/kod/ext v0.11.0
 	github.com/golang/protobuf v1.5.4
@@ -31,7 +32,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.10.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dominikbraun/graph v0.23.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
