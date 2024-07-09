@@ -96,12 +96,7 @@ func (c *caller) GetDescs() []*desc.FileDescriptor {
 }
 
 func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error) {
-	// startTime := time.Now()
-	// md := metadata.New(nil)
-	// otelgrpc.Extract(ctx, &md)
-	// ctx = metadata.NewOutgoingContext(ctx, md)
 	res, err := c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
-	// log.Printf("[INFO] grpc call %q took: %fms", rpc.GetFullyQualifiedName(), float64(time.Since(startTime))/float64(time.Millisecond))
 	return res, err
 }
 
