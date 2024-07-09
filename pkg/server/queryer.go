@@ -48,6 +48,7 @@ func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result i
 		}
 		switch op.Operation {
 		case ast.Query:
+			// we allow single flight for queries right now
 			ctx = context.WithValue(ctx, allowSingleFlightKey, true)
 			err = q.resolveQuery(ctx, selection, res, input.Variables)
 
