@@ -8,6 +8,8 @@ import (
 	"reflect"
 
 	"github.com/go-kod/kod"
+	"github.com/go-kod/kod/interceptor"
+	"github.com/go-kod/kod/interceptor/kratelimit"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/golang/protobuf/ptypes"
@@ -27,6 +29,12 @@ type queryer struct {
 
 	registry kod.Ref[Registry]
 	caller   kod.Ref[Caller]
+}
+
+func (q *queryer) Interceptors() []interceptor.Interceptor {
+	return []interceptor.Interceptor{
+		kratelimit.Interceptor(),
+	}
 }
 
 func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error {

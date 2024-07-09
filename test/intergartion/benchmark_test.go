@@ -43,7 +43,7 @@ func BenchmarkGateway(b *testing.B) {
 	}).AnyTimes()
 
 	kod.RunTest(b, func(ctx context.Context, s server.ServerComponent) {
-		handler, err := s.BuildServer(ctx)
+		handler, err := s.BuildServer()
 		require.Nil(b, err)
 		payload, err := json.Marshal(map[string]interface{}{
 			"query":         constructsScalarsQuery,

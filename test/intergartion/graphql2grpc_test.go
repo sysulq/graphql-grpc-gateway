@@ -64,7 +64,7 @@ func TestGraphql2Grpc(t *testing.T) {
 
 		for _, c := range cases {
 
-			handler, err := s.BuildServer(ctx)
+			handler, err := s.BuildServer()
 			require.Nil(t, err)
 
 			record := httptest.NewRecorder()

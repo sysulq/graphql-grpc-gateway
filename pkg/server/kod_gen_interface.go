@@ -20,7 +20,7 @@ type ConfigComponent interface {
 
 // server is a component that implements ServerComponent.
 type ServerComponent interface {
-	BuildServer(ctx context.Context) (http.Handler, error)
+	BuildServer() (http.Handler, error)
 }
 
 // caller is a component that implements Caller.

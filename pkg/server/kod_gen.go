@@ -277,26 +277,8 @@ type serverComponent_local_stub struct {
 // Check that serverComponent_local_stub implements the ServerComponent interface.
 var _ ServerComponent = (*serverComponent_local_stub)(nil)
 
-func (s serverComponent_local_stub) BuildServer(ctx context.Context) (r0 http.Handler, err error) {
-
-	if s.interceptor == nil {
-		r0, err = s.impl.BuildServer(ctx)
-		return
-	}
-
-	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
-		r0, err = s.impl.BuildServer(ctx)
-		res[0] = r0
-		return
-	}
-
-	info := interceptor.CallInfo{
-		Impl:       s.impl,
-		Component:  s.name,
-		FullMethod: "github.com/sysulq/graphql-gateway/pkg/server/ServerComponent.BuildServer",
-		Method:     "BuildServer",
-	}
-
-	err = s.interceptor(ctx, info, []any{}, []any{r0}, call)
+func (s serverComponent_local_stub) BuildServer() (r0 http.Handler, err error) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0, err = s.impl.BuildServer()
 	return
 }

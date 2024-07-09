@@ -47,7 +47,7 @@ func (ins *server) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func (s *server) BuildServer(ctx context.Context) (http.Handler, error) {
+func (s *server) BuildServer() (http.Handler, error) {
 	queryFactory := gateway.QueryerFactory(func(ctx *gateway.PlanningContext, url string) graphql.Queryer {
 		return s.queryer.Get()
 	})

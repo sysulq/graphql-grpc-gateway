@@ -51,7 +51,7 @@ func TestE2E(t *testing.T) {
 				constructsServerCh <- l.Addr()
 			}()
 
-			handler, err := s.BuildServer(ctx)
+			handler, err := s.BuildServer()
 			require.Nil(t, err)
 			http.Serve(l, handler)
 		}()

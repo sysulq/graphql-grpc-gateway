@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/go-kod/kod"
+	"github.com/go-kod/kod/interceptor"
+	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
 	"github.com/sysulq/graphql-gateway/pkg/protoparser"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc/credentials"
@@ -101,4 +103,10 @@ func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message p
 	res, err := c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
 	// log.Printf("[INFO] grpc call %q took: %fms", rpc.GetFullyQualifiedName(), float64(time.Since(startTime))/float64(time.Millisecond))
 	return res, err
+}
+
+func (c *caller) Interceptors() []interceptor.Interceptor {
+	return []interceptor.Interceptor{
+		kcircuitbreaker.Interceptor(),
+	}
 }

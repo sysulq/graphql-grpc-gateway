@@ -83,18 +83,18 @@ func (m *MockServerComponent) EXPECT() *MockServerComponentMockRecorder {
 }
 
 // BuildServer mocks base method.
-func (m *MockServerComponent) BuildServer(ctx context.Context) (http.Handler, error) {
+func (m *MockServerComponent) BuildServer() (http.Handler, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BuildServer", ctx)
+	ret := m.ctrl.Call(m, "BuildServer")
 	ret0, _ := ret[0].(http.Handler)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // BuildServer indicates an expected call of BuildServer.
-func (mr *MockServerComponentMockRecorder) BuildServer(ctx any) *gomock.Call {
+func (mr *MockServerComponentMockRecorder) BuildServer() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildServer", reflect.TypeOf((*MockServerComponent)(nil).BuildServer), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildServer", reflect.TypeOf((*MockServerComponent)(nil).BuildServer))
 }
 
 // MockCaller is a mock of Caller interface.
