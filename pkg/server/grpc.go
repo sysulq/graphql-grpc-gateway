@@ -103,9 +103,15 @@ func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message p
 	if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
 		hash := Hash64.Get()
 		defer Hash64.Put(hash)
+
+		msg, err := proto.Marshal(message)
+		if err != nil {
+			return nil, err
+		}
+
 		// generate hash based on rpc pointer
 		hash.Sum([]byte(rpc.GetFullyQualifiedName()))
-		hash.Sum([]byte(message.String()))
+		hash.Sum(msg)
 		sum := hash.Sum64()
 		key := strconv.FormatUint(sum, 10)
 
