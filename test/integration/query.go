@@ -5,6 +5,43 @@ type (
 	l = []interface{}
 )
 
+const contructsMultipleQuery = `
+query {
+  queryQuery1(in: {
+    stringX: "Some String Value", 
+    foo: {                         
+      param1: "Foo Parameter Value"
+    },
+    double: [1.23, 4.56],           
+    string2: "Another String Value"  
+    foo2: {                         
+      param1: "Foo2 Parameter Value"
+    },
+    double2: [7.89],                  
+    bars: "BAR2",                    
+    str: "Yet another string"      
+  }) {
+   stringX
+  }，
+  queryQuery2(in: {
+    stringX: "Some String Value", 
+    foo: {                         
+      param1: "Foo Parameter Value"
+    },
+    double: [1.23, 4.56],           
+    string2: "Another String Value"  
+    foo2: {                         
+      param1: "Foo2 Parameter Value"
+    },
+    double2: [7.89],                  
+    bars: "BAR2",                    
+    str: "Yet another string"        
+  }) {
+   stringX
+  }，
+}
+`
+
 const constructsScalarsQuery = `
 mutation {
   constructsScalars_(in: {

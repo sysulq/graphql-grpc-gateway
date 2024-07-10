@@ -18,18 +18,18 @@ import (
 var testGatewayExpectedSchema []byte
 
 func TestGraphqlSchema(t *testing.T) {
-	infos := test.SetupDeps()
+	infos := test.SetupDeps(t)
 
 	mockConfig := server.NewMockConfigComponent(gomock.NewController(t))
 	mockConfig.EXPECT().Config().Return(&server.Config{
 		Grpc: server.Grpc{
 			Services: []*server.Service{
 				{
-					Address:    infos.ConstructsServerAddr,
+					Address:    infos.ConstructsServerAddr.Addr().String(),
 					Reflection: true,
 				},
 				{
-					Address:    infos.OptionsServerAddr,
+					Address:    infos.OptionsServerAddr.Addr().String(),
 					Reflection: true,
 				},
 			},

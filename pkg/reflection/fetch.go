@@ -12,15 +12,19 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
-	gr "github.com/jhump/protoreflect/grpcreflect"
+	"github.com/jhump/protoreflect/grpcreflect"
 	"google.golang.org/grpc"
-	grpcreflect "google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
+	"google.golang.org/grpc/reflection/grpc_reflection_v1"
+	"google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-const reflectionServiceName = "grpc.reflection.v1"
+func isReflectionServiceName(name string) bool {
+	return name == grpc_reflection_v1.ServerReflection_ServiceDesc.ServiceName ||
+		name == grpc_reflection_v1alpha.ServerReflection_ServiceDesc.ServiceName
+}
 
 var ErrTLSHandshakeFailed = errors.New("TLS handshake failed")
 
@@ -33,13 +37,13 @@ type Client interface {
 }
 
 type client struct {
-	client *gr.Client
+	client *grpcreflect.Client
 }
 
 // NewClient returns an instance of gRPC reflection client for gRPC protocol.
 func NewClient(conn grpc.ClientConnInterface) Client {
 	return &client{
-		client: gr.NewClientAuto(context.Background(), conn),
+		client: grpcreflect.NewClientAuto(context.Background(), conn),
 	}
 }
 
@@ -61,7 +65,7 @@ func (c *client) ListPackages() ([]*desc.FileDescriptor, error) {
 
 	var fds []*desc.FileDescriptor
 	for _, s := range ssvcs {
-		if strings.Contains(s, reflectionServiceName) {
+		if isReflectionServiceName(s) {
 			continue
 		}
 		svc, err := c.client.ResolveService(s)
@@ -80,11 +84,11 @@ func (c *client) Reset() {
 }
 
 func NewClientWithImportsResolver(conn grpc.ClientConnInterface) Client {
-	return &clientV2{client: grpcreflect.NewServerReflectionClient(conn), fileMap: map[*descriptorpb.FileDescriptorProto]struct{}{}, mu: &sync.RWMutex{}}
+	return &clientV2{client: grpc_reflection_v1.NewServerReflectionClient(conn), fileMap: map[*descriptorpb.FileDescriptorProto]struct{}{}, mu: &sync.RWMutex{}}
 }
 
 type clientV2 struct {
-	client  grpcreflect.ServerReflectionClient
+	client  grpc_reflection_v1.ServerReflectionClient
 	fileMap map[*descriptorpb.FileDescriptorProto]struct{}
 	mu      *sync.RWMutex
 }
@@ -95,8 +99,8 @@ func (c *clientV2) ListPackages() (descriptors []*desc.FileDescriptor, err error
 	if err != nil {
 		return nil, err
 	}
-	err = stream.Send(&grpcreflect.ServerReflectionRequest{
-		MessageRequest: &grpcreflect.ServerReflectionRequest_ListServices{
+	err = stream.Send(&grpc_reflection_v1.ServerReflectionRequest{
+		MessageRequest: &grpc_reflection_v1.ServerReflectionRequest_ListServices{
 			ListServices: "*",
 		},
 	})
@@ -134,7 +138,7 @@ func (c *clientV2) ListPackages() (descriptors []*desc.FileDescriptor, err error
 				go func() {
 					// TODO stop signal when this for ends
 					for _, svc := range res.GetListServicesResponse().Service {
-						if strings.Contains(svc.GetName(), reflectionServiceName) {
+						if isReflectionServiceName(svc.GetName()) {
 							continue
 						}
 						files, err := filebus.GetFilesForSymbol(svc.GetName())
@@ -150,7 +154,7 @@ func (c *clientV2) ListPackages() (descriptors []*desc.FileDescriptor, err error
 						}
 					}
 
-					close(errCh)
+					errCh <- nil
 				}()
 				continue
 			}
@@ -164,26 +168,24 @@ func (c *clientV2) ListPackages() (descriptors []*desc.FileDescriptor, err error
 			}
 		}
 	}()
-	select {
-	case err, ok := <-errCh:
-		if !ok {
-			var files []*descriptorpb.FileDescriptorProto
-			c.mu.RLock()
-			for f := range c.fileMap {
-				files = append(files, f)
-			}
-			c.mu.RUnlock()
-			fm, err := desc.CreateFileDescriptors(files)
-			if err != nil {
-				return nil, err
-			}
-			for _, f := range fm {
-				descriptors = append(descriptors, f)
-			}
-			return descriptors, nil
+	err, ok := <-errCh
+	if ok && err == nil {
+		var files []*descriptorpb.FileDescriptorProto
+		c.mu.RLock()
+		for f := range c.fileMap {
+			files = append(files, f)
 		}
-		return nil, err
+		c.mu.RUnlock()
+		fm, err := desc.CreateFileDescriptors(files)
+		if err != nil {
+			return nil, err
+		}
+		for _, f := range fm {
+			descriptors = append(descriptors, f)
+		}
+		return descriptors, nil
 	}
+	return nil, err
 }
 
 func (c *clientV2) processFile(file *descriptorpb.FileDescriptorProto, filebus FileBus) error {
@@ -285,13 +287,13 @@ type FileBus interface {
 	GetFilesForExtension(symbol string, extensionNr int32) (files []*descriptorpb.FileDescriptorProto, err error)
 }
 
-func NewFileBus() (chan *grpcreflect.ServerReflectionRequest, chan *grpcreflect.ServerReflectionResponse, FileBus) {
-	request := make(chan *grpcreflect.ServerReflectionRequest)
-	response := make(chan *grpcreflect.ServerReflectionResponse)
+func NewFileBus() (chan *grpc_reflection_v1.ServerReflectionRequest, chan *grpc_reflection_v1.ServerReflectionResponse, FileBus) {
+	request := make(chan *grpc_reflection_v1.ServerReflectionRequest)
+	response := make(chan *grpc_reflection_v1.ServerReflectionResponse)
 	fb := &fileBus{
 		symbols:       map[string]*descriptorpb.FileDescriptorProto{},
 		extensions:    map[extensionKey]*descriptorpb.FileDescriptorProto{},
-		subscriptions: map[*grpcreflect.ServerReflectionRequest]chan *grpcreflect.ServerReflectionResponse{},
+		subscriptions: map[*grpc_reflection_v1.ServerReflectionRequest]chan *grpc_reflection_v1.ServerReflectionResponse{},
 		request:       request,
 	}
 	go func() {
@@ -317,12 +319,12 @@ func NewFileBus() (chan *grpcreflect.ServerReflectionRequest, chan *grpcreflect.
 type fileBus struct {
 	symbols       map[string]*descriptorpb.FileDescriptorProto
 	extensions    map[extensionKey]*descriptorpb.FileDescriptorProto
-	subscriptions map[*grpcreflect.ServerReflectionRequest]chan *grpcreflect.ServerReflectionResponse
-	request       chan *grpcreflect.ServerReflectionRequest
+	subscriptions map[*grpc_reflection_v1.ServerReflectionRequest]chan *grpc_reflection_v1.ServerReflectionResponse
+	request       chan *grpc_reflection_v1.ServerReflectionRequest
 }
 
-func (f *fileBus) getFiles(request *grpcreflect.ServerReflectionRequest) (files []*descriptorpb.FileDescriptorProto, err error) {
-	subscription := make(chan *grpcreflect.ServerReflectionResponse)
+func (f *fileBus) getFiles(request *grpc_reflection_v1.ServerReflectionRequest) (files []*descriptorpb.FileDescriptorProto, err error) {
+	subscription := make(chan *grpc_reflection_v1.ServerReflectionResponse)
 	f.subscriptions[request] = subscription
 	f.request <- request
 	ctx := context.Background()
@@ -362,7 +364,7 @@ func (f *fileBus) GetFilesForSymbol(symbol string) (files []*descriptorpb.FileDe
 		return []*descriptorpb.FileDescriptorProto{file}, nil
 	}
 	defer func() { f.addToCache(files) }()
-	request := &grpcreflect.ServerReflectionRequest{MessageRequest: &grpcreflect.ServerReflectionRequest_FileContainingSymbol{
+	request := &grpc_reflection_v1.ServerReflectionRequest{MessageRequest: &grpc_reflection_v1.ServerReflectionRequest_FileContainingSymbol{
 		FileContainingSymbol: symbol,
 	}}
 	return f.getFiles(request)
@@ -375,8 +377,8 @@ func (f *fileBus) GetFilesForExtension(symbol string, extensionNr int32) (files 
 		return []*descriptorpb.FileDescriptorProto{file}, nil
 	}
 	defer func() { f.addToCache(files) }()
-	request := &grpcreflect.ServerReflectionRequest{MessageRequest: &grpcreflect.ServerReflectionRequest_FileContainingExtension{
-		FileContainingExtension: &grpcreflect.ExtensionRequest{
+	request := &grpc_reflection_v1.ServerReflectionRequest{MessageRequest: &grpc_reflection_v1.ServerReflectionRequest_FileContainingExtension{
+		FileContainingExtension: &grpc_reflection_v1.ExtensionRequest{
 			ContainingType:  symbol,
 			ExtensionNumber: extensionNr,
 		},

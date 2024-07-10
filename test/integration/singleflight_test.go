@@ -12,7 +12,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestGraphql2Grpc(t *testing.T) {
+func TestSingleFlight(t *testing.T) {
 	infos := test.SetupDeps(t)
 
 	mockConfig := server.NewMockConfigComponent(gomock.NewController(t))
@@ -35,45 +35,16 @@ func TestGraphql2Grpc(t *testing.T) {
 		gatewayUrl := test.SetupGateway(t, s)
 		querier := graphql.NewSingleRequestQueryer(gatewayUrl)
 
-		cases := []struct {
-			name         string
-			query        string
-			wantResponse interface{}
-		}{
-			{
-				name:         "Mutation constructs scalars",
-				query:        constructsScalarsQuery,
-				wantResponse: constructsScalarsResponse,
-			}, {
-				name:         "Mutation constructs any",
-				query:        constructsAnyQuery,
-				wantResponse: constructsAnyResponse,
-			}, {
-				name:         "Mutation constructs maps",
-				query:        constructsMapsQuery,
-				wantResponse: constructsMapsResponse,
-			}, {
-				name:         "Mutation constructs repeated",
-				query:        constructsRepeatedQuery,
-				wantResponse: constructsRepeatedResponse,
-			}, {
-				name:         "Mutation constructs oneofs",
-				query:        constructsOneofsQuery,
-				wantResponse: constructsOneofsResponse,
-			},
-		}
-
-		for _, tc := range cases {
-
+		t.Run("singleflight", func(t *testing.T) {
 			recv := map[string]interface{}{}
 			if err := querier.Query(context.Background(), &graphql.QueryInput{
-				Query: tc.query,
+				Query: contructsMultipleQuery,
 			}, &recv); err != nil {
 				t.Fatal(err)
 			}
-			if !reflect.DeepEqual(recv, tc.wantResponse) {
-				t.Errorf("mutation failed: expected: %s got: %s", tc.wantResponse, recv)
+			if !reflect.DeepEqual(recv, constructsAnyResponse) {
+				t.Errorf("mutation failed: expected: %s got: %s", constructsAnyResponse, recv)
 			}
-		}
+		})
 	}, kod.WithFakes(kod.Fake[server.ConfigComponent](mockConfig)))
 }

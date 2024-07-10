@@ -20,18 +20,18 @@ func BenchmarkGateway(b *testing.B) {
 	b.Setenv("OTEL_METRICS_EXPORTER", "none")
 	b.Setenv("OTEL_LOGS_EXPORTER", "none")
 
-	infos := test.SetupDeps()
+	infos := test.SetupDeps(b)
 
 	mockConfig := server.NewMockConfigComponent(gomock.NewController(b))
 	mockConfig.EXPECT().Config().Return(&server.Config{
 		Grpc: server.Grpc{
 			Services: []*server.Service{
 				{
-					Address:    infos.ConstructsServerAddr,
+					Address:    infos.ConstructsServerAddr.Addr().String(),
 					Reflection: true,
 				},
 				{
-					Address:    infos.OptionsServerAddr,
+					Address:    infos.OptionsServerAddr.Addr().String(),
 					Reflection: true,
 				},
 			},

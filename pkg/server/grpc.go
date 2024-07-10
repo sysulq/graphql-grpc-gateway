@@ -118,8 +118,11 @@ func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message p
 		res, err, _ := c.singleflight.Do(key, func() (interface{}, error) {
 			return c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
 		})
+		if err != nil {
+			return nil, err
+		}
 
-		return res.(proto.Message), err
+		return res.(proto.Message), nil
 	}
 
 	res, err := c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"testing"
@@ -53,8 +52,10 @@ func CompareGraphql(t *testing.T, got, expect *ast.Schema) {
 }
 
 type DepsInfo struct {
-	OptionsServerAddr    string
-	ConstructsServerAddr string
+	OptionsServerAddr    net.Listener
+	ConstructsServerAddr net.Listener
+	OptionServer         *grpc.Server
+	ConstructServer      *grpc.Server
 }
 
 func SetupGateway(t testing.TB, s server.ServerComponent) string {
@@ -77,43 +78,45 @@ func SetupGateway(t testing.TB, s server.ServerComponent) string {
 	return gatewayUrl
 }
 
-func SetupDeps() DepsInfo {
+func SetupDeps(t testing.TB) DepsInfo {
 	var (
-		optionsServerCh    = make(chan string)
-		constructsServerCh = make(chan string)
+		optionsServerCh    = make(chan net.Listener)
+		constructsServerCh = make(chan net.Listener)
+		optionsServer      *grpc.Server
+		constructsServer   *grpc.Server
 	)
 	go func() {
 		l, err := net.Listen("tcp", "localhost:0")
-		if err != nil {
-			log.Fatal(err)
-		}
+		require.Nil(t, err)
 		go func() {
 			time.Sleep(10 * time.Millisecond)
-			optionsServerCh <- l.Addr().String()
+			optionsServerCh <- l
 		}()
 		s := grpc.NewServer()
 		pb.RegisterServiceServer(s, &optionsServiceMock{})
 		reflection.Register(s)
+		optionsServer = s
 		s.Serve(l)
 	}()
 	go func() {
 		l, err := net.Listen("tcp", "localhost:0")
-		if err != nil {
-			log.Fatal(err)
-		}
+		require.Nil(t, err)
 		go func() {
 			time.Sleep(10 * time.Millisecond)
-			constructsServerCh <- l.Addr().String()
+			constructsServerCh <- l
 		}()
 		s := grpc.NewServer()
 		pb.RegisterConstructsServer(s, constructsServiceMock{})
 		reflection.Register(s)
+		constructsServer = s
 		s.Serve(l)
 	}()
 
 	return DepsInfo{
 		OptionsServerAddr:    <-optionsServerCh,
 		ConstructsServerAddr: <-constructsServerCh,
+		OptionServer:         optionsServer,
+		ConstructServer:      constructsServer,
 	}
 }
 
