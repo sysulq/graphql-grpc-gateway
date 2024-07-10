@@ -1,13 +1,16 @@
-package intergartion
+package integration
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"net/http/httptest"
+	"fmt"
+	"net"
+	"net/http"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/go-kod/kod"
+	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/require"
 	"github.com/sysulq/graphql-gateway/pkg/server"
 	"github.com/sysulq/graphql-gateway/test"
@@ -34,6 +37,24 @@ func TestGraphql2Grpc(t *testing.T) {
 	}).AnyTimes()
 
 	kod.RunTest(t, func(ctx context.Context, s server.ServerComponent) {
+		serverCh := make(chan net.Addr)
+		go func() {
+			l, err := net.Listen("tcp", ":0")
+			require.Nil(t, err)
+			go func() {
+				time.Sleep(10 * time.Millisecond)
+				serverCh <- l.Addr()
+			}()
+
+			handler, err := s.BuildServer()
+			require.Nil(t, err)
+			http.Serve(l, handler)
+		}()
+		gatewayServer := <-serverCh
+
+		gatewayUrl := fmt.Sprintf("http://127.0.0.1:%d/query", gatewayServer.(*net.TCPAddr).Port)
+		querier := graphql.NewSingleRequestQueryer(gatewayUrl)
+
 		cases := []struct {
 			name         string
 			query        string
@@ -62,31 +83,17 @@ func TestGraphql2Grpc(t *testing.T) {
 			},
 		}
 
-		for _, c := range cases {
+		for _, tc := range cases {
 
-			handler, err := s.BuildServer()
-			require.Nil(t, err)
-
-			record := httptest.NewRecorder()
-
-			payload, err := json.Marshal(map[string]interface{}{
-				"query":         c.query,
-				"variables":     map[string]interface{}{},
-				"operationName": "",
-			})
-			require.Nil(t, err)
-
-			req := httptest.NewRequest("POST", "/query", bytes.NewBuffer(payload))
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", "Bearer token")
-
-			handler.ServeHTTP(record, req)
-
-			data := make(map[string]interface{})
-			err = json.Unmarshal(record.Body.Bytes(), &data)
-			require.Nil(t, err)
-
-			require.Equal(t, c.wantResponse, data["data"])
+			recv := map[string]interface{}{}
+			if err := querier.Query(context.Background(), &graphql.QueryInput{
+				Query: tc.query,
+			}, &recv); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(recv, tc.wantResponse) {
+				t.Errorf("mutation failed: expected: %s got: %s", tc.wantResponse, recv)
+			}
 		}
 	}, kod.WithFakes(kod.Fake[server.ConfigComponent](mockConfig)))
 }

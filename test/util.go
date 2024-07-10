@@ -3,15 +3,19 @@ package test
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"testing"
 	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pmezard/go-difflib/difflib"
+	"github.com/stretchr/testify/require"
 	pb "github.com/sysulq/graphql-gateway/api/test"
+	"github.com/sysulq/graphql-gateway/pkg/server"
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/formatter"
 	"google.golang.org/grpc"
@@ -26,7 +30,7 @@ type (
 	l = []interface{}
 )
 
-func compareGraphql(t *testing.T, got, expect *ast.Schema) {
+func CompareGraphql(t *testing.T, got, expect *ast.Schema) {
 	t.Helper()
 
 	expectedGraphql := &bytes.Buffer{}
@@ -51,6 +55,26 @@ func compareGraphql(t *testing.T, got, expect *ast.Schema) {
 type DepsInfo struct {
 	OptionsServerAddr    string
 	ConstructsServerAddr string
+}
+
+func SetupGateway(t testing.TB, s server.ServerComponent) string {
+	serverCh := make(chan net.Addr)
+	go func() {
+		l, err := net.Listen("tcp", ":0")
+		require.Nil(t, err)
+		go func() {
+			time.Sleep(10 * time.Millisecond)
+			serverCh <- l.Addr()
+		}()
+
+		handler, err := s.BuildServer()
+		require.Nil(t, err)
+		http.Serve(l, handler)
+	}()
+	gatewayServer := <-serverCh
+
+	gatewayUrl := fmt.Sprintf("http://127.0.0.1:%d/query", gatewayServer.(*net.TCPAddr).Port)
+	return gatewayUrl
 }
 
 func SetupDeps() DepsInfo {

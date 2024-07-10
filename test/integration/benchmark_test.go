@@ -1,4 +1,4 @@
-package intergartion
+package integration
 
 import (
 	"bytes"
@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/ext/client/kpyroscope"
 	"github.com/stretchr/testify/require"
 	"github.com/sysulq/graphql-gateway/pkg/server"
 	"github.com/sysulq/graphql-gateway/test"
@@ -36,9 +35,6 @@ func BenchmarkGateway(b *testing.B) {
 					Reflection: true,
 				},
 			},
-		},
-		Pyroscope: kpyroscope.Config{
-			ServerAddress: "localhost:4040",
 		},
 	}).AnyTimes()
 

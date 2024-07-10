@@ -1,4 +1,4 @@
-package intergartion
+package integration
 
 type (
 	j = map[string]interface{}
