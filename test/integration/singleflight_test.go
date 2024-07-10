@@ -2,11 +2,12 @@ package integration
 
 import (
 	"context"
-	"reflect"
+	"sync"
 	"testing"
 
 	"github.com/go-kod/kod"
 	"github.com/nautilus/graphql"
+	"github.com/stretchr/testify/assert"
 	"github.com/sysulq/graphql-gateway/pkg/server"
 	"github.com/sysulq/graphql-gateway/test"
 	"go.uber.org/mock/gomock"
@@ -35,16 +36,32 @@ func TestSingleFlight(t *testing.T) {
 		gatewayUrl := test.SetupGateway(t, s)
 		querier := graphql.NewSingleRequestQueryer(gatewayUrl)
 
-		t.Run("singleflight", func(t *testing.T) {
+		t.Run("multiple different query", func(t *testing.T) {
 			recv := map[string]interface{}{}
 			if err := querier.Query(context.Background(), &graphql.QueryInput{
 				Query: contructsMultipleQuery,
 			}, &recv); err != nil {
 				t.Fatal(err)
 			}
-			if !reflect.DeepEqual(recv, constructsAnyResponse) {
-				t.Errorf("mutation failed: expected: %s got: %s", constructsAnyResponse, recv)
+			assert.EqualValues(t, constructsMultipleResponse, recv)
+		})
+
+		t.Run("multiple same query", func(t *testing.T) {
+			wg := sync.WaitGroup{}
+			wg.Add(2)
+			for i := 0; i < 2; i++ {
+				go func() {
+					defer wg.Done()
+					recv := map[string]interface{}{}
+					if err := querier.Query(context.Background(), &graphql.QueryInput{
+						Query: contructsMultipleSameQuery,
+					}, &recv); err != nil {
+						t.Fatal(err)
+					}
+					assert.EqualValues(t, constructsMultipleSameResponse, recv)
+				}()
 			}
+			wg.Wait()
 		})
 	}, kod.WithFakes(kod.Fake[server.ConfigComponent](mockConfig)))
 }

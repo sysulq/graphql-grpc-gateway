@@ -40,7 +40,7 @@ func init() {
 	kod.Register(&kod.Registration{
 		Name:      "github.com/sysulq/graphql-gateway/pkg/server/ConfigComponent",
 		Interface: reflect.TypeOf((*ConfigComponent)(nil)).Elem(),
-		Impl:      reflect.TypeOf(Config{}),
+		Impl:      reflect.TypeOf(config{}),
 		Refs:      ``,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
@@ -124,7 +124,7 @@ func init() {
 
 // kod.InstanceOf checks.
 var _ kod.InstanceOf[Caller] = (*caller)(nil)
-var _ kod.InstanceOf[ConfigComponent] = (*Config)(nil)
+var _ kod.InstanceOf[ConfigComponent] = (*config)(nil)
 var _ kod.InstanceOf[Queryer] = (*queryer)(nil)
 var _ kod.InstanceOf[Registry] = (*repository)(nil)
 var _ kod.InstanceOf[ServerComponent] = (*server)(nil)

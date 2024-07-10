@@ -2,14 +2,11 @@ package server
 
 import (
 	"context"
-	"flag"
-	"os"
 
 	"dario.cat/mergo"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/ext/client/kpyroscope"
 	"github.com/rs/cors"
-	"gopkg.in/yaml.v3"
 )
 
 type Tls struct {
@@ -28,9 +25,13 @@ type Service struct {
 	Reflection     bool            `json:"reflection" yaml:"reflection"`
 	ProtoFiles     []string        `json:"proto_files" yaml:"proto_files"`
 }
-type Config struct {
-	kod.Implements[ConfigComponent]
 
+type config struct {
+	kod.Implements[ConfigComponent]
+	kod.WithGlobalConfig[Config]
+}
+
+type Config struct {
 	Pyroscope  kpyroscope.Config `json:"pyroscope" yaml:"pyroscope"`
 	Grpc       Grpc              `json:"grpc" yaml:"grpc"`
 	Cors       cors.Options      `json:"cors" yaml:"cors"`
@@ -39,7 +40,7 @@ type Config struct {
 	Tls        Tls               `json:"tls" yaml:"tls"`
 }
 
-func DefaultConfig() *Config {
+func defaultConfig() *Config {
 	return &Config{
 		Address: ":8080",
 		Pyroscope: kpyroscope.Config{
@@ -47,33 +48,14 @@ func DefaultConfig() *Config {
 		},
 		Cors:       cors.Options{},
 		Grpc:       Grpc{},
-		Playground: []bool{true}[0],
+		Playground: true,
 	}
 }
 
-var configFile = flag.String("config", "", "The config file (if not set will use the default configuration)")
-
-func (c *Config) Init(ctx context.Context) error {
-	flag.Parse()
-
-	cfg := DefaultConfig()
-	if *configFile != "" {
-		f, err := os.Open(*configFile)
-		if err != nil {
-			return err
-		}
-
-		err = yaml.NewDecoder(f).Decode(cfg)
-		if err != nil {
-			return err
-		}
-
-		mergo.Merge(c, cfg)
-	}
-
-	return nil
+func (ins *config) Init(ctx context.Context) error {
+	return mergo.Merge(ins.Config(), defaultConfig())
 }
 
-func (c *Config) Config() *Config {
-	return c
+func (ins *config) Config() *Config {
+	return ins.WithGlobalConfig.Config()
 }

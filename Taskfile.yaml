@@ -13,7 +13,7 @@ env:
 tasks:
   gateway:
     cmds:
-      - go run ./cmd/gateway -config ./example/gateway/config.yaml
+      - KOD_CONFIG=./example/gateway/config.yaml go run ./cmd/gateway
 
   deps:
     deps:

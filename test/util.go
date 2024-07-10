@@ -94,6 +94,7 @@ func SetupDeps(t testing.TB) DepsInfo {
 		}()
 		s := grpc.NewServer()
 		pb.RegisterServiceServer(s, &optionsServiceMock{})
+		pb.RegisterQueryServer(s, &optionsQueryMock{})
 		reflection.Register(s)
 		optionsServer = s
 		s.Serve(l)
@@ -212,6 +213,18 @@ func (o *optionsServiceMock) Ignore(ctx context.Context, data *pb.Data) (*pb.Dat
 }
 
 func (o *optionsServiceMock) Name(ctx context.Context, data *pb.Data) (*pb.Data, error) {
+	return data, nil
+}
+
+type optionsQueryMock struct {
+	pb.UnimplementedQueryServer
+}
+
+func (o *optionsQueryMock) Query1(ctx context.Context, data *pb.Data) (*pb.Data, error) {
+	return data, nil
+}
+
+func (o *optionsQueryMock) Query2(ctx context.Context, data *pb.Data) (*pb.Data, error) {
 	return data, nil
 }
 

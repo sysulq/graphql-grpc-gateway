@@ -110,8 +110,8 @@ func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message p
 		}
 
 		// generate hash based on rpc pointer
-		hash.Sum([]byte(rpc.GetFullyQualifiedName()))
-		hash.Sum(msg)
+		hash.Write([]byte(rpc.GetFullyQualifiedName()))
+		hash.Write(msg)
 		sum := hash.Sum64()
 		key := strconv.FormatUint(sum, 10)
 

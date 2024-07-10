@@ -13,7 +13,7 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
-// Config is a component that implements ConfigComponent.
+// config is a component that implements ConfigComponent.
 type ConfigComponent interface {
 	Config() *Config
 }

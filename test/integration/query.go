@@ -6,9 +6,9 @@ type (
 )
 
 const contructsMultipleQuery = `
-query {
+{
   queryQuery1(in: {
-    stringX: "Some String Value", 
+    stringX: "queryQuery1", 
     foo: {                         
       param1: "Foo Parameter Value"
     },
@@ -22,9 +22,9 @@ query {
     str: "Yet another string"      
   }) {
    stringX
-  }，
+  },
   queryQuery2(in: {
-    stringX: "Some String Value", 
+    stringX: "queryQuery2", 
     foo: {                         
       param1: "Foo Parameter Value"
     },
@@ -38,9 +38,61 @@ query {
     str: "Yet another string"        
   }) {
    stringX
-  }，
+  }
 }
 `
+
+var constructsMultipleResponse = j{
+	"queryQuery1": j{
+		"stringX": "queryQuery1",
+	},
+	"queryQuery2": j{
+		"stringX": "queryQuery2",
+	},
+}
+
+const contructsMultipleSameQuery = `
+{
+  queryQuery1(in: {
+    stringX: "queryQuery1", 
+    foo: {                         
+      param1: "Foo Parameter Value"
+    },
+    double: [1.23, 4.56],           
+    string2: "Another String Value"  
+    foo2: {                         
+      param1: "Foo2 Parameter Value"
+    },
+    double2: [7.89],                  
+    bars: "BAR2",                    
+    str: "Yet another string"      
+  }) {
+   stringX
+  },
+  queryQuery1(in: {
+    stringX: "queryQuery1", 
+    foo: {                         
+      param1: "Foo Parameter Value"
+    },
+    double: [1.23, 4.56],           
+    string2: "Another String Value"  
+    foo2: {                         
+      param1: "Foo2 Parameter Value"
+    },
+    double2: [7.89],                  
+    bars: "BAR2",                    
+    str: "Yet another string"      
+  }) {
+   stringX
+  },
+}
+`
+
+var constructsMultipleSameResponse = j{
+	"queryQuery1": j{
+		"stringX": "queryQuery1",
+	},
+}
 
 const constructsScalarsQuery = `
 mutation {
