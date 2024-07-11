@@ -3,14 +3,14 @@ package generator
 import (
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
 	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	any "google.golang.org/protobuf/types/known/anypb"
 )
 
 type ObjectDescriptor struct {
 	*ast.Definition
-	desc.Descriptor
+	protoreflect.Descriptor
 
 	types      []*ObjectDescriptor
 	fields     []*FieldDescriptor
@@ -21,8 +21,8 @@ func (o *ObjectDescriptor) AsGraphql() *ast.Definition {
 	return o.Definition
 }
 
-func (o *ObjectDescriptor) uniqueName(f *desc.FieldDescriptor) string {
-	return strings.Title(f.GetName())
+func (o *ObjectDescriptor) uniqueName(f protoreflect.FieldDescriptor) string {
+	return strings.Title(string(f.Name()))
 }
 
 func (o *ObjectDescriptor) IsInput() bool {
@@ -38,24 +38,25 @@ func (o *ObjectDescriptor) GetTypes() []*ObjectDescriptor {
 }
 
 func (o *ObjectDescriptor) IsMessage() bool {
-	_, ok := o.Descriptor.(*desc.MessageDescriptor)
+	_, ok := o.Descriptor.(protoreflect.MessageDescriptor)
 	return ok
 }
 
 // same isEmpty but for mortals
-func IsEmpty(o *desc.MessageDescriptor) bool { return isEmpty(o, NewCallstack()) }
+func IsEmpty(o protoreflect.MessageDescriptor) bool { return isEmpty(o, NewCallstack()) }
 
 // make sure objects are fulled with all objects
-func isEmpty(o *desc.MessageDescriptor, callstack Callstack) bool {
+func isEmpty(o protoreflect.MessageDescriptor, callstack Callstack) bool {
 	callstack.Push(o)
 	defer callstack.Pop(o)
 
-	if len(o.GetFields()) == 0 {
+	if o == nil {
 		return true
 	}
-	for _, f := range o.GetFields() {
-		objType := f.GetMessageType()
-		if objType == nil {
+	for i := 0; i < o.Fields().Len(); i++ {
+		f := o.Fields().Get(i)
+		objType := f.Message()
+		if objType != nil {
 			return false
 		}
 
@@ -72,6 +73,6 @@ func isEmpty(o *desc.MessageDescriptor, callstack Callstack) bool {
 }
 
 // TODO maybe not compare by strings
-func IsAny(o *desc.MessageDescriptor) bool {
-	return string((&any.Any{}).ProtoReflect().Descriptor().FullName()) == o.GetFullyQualifiedName()
+func IsAny(o protoreflect.MessageDescriptor) bool {
+	return string((&any.Any{}).ProtoReflect().Descriptor().FullName()) == string(o.FullName())
 }

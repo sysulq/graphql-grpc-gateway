@@ -11,13 +11,14 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/grpcreflect"
+	"github.com/jhump/protoreflect/v2/grpcreflect"
+	"github.com/jhump/protoreflect/v2/protowrap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -33,7 +34,7 @@ type Client interface {
 	// ListPackages lists file descriptors from the gRPC reflection server.
 	// ListPackages returns these errors:
 	//   - ErrTLSHandshakeFailed: TLS misconfig.
-	ListPackages() ([]*desc.FileDescriptor, error)
+	ListPackages() ([]protoreflect.FileDescriptor, error)
 }
 
 type client struct {
@@ -47,7 +48,7 @@ func NewClient(conn grpc.ClientConnInterface) Client {
 	}
 }
 
-func (c *client) ListPackages() ([]*desc.FileDescriptor, error) {
+func (c *client) ListPackages() ([]protoreflect.FileDescriptor, error) {
 	// c.client.FileContainingExtension()
 	ssvcs, err := c.client.ListServices()
 	if err != nil {
@@ -63,18 +64,17 @@ func (c *client) ListPackages() ([]*desc.FileDescriptor, error) {
 		return nil, fmt.Errorf("failed to list services from reflecton enabled gRPC server: %w", err)
 	}
 
-	var fds []*desc.FileDescriptor
+	var fds []protoreflect.FileDescriptor
 	for _, s := range ssvcs {
-		if isReflectionServiceName(s) {
+		if isReflectionServiceName(string(s)) {
 			continue
 		}
-		svc, err := c.client.ResolveService(s)
+		svc, err := c.client.FileContainingSymbol(s)
 		if err != nil {
 			return nil, err
 		}
 
-		fd := svc.GetFile() //.AsFileDescriptorProto()
-		fds = append(fds, fd)
+		fds = append(fds, svc)
 	}
 	return fds, nil
 }
@@ -93,7 +93,7 @@ type clientV2 struct {
 	mu      *sync.RWMutex
 }
 
-func (c *clientV2) ListPackages() (descriptors []*desc.FileDescriptor, err error) {
+func (c *clientV2) ListPackages() (descriptors []protoreflect.FileDescriptor, err error) {
 	ctx := context.Background()
 	stream, err := c.client.ServerReflectionInfo(ctx)
 	if err != nil {
@@ -170,19 +170,17 @@ func (c *clientV2) ListPackages() (descriptors []*desc.FileDescriptor, err error
 	}()
 	err, ok := <-errCh
 	if ok && err == nil {
-		var files []*descriptorpb.FileDescriptorProto
+		var descriptors []protoreflect.FileDescriptor
 		c.mu.RLock()
 		for f := range c.fileMap {
-			files = append(files, f)
+			desc, err := protowrap.FromFileDescriptorProto(f, protoregistry.GlobalFiles)
+			if err != nil {
+				return nil, err
+			}
+			descriptors = append(descriptors, desc)
 		}
 		c.mu.RUnlock()
-		fm, err := desc.CreateFileDescriptors(files)
-		if err != nil {
-			return nil, err
-		}
-		for _, f := range fm {
-			descriptors = append(descriptors, f)
-		}
+
 		return descriptors, nil
 	}
 	return nil, err

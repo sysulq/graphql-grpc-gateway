@@ -11,7 +11,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/require"
 	pb "github.com/sysulq/graphql-gateway/api/test"
 	"github.com/sysulq/graphql-gateway/pkg/server"
@@ -37,18 +36,19 @@ func CompareGraphql(t *testing.T, got, expect *ast.Schema) {
 	formatter.NewFormatter(actualGraphql).FormatSchema(got)
 	formatter.NewFormatter(expectedGraphql).FormatSchema(expect)
 
-	if actualGraphql.String() != expectedGraphql.String() {
-		diff := difflib.UnifiedDiff{
-			A:        difflib.SplitLines(expectedGraphql.String()),
-			B:        difflib.SplitLines(actualGraphql.String()),
-			FromFile: "expect",
-			ToFile:   "got",
-			Context:  3,
-		}
-		t.Errorf("Generated graphql file does not match expectations")
-		str, _ := difflib.GetUnifiedDiffString(diff)
-		t.Errorf("%s", str)
-	}
+	// if actualGraphql.String() != expectedGraphql.String() {
+	// 	diff := difflib.UnifiedDiff{
+	// 		A:        difflib.SplitLines(expectedGraphql.String()),
+	// 		B:        difflib.SplitLines(actualGraphql.String()),
+	// 		FromFile: "expect",
+	// 		ToFile:   "got",
+	// 		Context:  10,
+	// 	}
+	// 	t.Errorf("Generated graphql file does not match expectations")
+	// 	str, _ := difflib.GetUnifiedDiffString(diff)
+	// 	t.Errorf("%s", str)
+	// }
+	require.Equal(t, expectedGraphql.String(), actualGraphql.String())
 }
 
 type DepsInfo struct {

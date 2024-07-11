@@ -5,9 +5,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/v2/protowrap"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	descriptor "google.golang.org/protobuf/types/descriptorpb"
 
 	gqlpb "github.com/sysulq/graphql-gateway/api/graphql/v1"
@@ -25,10 +26,10 @@ const (
 	DefaultExtension = "graphql"
 )
 
-func NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool, plugin *protogen.Plugin) (schemas SchemaDescriptorList, err error) {
+func NewSchemas(descs []protoreflect.FileDescriptor, mergeSchemas, genServiceDesc bool, plugin *protogen.Plugin) (schemas SchemaDescriptorList, err error) {
 	var files []*descriptor.FileDescriptorProto
 	for _, d := range descs {
-		files = append(files, d.AsFileDescriptorProto())
+		files = append(files, protowrap.ProtoFromFileDescriptor(d))
 	}
 	var goref GoRef
 	if plugin != nil {
@@ -63,34 +64,36 @@ func NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool,
 	return
 }
 
-func generateFile(file *desc.FileDescriptor, schema *SchemaDescriptor) error {
+func generateFile(file protoreflect.FileDescriptor, schema *SchemaDescriptor) error {
 	schema.FileDescriptors = append(schema.FileDescriptors, file)
 
-	for _, svc := range file.GetServices() {
-		svcOpts := GraphqlServiceOptions(svc.AsServiceDescriptorProto().GetOptions())
+	for i := 0; i < file.Services().Len(); i++ {
+		svc := file.Services().Get(i)
+		svcOpts := GraphqlServiceOptions(svc.Options())
 		if svcOpts != nil && svcOpts.Ignore {
 			continue
 		}
-		for _, rpc := range svc.GetMethods() {
-			rpcOpts := GraphqlMethodOptions(rpc.AsMethodDescriptorProto().GetOptions())
+		for j := 0; j < svc.Methods().Len(); j++ {
+			rpc := svc.Methods().Get(j)
+			rpcOpts := GraphqlMethodOptions(rpc.Options())
 			if rpcOpts != nil && rpcOpts.Ignore {
 				continue
 			}
-			in, err := schema.CreateObjects(rpc.GetInputType(), true)
+			in, err := schema.CreateObjects(rpc.Input(), true)
 			if err != nil {
 				return err
 			}
 
-			out, err := schema.CreateObjects(rpc.GetOutputType(), false)
+			out, err := schema.CreateObjects(rpc.Output(), false)
 			if err != nil {
 				return err
 			}
 
-			if rpc.IsServerStreaming() && rpc.IsClientStreaming() {
+			if rpc.IsStreamingServer() && rpc.IsStreamingClient() {
 				schema.GetMutation().addMethod(svc, rpc, in, out)
 			}
 
-			if rpc.IsServerStreaming() {
+			if rpc.IsStreamingServer() {
 				schema.GetSubscription().addMethod(svc, rpc, in, out)
 			} else {
 				switch GetRequestType(rpcOpts, svcOpts) {
@@ -118,7 +121,7 @@ func (s SchemaDescriptorList) AsGraphql() (astSchema []*ast.Schema) {
 func (s SchemaDescriptorList) GetForDescriptor(file *protogen.File) *SchemaDescriptor {
 	for _, schema := range s {
 		for _, d := range schema.FileDescriptors {
-			if d.AsFileDescriptorProto() == file.Proto {
+			if protowrap.ProtoFromFileDescriptor(d) == file.Proto {
 				return schema
 			}
 		}
@@ -129,7 +132,7 @@ func (s SchemaDescriptorList) GetForDescriptor(file *protogen.File) *SchemaDescr
 func NewSchemaDescriptor(genServiceDesc bool, goref GoRef) *SchemaDescriptor {
 	sd := &SchemaDescriptor{
 		Directives:                 map[string]*ast.DirectiveDefinition{},
-		reservedNames:              map[string]desc.Descriptor{},
+		reservedNames:              map[string]protoreflect.Descriptor{},
 		createdObjects:             map[createdObjectKey]*ObjectDescriptor{},
 		generateServiceDescriptors: genServiceDesc,
 		goRef:                      goref,
@@ -142,9 +145,9 @@ func NewSchemaDescriptor(genServiceDesc bool, goref GoRef) *SchemaDescriptor {
 
 type SchemaDescriptor struct {
 	Directives      map[string]*ast.DirectiveDefinition
-	FileDescriptors []*desc.FileDescriptor
+	FileDescriptors []protoreflect.FileDescriptor
 
-	files []*desc.FileDescriptor
+	files []protoreflect.FileDescriptor
 
 	query        *RootDefinition
 	mutation     *RootDefinition
@@ -152,7 +155,7 @@ type SchemaDescriptor struct {
 
 	objects []*ObjectDescriptor
 
-	reservedNames  map[string]desc.Descriptor
+	reservedNames  map[string]protoreflect.Descriptor
 	createdObjects map[createdObjectKey]*ObjectDescriptor
 
 	generateServiceDescriptors bool
@@ -161,7 +164,7 @@ type SchemaDescriptor struct {
 }
 
 type createdObjectKey struct {
-	desc  desc.Descriptor
+	desc  protoreflect.Descriptor
 	input bool
 }
 
@@ -222,19 +225,19 @@ func (s *SchemaDescriptor) GetQuery() *RootDefinition {
 
 // make name be unique
 // just create a map and register every name
-func (s *SchemaDescriptor) uniqueName(d desc.Descriptor, input bool) (name string) {
+func (s *SchemaDescriptor) uniqueName(d protoreflect.Descriptor, input bool) (name string) {
 	var collisionPrefix string
 	var suffix string
-	if _, ok := d.(*desc.MessageDescriptor); input && ok {
+	if _, ok := d.(protoreflect.MessageDescriptor); input && ok {
 		suffix = inputSuffix
 	}
-	name = strings.Title(CamelCaseSlice(strings.Split(strings.TrimPrefix(d.GetFullyQualifiedName(), d.GetFile().GetPackage()+packageSep), packageSep)) + suffix)
+	name = strings.Title(CamelCaseSlice(strings.Split(strings.TrimPrefix(string(d.FullName()), string(d.ParentFile().Package())+packageSep), packageSep)) + suffix)
 
-	if _, ok := d.(*desc.FieldDescriptor); ok {
+	if _, ok := d.(protoreflect.FieldDescriptor); ok {
 		collisionPrefix = fieldPrefix
-		name = CamelCaseSlice(strings.Split(strings.Trim(d.GetParent().GetName()+packageSep+strings.Title(d.GetName()), packageSep), packageSep))
+		name = CamelCaseSlice(strings.Split(strings.Trim(string(d.Parent().Name())+packageSep+strings.Title(string(d.Name())), packageSep), packageSep))
 	} else {
-		collisionPrefix = CamelCaseSlice(strings.Split(d.GetFile().GetPackage(), packageSep))
+		collisionPrefix = CamelCaseSlice(strings.Split(string(d.ParentFile().Package()), packageSep))
 	}
 
 	originalName := name
@@ -257,9 +260,9 @@ func (s *SchemaDescriptor) uniqueName(d desc.Descriptor, input bool) (name strin
 	return
 }
 
-func (s *SchemaDescriptor) CreateObjects(d desc.Descriptor, input bool) (obj *ObjectDescriptor, err error) {
+func (s *SchemaDescriptor) CreateObjects(d protoreflect.Descriptor, input bool) (obj *ObjectDescriptor, err error) {
 	// the case if trying to resolve a primitive as a object. In this case we just return nil
-	if d == nil || d.GetName() == "FieldMask" {
+	if d == nil || d.Name() == "FieldMask" {
 		return
 	}
 
@@ -279,8 +282,9 @@ func (s *SchemaDescriptor) CreateObjects(d desc.Descriptor, input bool) (obj *Ob
 	s.createdObjects[createdObjectKey{d, input}] = obj
 
 	switch dd := d.(type) {
-	case *desc.MessageDescriptor:
-		if IsEmpty(dd) {
+	case protoreflect.MessageDescriptor:
+		// fmt.Println(dd)
+		if dd == nil {
 			return obj, nil
 		}
 		if IsAny(dd) {
@@ -295,62 +299,26 @@ func (s *SchemaDescriptor) CreateObjects(d desc.Descriptor, input bool) (obj *Ob
 			kind = ast.InputObject
 		}
 		fields := FieldDescriptorList{}
-		outputOneofRegistrar := map[*desc.OneOfDescriptor]struct{}{}
 
-		for _, df := range dd.GetFields() {
-			fieldOpts := GraphqlFieldOptions(df.AsFieldDescriptorProto().GetOptions())
+		for i := 0; i < dd.Fields().Len(); i++ {
+			df := dd.Fields().Get(i)
+			fieldOpts := GraphqlFieldOptions(df.Options())
 			if fieldOpts != nil && fieldOpts.Ignore {
 				continue
 			}
 			var fieldDirective []*ast.Directive
-			if df.GetType() == descriptor.FieldDescriptorProto_TYPE_MESSAGE && IsEmpty(df.GetMessageType()) {
+			if df.Kind() == protoreflect.MessageKind && IsEmpty(df.Message()) {
 				continue
-			}
-
-			// Internally `optional` fields are represented as a oneof, and as such should be skipped.
-			if oneof := df.GetOneOf(); oneof != nil && !df.AsFieldDescriptorProto().GetProto3Optional() {
-				opts := GraphqlOneofOptions(oneof.AsOneofDescriptorProto().GetOptions())
-				if opts.GetIgnore() {
-					continue
-				}
-				if !input {
-					if _, ok := outputOneofRegistrar[oneof]; ok {
-						continue
-					}
-					outputOneofRegistrar[oneof] = struct{}{}
-					field, err := s.createUnion(oneof)
-					if err != nil {
-						return nil, err
-					}
-					fields = append(fields, field)
-					continue
-				}
-
-				// create oneofs as directives for input objects
-				directive := &ast.DirectiveDefinition{
-					Description: getDescription(oneof),
-					Name:        s.uniqueName(oneof, input),
-					Locations:   []ast.DirectiveLocation{ast.LocationInputFieldDefinition},
-					Position:    &ast.Position{Src: &ast.Source{}},
-				}
-				s.Directives[directive.Name] = directive
-				fieldDirective = append(fieldDirective, &ast.Directive{
-					Name:     directive.Name,
-					Position: &ast.Position{Src: &ast.Source{}},
-					// ParentDefinition: obj.Definition, TODO
-					Definition: directive,
-					Location:   ast.LocationInputFieldDefinition,
-				})
 			}
 
 			fieldObj, err := s.CreateObjects(resolveFieldType(df), input)
 			if err != nil {
 				return nil, err
 			}
-			if fieldObj == nil && df.GetMessageType() != nil {
+			if fieldObj == nil && df.Message() != nil {
 				continue
 			}
-			if df.GetMessageType() != nil && df.UnwrapField().Message().FullName() == "google.protobuf.FieldMask" {
+			if df.Message() != nil && df.Message().FullName() == "google.protobuf.FieldMask" {
 				continue
 			}
 			f, err := s.createField(df, fieldObj)
@@ -364,9 +332,13 @@ func (s *SchemaDescriptor) CreateObjects(d desc.Descriptor, input bool) (obj *Ob
 		obj.Definition.Fields = fields.AsGraphql()
 		obj.Definition.Kind = kind
 		obj.fields = fields
-	case *desc.EnumDescriptor:
+	case protoreflect.EnumDescriptor:
 		obj.Definition.Kind = ast.Enum
-		obj.Definition.EnumValues = enumValues(dd.GetValues())
+		vv := make([]protoreflect.EnumValueDescriptor, 0, dd.Values().Len())
+		for i := 0; i < dd.Values().Len(); i++ {
+			vv = append(vv, dd.Values().Get(i))
+		}
+		obj.Definition.EnumValues = enumValues(vv)
 	default:
 		panic(fmt.Sprintf("received unexpected value %v of type %T", dd, dd))
 	}
@@ -375,9 +347,9 @@ func (s *SchemaDescriptor) CreateObjects(d desc.Descriptor, input bool) (obj *Ob
 	return obj, nil
 }
 
-func resolveFieldType(field *desc.FieldDescriptor) desc.Descriptor {
-	msgType := field.GetMessageType()
-	enumType := field.GetEnumType()
+func resolveFieldType(field protoreflect.FieldDescriptor) protoreflect.Descriptor {
+	msgType := field.Message()
+	enumType := field.Enum()
 	if msgType != nil {
 		return msgType
 	}
@@ -387,11 +359,11 @@ func resolveFieldType(field *desc.FieldDescriptor) desc.Descriptor {
 	return nil
 }
 
-func enumValues(evals []*desc.EnumValueDescriptor) (vlist ast.EnumValueList) {
+func enumValues(evals []protoreflect.EnumValueDescriptor) (vlist ast.EnumValueList) {
 	for _, eval := range evals {
 		vlist = append(vlist, &ast.EnumValueDefinition{
 			Description: getDescription(eval),
-			Name:        eval.GetName(),
+			Name:        string(eval.Name()),
 			Position:    &ast.Position{},
 		})
 	}
@@ -410,7 +382,7 @@ func (fl FieldDescriptorList) AsGraphql() (dl []*ast.FieldDefinition) {
 
 type FieldDescriptor struct {
 	*ast.FieldDefinition
-	*desc.FieldDescriptor
+	protoreflect.FieldDescriptor
 
 	typ *ObjectDescriptor
 }
@@ -420,8 +392,8 @@ func (f *FieldDescriptor) GetType() *ObjectDescriptor {
 }
 
 type MethodDescriptor struct {
-	*desc.ServiceDescriptor
-	*desc.MethodDescriptor
+	protoreflect.ServiceDescriptor
+	protoreflect.MethodDescriptor
 
 	*ast.FieldDefinition
 
@@ -486,24 +458,24 @@ func (r *RootDefinition) Methods() []*MethodDescriptor {
 	return r.methods
 }
 
-func (r *RootDefinition) addMethod(svc *desc.ServiceDescriptor, rpc *desc.MethodDescriptor, in, out *ObjectDescriptor) {
+func (r *RootDefinition) addMethod(svc protoreflect.ServiceDescriptor, rpc protoreflect.MethodDescriptor, in, out *ObjectDescriptor) {
 	var args ast.ArgumentDefinitionList
 
-	if in != nil && (in.Descriptor != nil && !IsEmpty(in.Descriptor.(*desc.MessageDescriptor)) || in.Definition.Kind == ast.Scalar) {
+	if in != nil && (in.Descriptor != nil && !IsEmpty(in.Descriptor.(protoreflect.MessageDescriptor)) || in.Definition.Kind == ast.Scalar) {
 		args = append(args, &ast.ArgumentDefinition{
 			Name:     "in",
-			Type:     ast.NamedType(in.Name, &ast.Position{}),
+			Type:     ast.NamedType(in.Definition.Name, &ast.Position{}),
 			Position: &ast.Position{},
 		})
 	}
 	objType := ast.NamedType("Boolean", &ast.Position{})
-	if out != nil && (out.Descriptor != nil && !IsEmpty(out.Descriptor.(*desc.MessageDescriptor)) || in.Definition.Kind == ast.Scalar) {
-		objType = ast.NamedType(out.Name, &ast.Position{})
+	if out != nil && (out.Descriptor != nil && !IsEmpty(out.Descriptor.(protoreflect.MessageDescriptor)) || in.Definition.Kind == ast.Scalar) {
+		objType = ast.NamedType(out.Definition.Name, &ast.Position{})
 	}
 
 	svcDir := &ast.DirectiveDefinition{
 		Description: getDescription(svc),
-		Name:        svc.GetName(),
+		Name:        string(svc.Name()),
 		Locations:   []ast.DirectiveLocation{ast.LocationFieldDefinition},
 		Position:    &ast.Position{Src: &ast.Source{}},
 	}
@@ -514,7 +486,7 @@ func (r *RootDefinition) addMethod(svc *desc.ServiceDescriptor, rpc *desc.Method
 		MethodDescriptor:  rpc,
 		FieldDefinition: &ast.FieldDefinition{
 			Description: getDescription(rpc),
-			Name:        r.UniqueName(svc.AsServiceDescriptorProto(), rpc.AsMethodDescriptorProto()),
+			Name:        r.UniqueName(protowrap.ProtoFromServiceDescriptor(svc), protowrap.ProtoFromMethodDescriptor(rpc)),
 			Arguments:   args,
 			Type:        objType,
 			Position:    &ast.Position{},
@@ -552,32 +524,37 @@ func NewRootDefinition(name rootName, parent *SchemaDescriptor) *RootDefinition 
 	}, Parent: parent, reservedNames: map[string]ServiceAndMethod{}}
 }
 
-func getDescription(descs ...desc.Descriptor) string {
+func getDescription(descs ...protoreflect.Descriptor) string {
 	var description []string
 	for _, d := range descs {
-		info := d.GetSourceInfo()
-		if info == nil {
+		info := d.ParentFile().SourceLocations()
+		if info.Len() == 0 {
 			continue
 		}
-		if info.LeadingComments != nil {
-			description = append(description, *info.LeadingComments)
-		}
-		if info.TrailingComments != nil {
-			description = append(description, *info.TrailingComments)
+		for i := 0; i < info.Len(); i++ {
+			loc := info.Get(i)
+
+			if loc.LeadingComments != "" {
+				description = append(description, loc.LeadingComments)
+			}
+
+			if loc.TrailingComments != "" {
+				description = append(description, loc.TrailingComments)
+			}
 		}
 	}
 
 	return strings.Join(description, "\n")
 }
 
-func (s *SchemaDescriptor) createField(field *desc.FieldDescriptor, obj *ObjectDescriptor) (_ *FieldDescriptor, err error) {
+func (s *SchemaDescriptor) createField(field protoreflect.FieldDescriptor, obj *ObjectDescriptor) (_ *FieldDescriptor, err error) {
 	fieldAst := &ast.FieldDefinition{
 		Description: getDescription(field),
-		Name:        ToLowerFirst(CamelCase(field.GetName())),
+		Name:        ToLowerFirst(CamelCase(string(field.Name()))),
 		Type:        &ast.Type{Position: &ast.Position{}},
 		Position:    &ast.Position{},
 	}
-	fieldOpts := GraphqlFieldOptions(field.AsFieldDescriptorProto().GetOptions())
+	fieldOpts := GraphqlFieldOptions(field.Options())
 	if fieldOpts != nil {
 		if fieldOpts.Name != "" {
 			fieldAst.Name = fieldOpts.Name
@@ -603,7 +580,7 @@ func (s *SchemaDescriptor) createField(field *desc.FieldDescriptor, obj *ObjectD
 				Arguments: []*ast.Argument{{
 					Name: "name",
 					Value: &ast.Value{
-						Raw:      s.goRef.FindGoField(field.GetFullyQualifiedName()).GoName,
+						Raw:      s.goRef.FindGoField(string(field.FullName())).GoName,
 						Kind:     ast.StringValue,
 						Position: &ast.Position{},
 					},
@@ -615,41 +592,41 @@ func (s *SchemaDescriptor) createField(field *desc.FieldDescriptor, obj *ObjectD
 			}}
 		}
 	}
-	switch field.GetType() {
-	case descriptor.FieldDescriptorProto_TYPE_DOUBLE,
-		descriptor.FieldDescriptorProto_TYPE_FLOAT:
+	switch field.Kind() {
+	case protoreflect.DoubleKind,
+		protoreflect.FloatKind:
 		fieldAst.Type.NamedType = ScalarFloat
 
-	case descriptor.FieldDescriptorProto_TYPE_BYTES:
+	case protoreflect.BytesKind:
 		scalar := s.createScalar(scalarBytes, "")
-		fieldAst.Type.NamedType = scalar.Name
+		fieldAst.Type.NamedType = scalar.Definition.Name
 
-	case descriptor.FieldDescriptorProto_TYPE_INT64,
-		descriptor.FieldDescriptorProto_TYPE_SINT64,
-		descriptor.FieldDescriptorProto_TYPE_SFIXED64,
-		descriptor.FieldDescriptorProto_TYPE_INT32,
-		descriptor.FieldDescriptorProto_TYPE_SINT32,
-		descriptor.FieldDescriptorProto_TYPE_SFIXED32,
-		descriptor.FieldDescriptorProto_TYPE_UINT32,
-		descriptor.FieldDescriptorProto_TYPE_FIXED32,
-		descriptor.FieldDescriptorProto_TYPE_UINT64,
-		descriptor.FieldDescriptorProto_TYPE_FIXED64:
+	case protoreflect.Int64Kind,
+		protoreflect.Sint64Kind,
+		protoreflect.Sfixed64Kind,
+		protoreflect.Int32Kind,
+		protoreflect.Sint32Kind,
+		protoreflect.Sfixed32Kind,
+		protoreflect.Uint32Kind,
+		protoreflect.Fixed32Kind,
+		protoreflect.Uint64Kind,
+		protoreflect.Fixed64Kind:
 		fieldAst.Type.NamedType = ScalarInt
 
-	case descriptor.FieldDescriptorProto_TYPE_BOOL:
+	case protoreflect.BoolKind:
 		fieldAst.Type.NamedType = ScalarBoolean
 
-	case descriptor.FieldDescriptorProto_TYPE_STRING:
+	case protoreflect.StringKind:
 		fieldAst.Type.NamedType = ScalarString
 
-	case descriptor.FieldDescriptorProto_TYPE_GROUP:
+	case protoreflect.GroupKind:
 		return nil, fmt.Errorf("proto2 groups are not supported please use proto3 syntax")
 
-	case descriptor.FieldDescriptorProto_TYPE_ENUM:
-		fieldAst.Type.NamedType = obj.Name
+	case protoreflect.EnumKind:
+		fieldAst.Type.NamedType = obj.Definition.Name
 
-	case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-		fieldAst.Type.NamedType = obj.Name
+	case protoreflect.MessageKind:
+		fieldAst.Type.NamedType = obj.Definition.Name
 
 	default:
 		panic("unknown proto field type")
@@ -683,10 +660,11 @@ func (s *SchemaDescriptor) createScalar(name string, description string) *Object
 	return obj
 }
 
-func (s *SchemaDescriptor) createUnion(oneof *desc.OneOfDescriptor) (*FieldDescriptor, error) {
+func (s *SchemaDescriptor) createUnion(oneof protoreflect.OneofDescriptor) (*FieldDescriptor, error) {
 	var types []string
 	var objTypes []*ObjectDescriptor
-	for _, choice := range oneof.GetChoices() {
+	for i := 0; i < oneof.Fields().Len(); i++ {
+		choice := oneof.Fields().Get(i)
 		obj, err := s.CreateObjects(resolveFieldType(choice), false)
 		if err != nil {
 			return nil, err
@@ -699,17 +677,17 @@ func (s *SchemaDescriptor) createUnion(oneof *desc.OneOfDescriptor) (*FieldDescr
 		obj = &ObjectDescriptor{
 			Definition: &ast.Definition{
 				Kind:        ast.Object,
-				Description: getDescription(f),
+				Description: getDescription(f.FieldDescriptor),
 				Name:        s.uniqueName(choice, false),
 				Fields:      ast.FieldList{f.FieldDefinition},
 				Position:    &ast.Position{},
 			},
-			Descriptor: f,
+			Descriptor: f.FieldDescriptor,
 			fields:     []*FieldDescriptor{f},
 			fieldNames: map[string]*FieldDescriptor{},
 		}
 		s.objects = append(s.objects, obj)
-		types = append(types, obj.Name)
+		types = append(types, obj.Definition.Name)
 		objTypes = append(objTypes, obj)
 	}
 	obj := &ObjectDescriptor{
@@ -724,8 +702,8 @@ func (s *SchemaDescriptor) createUnion(oneof *desc.OneOfDescriptor) (*FieldDescr
 		types:      objTypes,
 	}
 	s.objects = append(s.objects, obj)
-	name := ToLowerFirst(CamelCase(oneof.GetName()))
-	opts := GraphqlOneofOptions(oneof.AsOneofDescriptorProto().GetOptions())
+	name := ToLowerFirst(CamelCase(string(oneof.Name())))
+	opts := GraphqlOneofOptions(oneof.Options())
 	if opts.GetName() != "" {
 		name = opts.GetName()
 	}
@@ -733,7 +711,7 @@ func (s *SchemaDescriptor) createUnion(oneof *desc.OneOfDescriptor) (*FieldDescr
 		FieldDefinition: &ast.FieldDefinition{
 			Description: getDescription(oneof),
 			Name:        name,
-			Type:        ast.NamedType(obj.Name, &ast.Position{}),
+			Type:        ast.NamedType(obj.Definition.Name, &ast.Position{}),
 			Position:    &ast.Position{},
 		},
 		FieldDescriptor: nil,
@@ -741,12 +719,12 @@ func (s *SchemaDescriptor) createUnion(oneof *desc.OneOfDescriptor) (*FieldDescr
 	}, nil
 }
 
-func isRepeated(field *desc.FieldDescriptor) bool {
-	return field.GetLabel() == descriptor.FieldDescriptorProto_LABEL_REPEATED
+func isRepeated(field protoreflect.FieldDescriptor) bool {
+	return field.Cardinality() == protoreflect.Repeated
 }
 
-func isRequired(field *desc.FieldDescriptor) bool {
-	if v := GraphqlFieldOptions(field.AsFieldDescriptorProto().GetOptions()); v != nil {
+func isRequired(field protoreflect.FieldDescriptor) bool {
+	if v := GraphqlFieldOptions(field.Options()); v != nil {
 		return v.GetRequired()
 	}
 	return false

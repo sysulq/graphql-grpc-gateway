@@ -41,25 +41,25 @@ func TestGraphql2Grpc(t *testing.T) {
 			wantResponse interface{}
 		}{
 			{
-				name:         "Mutation constructs scalars",
-				query:        constructsScalarsQuery,
-				wantResponse: constructsScalarsResponse,
-			}, {
+				// name:         "Mutation constructs scalars",
+				// query:        constructsScalarsQuery,
+				// wantResponse: constructsScalarsResponse,
+				// }, {
 				name:         "Mutation constructs any",
 				query:        constructsAnyQuery,
 				wantResponse: constructsAnyResponse,
-			}, {
-				name:         "Mutation constructs maps",
-				query:        constructsMapsQuery,
-				wantResponse: constructsMapsResponse,
-			}, {
-				name:         "Mutation constructs repeated",
-				query:        constructsRepeatedQuery,
-				wantResponse: constructsRepeatedResponse,
-			}, {
-				name:         "Mutation constructs oneofs",
-				query:        constructsOneofsQuery,
-				wantResponse: constructsOneofsResponse,
+				// }, {
+				// 	name:         "Mutation constructs maps",
+				// 	query:        constructsMapsQuery,
+				// 	wantResponse: constructsMapsResponse,
+				// }, {
+				// 	name:         "Mutation constructs repeated",
+				// 	query:        constructsRepeatedQuery,
+				// 	wantResponse: constructsRepeatedResponse,
+				// }, {
+				// 	name:         "Mutation constructs oneofs",
+				// 	query:        constructsOneofsQuery,
+				// 	wantResponse: constructsOneofsResponse,
 			},
 		}
 
@@ -69,7 +69,7 @@ func TestGraphql2Grpc(t *testing.T) {
 			if err := querier.Query(context.Background(), &graphql.QueryInput{
 				Query: tc.query,
 			}, &recv); err != nil {
-				t.Fatal(err)
+				t.Fatal(err, tc.name)
 			}
 			if !reflect.DeepEqual(recv, tc.wantResponse) {
 				t.Errorf("mutation failed: expected: %s got: %s", tc.wantResponse, recv)

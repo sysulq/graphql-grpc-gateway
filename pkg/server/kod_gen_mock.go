@@ -14,12 +14,12 @@ import (
 	http "net/http"
 	reflect "reflect"
 
-	proto "github.com/golang/protobuf/proto"
-	desc "github.com/jhump/protoreflect/desc"
 	graphql "github.com/nautilus/graphql"
 	generator "github.com/sysulq/graphql-gateway/pkg/generator"
 	ast "github.com/vektah/gqlparser/v2/ast"
 	gomock "go.uber.org/mock/gomock"
+	proto "google.golang.org/protobuf/proto"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // MockConfigComponent is a mock of ConfigComponent interface.
@@ -121,7 +121,7 @@ func (m *MockCaller) EXPECT() *MockCallerMockRecorder {
 }
 
 // Call mocks base method.
-func (m *MockCaller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error) {
+func (m *MockCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Call", ctx, rpc, message)
 	ret0, _ := ret[0].(proto.Message)
@@ -136,10 +136,10 @@ func (mr *MockCallerMockRecorder) Call(ctx, rpc, message any) *gomock.Call {
 }
 
 // GetDescs mocks base method.
-func (m *MockCaller) GetDescs() []*desc.FileDescriptor {
+func (m *MockCaller) GetDescs() []protoreflect.FileDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDescs")
-	ret0, _ := ret[0].([]*desc.FileDescriptor)
+	ret0, _ := ret[0].([]protoreflect.FileDescriptor)
 	return ret0
 }
 
@@ -210,10 +210,10 @@ func (m *MockRegistry) EXPECT() *MockRegistryMockRecorder {
 }
 
 // FindFieldByName mocks base method.
-func (m *MockRegistry) FindFieldByName(msg desc.Descriptor, name string) *desc.FieldDescriptor {
+func (m *MockRegistry) FindFieldByName(msg protoreflect.Descriptor, name string) protoreflect.FieldDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindFieldByName", msg, name)
-	ret0, _ := ret[0].(*desc.FieldDescriptor)
+	ret0, _ := ret[0].(protoreflect.FieldDescriptor)
 	return ret0
 }
 
@@ -238,10 +238,10 @@ func (mr *MockRegistryMockRecorder) FindGraphqlFieldByProtoField(msg, name any) 
 }
 
 // FindMethodByName mocks base method.
-func (m *MockRegistry) FindMethodByName(op ast.Operation, name string) *desc.MethodDescriptor {
+func (m *MockRegistry) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindMethodByName", op, name)
-	ret0, _ := ret[0].(*desc.MethodDescriptor)
+	ret0, _ := ret[0].(protoreflect.MethodDescriptor)
 	return ret0
 }
 
@@ -252,10 +252,10 @@ func (mr *MockRegistryMockRecorder) FindMethodByName(op, name any) *gomock.Call 
 }
 
 // FindObjectByFullyQualifiedName mocks base method.
-func (m *MockRegistry) FindObjectByFullyQualifiedName(fqn string) (*desc.MessageDescriptor, *ast.Definition) {
+func (m *MockRegistry) FindObjectByFullyQualifiedName(fqn string) (protoreflect.MessageDescriptor, *ast.Definition) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindObjectByFullyQualifiedName", fqn)
-	ret0, _ := ret[0].(*desc.MessageDescriptor)
+	ret0, _ := ret[0].(protoreflect.MessageDescriptor)
 	ret1, _ := ret[1].(*ast.Definition)
 	return ret0, ret1
 }
@@ -267,10 +267,10 @@ func (mr *MockRegistryMockRecorder) FindObjectByFullyQualifiedName(fqn any) *gom
 }
 
 // FindObjectByName mocks base method.
-func (m *MockRegistry) FindObjectByName(name string) *desc.MessageDescriptor {
+func (m *MockRegistry) FindObjectByName(name string) protoreflect.MessageDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindObjectByName", name)
-	ret0, _ := ret[0].(*desc.MessageDescriptor)
+	ret0, _ := ret[0].(protoreflect.MessageDescriptor)
 	return ret0
 }
 
@@ -281,10 +281,10 @@ func (mr *MockRegistryMockRecorder) FindObjectByName(name any) *gomock.Call {
 }
 
 // FindUnionFieldByMessageFQNAndName mocks base method.
-func (m *MockRegistry) FindUnionFieldByMessageFQNAndName(fqn, name string) *desc.FieldDescriptor {
+func (m *MockRegistry) FindUnionFieldByMessageFQNAndName(fqn, name string) protoreflect.FieldDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindUnionFieldByMessageFQNAndName", fqn, name)
-	ret0, _ := ret[0].(*desc.FieldDescriptor)
+	ret0, _ := ret[0].(protoreflect.FieldDescriptor)
 	return ret0
 }
 

@@ -6,11 +6,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/nautilus/graphql"
 	"github.com/sysulq/graphql-gateway/pkg/generator"
 	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // config is a component that implements ConfigComponent.
@@ -25,8 +25,8 @@ type ServerComponent interface {
 
 // caller is a component that implements Caller.
 type Caller interface {
-	GetDescs() []*desc.FileDescriptor
-	Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error)
+	GetDescs() []protoreflect.FileDescriptor
+	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
 }
 
 // queryer is a component that implements Queryer.
@@ -37,10 +37,10 @@ type Queryer interface {
 // repository is a component that implements Registry.
 type Registry interface {
 	SchemaDescriptorList() generator.SchemaDescriptorList
-	FindMethodByName(op ast.Operation, name string) *desc.MethodDescriptor
-	FindObjectByName(name string) *desc.MessageDescriptor
-	FindObjectByFullyQualifiedName(fqn string) (*desc.MessageDescriptor, *ast.Definition)
-	FindFieldByName(msg desc.Descriptor, name string) *desc.FieldDescriptor
-	FindUnionFieldByMessageFQNAndName(fqn, name string) *desc.FieldDescriptor
+	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
+	FindObjectByName(name string) protoreflect.MessageDescriptor
+	FindObjectByFullyQualifiedName(fqn string) (protoreflect.MessageDescriptor, *ast.Definition)
+	FindFieldByName(msg protoreflect.Descriptor, name string) protoreflect.FieldDescriptor
+	FindUnionFieldByMessageFQNAndName(fqn, name string) protoreflect.FieldDescriptor
 	FindGraphqlFieldByProtoField(msg *ast.Definition, name string) *ast.FieldDefinition
 }

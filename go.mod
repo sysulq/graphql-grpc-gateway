@@ -12,6 +12,7 @@ require (
 	github.com/grafana/pyroscope-go v1.1.1
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jhump/protoreflect v1.16.0
+	github.com/jhump/protoreflect/v2 v2.0.0-20240207013822-c9ae7caed596
 	github.com/nautilus/gateway v0.3.17
 	github.com/nautilus/graphql v0.0.25
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
@@ -24,7 +25,6 @@ require (
 	golang.org/x/sync v0.7.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -110,4 +110,5 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240701130421-f6361c86f094 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
