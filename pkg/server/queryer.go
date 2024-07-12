@@ -271,7 +271,7 @@ func (q *queryer) pbEncode(in protoreflect.MessageDescriptor, field *ast.Field, 
 }
 
 func (q *queryer) pbValue(val interface{}, reqDesc protoreflect.FieldDescriptor) (_ interface{}, err error) {
-	var msgDesc protoreflect.MessageDescriptor
+	msgDesc := reqDesc.Message()
 
 	switch v := val.(type) {
 	case float64:
@@ -339,11 +339,6 @@ func (q *queryer) pbValue(val interface{}, reqDesc protoreflect.FieldDescriptor)
 			}
 		}
 		var msg *dynamicpb.Message
-		if reqDesc != nil {
-			msgDesc = reqDesc.Message()
-		} else {
-			msgDesc = q.registry.Get().FindObjectByName(vvv)
-		}
 
 		protoDesc := msgDesc
 

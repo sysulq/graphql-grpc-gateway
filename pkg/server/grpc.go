@@ -66,7 +66,7 @@ func (c *caller) Init(ctx context.Context) (err error) {
 
 		var newDescs []protoreflect.FileDescriptor
 		if e.Reflection {
-			newDescs, err = reflection.NewClient(conn).ListPackages()
+			newDescs, err = reflection.NewClientWithImportsResolver(conn).ListPackages()
 			if err != nil {
 				return err
 			}
@@ -79,10 +79,7 @@ func (c *caller) Init(ctx context.Context) (err error) {
 		// 	newDescs = append(newDescs, descs...)
 		// }
 		for _, d := range newDescs {
-			for i := 0; i < d.Services().Len(); i++ {
-				svc := d.Services().Get(i)
-				descsconn[string(svc.FullName())] = conn
-			}
+			descsconn[d.Path()] = conn
 		}
 		descs = append(descs, newDescs...)
 	}
@@ -91,7 +88,7 @@ func (c *caller) Init(ctx context.Context) (err error) {
 		for i := 0; i < d.Services().Len(); i++ {
 			svc := d.Services().Get(i)
 			serviceStub[string(svc.FullName())] = grpcdynamic.NewStub(
-				descsconn[string(svc.FullName())], grpcdynamic.WithResolver(new(protoregistry.Types)))
+				descsconn[d.Path()], grpcdynamic.WithResolver(new(protoregistry.Types)))
 		}
 	}
 

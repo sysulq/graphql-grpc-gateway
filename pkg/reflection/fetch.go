@@ -12,13 +12,12 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/v2/grpcreflect"
-	"github.com/jhump/protoreflect/v2/protowrap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -170,16 +169,25 @@ func (c *clientV2) ListPackages() (descriptors []protoreflect.FileDescriptor, er
 	}()
 	err, ok := <-errCh
 	if ok && err == nil {
-		var descriptors []protoreflect.FileDescriptor
+		var files []*descriptorpb.FileDescriptorProto
 		c.mu.RLock()
 		for f := range c.fileMap {
-			desc, err := protowrap.FromFileDescriptorProto(f, protoregistry.GlobalFiles)
-			if err != nil {
-				return nil, err
-			}
-			descriptors = append(descriptors, desc)
+			files = append(files, f)
 		}
 		c.mu.RUnlock()
+
+		sets, err := protodesc.NewFiles(&descriptorpb.FileDescriptorSet{
+			File: files,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		descriptors := make([]protoreflect.FileDescriptor, 0, len(files))
+		sets.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+			descriptors = append(descriptors, fd)
+			return true
+		})
 
 		return descriptors, nil
 	}
@@ -196,7 +204,7 @@ func (c *clientV2) processFile(file *descriptorpb.FileDescriptorProto, filebus F
 	c.mu.Lock()
 	c.fileMap[file] = struct{}{}
 	c.mu.Unlock()
-	file.Name = proto.String(file.GetPackage() + "/" + file.GetName())
+	file.Name = proto.String(file.GetName())
 	file.Dependency = nil
 	deps := map[*descriptorpb.FileDescriptorProto]struct{}{}
 
@@ -262,6 +270,9 @@ func (c *clientV2) processFile(file *descriptorpb.FileDescriptorProto, filebus F
 		}
 	}
 	for _, m := range file.GetMessageType() {
+		if m.GetName() == "Maps" {
+			fmt.Println("!!!")
+		}
 		if err := getFilesForOptions(m.GetOptions(), m.GetName()); err != nil {
 			return err
 		}

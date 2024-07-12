@@ -43,36 +43,27 @@ func (o *ObjectDescriptor) IsMessage() bool {
 }
 
 // same isEmpty but for mortals
-func IsEmpty(o protoreflect.MessageDescriptor) bool { return isEmpty(o, NewCallstack()) }
+func IsEmpty(o protoreflect.MessageDescriptor) bool { return isEmpty(o) }
 
 // make sure objects are fulled with all objects
-func isEmpty(o protoreflect.MessageDescriptor, callstack Callstack) bool {
-	callstack.Push(o)
-	defer callstack.Pop(o)
-
+func isEmpty(o protoreflect.MessageDescriptor) bool {
 	if o == nil {
 		return true
 	}
-	for i := 0; i < o.Fields().Len(); i++ {
-		f := o.Fields().Get(i)
-		objType := f.Message()
-		if objType != nil {
-			return false
-		}
 
-		// check if the call stack already contains a reference to this type and prevent it from calling itself again
-		if callstack.Has(objType) {
-			return true
-		}
-		if !isEmpty(objType, callstack) {
-			return false
-		}
+	if o.FullName() == "google.protobuf.Empty" {
+		return true
 	}
 
-	return true
+	if o.Fields().Len() == 0 {
+		return true
+	}
+
+	return false
 }
 
 // TODO maybe not compare by strings
 func IsAny(o protoreflect.MessageDescriptor) bool {
+	// fmt.Println(string((&any.Any{}).ProtoReflect().Descriptor().FullName()), string(o.FullName()))
 	return string((&any.Any{}).ProtoReflect().Descriptor().FullName()) == string(o.FullName())
 }

@@ -100,6 +100,7 @@ func generateFile(file protoreflect.FileDescriptor, schema *SchemaDescriptor) er
 				case gqlpb.Type_QUERY:
 					schema.GetQuery().addMethod(svc, rpc, in, out)
 				default:
+					fmt.Println(rpc.FullName())
 					schema.GetMutation().addMethod(svc, rpc, in, out)
 				}
 			}
@@ -164,7 +165,7 @@ type SchemaDescriptor struct {
 }
 
 type createdObjectKey struct {
-	desc  protoreflect.Descriptor
+	desc  protoreflect.FullName
 	input bool
 }
 
@@ -266,7 +267,7 @@ func (s *SchemaDescriptor) CreateObjects(d protoreflect.Descriptor, input bool) 
 		return
 	}
 
-	if obj, ok := s.createdObjects[createdObjectKey{d, input}]; ok {
+	if obj, ok := s.createdObjects[createdObjectKey{d.FullName(), input}]; ok {
 		return obj, nil
 	}
 
@@ -279,17 +280,18 @@ func (s *SchemaDescriptor) CreateObjects(d protoreflect.Descriptor, input bool) 
 		Descriptor: d,
 	}
 
-	s.createdObjects[createdObjectKey{d, input}] = obj
+	s.createdObjects[createdObjectKey{d.FullName(), input}] = obj
 
 	switch dd := d.(type) {
 	case protoreflect.MessageDescriptor:
-		// fmt.Println(dd)
-		if dd == nil {
+		fmt.Println("----", dd.FullName())
+		if IsEmpty(dd) {
 			return obj, nil
 		}
+
 		if IsAny(dd) {
 			// TODO find a better way to handle any types
-			delete(s.createdObjects, createdObjectKey{d, input})
+			delete(s.createdObjects, createdObjectKey{d.FullName(), input})
 			any := s.createScalar(s.uniqueName(dd, false), anyTypeDescription)
 			return any, nil
 		}
@@ -299,23 +301,62 @@ func (s *SchemaDescriptor) CreateObjects(d protoreflect.Descriptor, input bool) 
 			kind = ast.InputObject
 		}
 		fields := FieldDescriptorList{}
+		outputOneofRegistrar := map[protoreflect.OneofDescriptor]struct{}{}
 
 		for i := 0; i < dd.Fields().Len(); i++ {
+
 			df := dd.Fields().Get(i)
+
 			fieldOpts := GraphqlFieldOptions(df.Options())
 			if fieldOpts != nil && fieldOpts.Ignore {
 				continue
 			}
 			var fieldDirective []*ast.Directive
-			if df.Kind() == protoreflect.MessageKind && IsEmpty(df.Message()) {
+			if IsEmpty(dd) {
 				continue
+			}
+
+			// Internally `optional` fields are represented as a oneof, and as such should be skipped.
+			if oneof := df.ContainingOneof(); oneof != nil && !protowrap.ProtoFromFieldDescriptor(df).GetProto3Optional() {
+				opts := GraphqlOneofOptions(oneof.Options())
+				if opts.GetIgnore() {
+					continue
+				}
+				if !input {
+					if _, ok := outputOneofRegistrar[oneof]; ok {
+						continue
+					}
+					outputOneofRegistrar[oneof] = struct{}{}
+					field, err := s.createUnion(oneof)
+					if err != nil {
+						return nil, err
+					}
+					fields = append(fields, field)
+					continue
+				}
+
+				// create oneofs as directives for input objects
+				directive := &ast.DirectiveDefinition{
+					Description: getDescription(oneof),
+					Name:        s.uniqueName(oneof, input),
+					Locations:   []ast.DirectiveLocation{ast.LocationInputFieldDefinition},
+					Position:    &ast.Position{Src: &ast.Source{}},
+				}
+				s.Directives[directive.Name] = directive
+				fieldDirective = append(fieldDirective, &ast.Directive{
+					Name:     directive.Name,
+					Position: &ast.Position{Src: &ast.Source{}},
+					// ParentDefinition: obj.Definition, TODO
+					Definition: directive,
+					Location:   ast.LocationInputFieldDefinition,
+				})
 			}
 
 			fieldObj, err := s.CreateObjects(resolveFieldType(df), input)
 			if err != nil {
 				return nil, err
 			}
-			if fieldObj == nil && df.Message() != nil {
+			if fieldObj == nil && df.Message() != nil && !df.IsMap() {
 				continue
 			}
 			if df.Message() != nil && df.Message().FullName() == "google.protobuf.FieldMask" {
