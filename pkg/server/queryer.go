@@ -594,6 +594,8 @@ func (q *queryer) protoMessageToMap(outputMsg *dynamic.Message, definition *ast.
 					arrayVals = append(arrayVals, vv)
 				}
 			}
+
+			vals[fieldDef.Name] = arrayVals
 		default:
 			vals[fieldDef.Name] = vv
 		}

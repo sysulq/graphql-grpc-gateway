@@ -34,4 +34,15 @@ tasks:
 
   test:
     cmds:
-      - go test -race -cover -coverprofile=coverage.out -covermode=atomic ./...
+      - go test -race -cover -coverprofile=coverage.out.tmp -covermode=atomic ./...
+    sources:
+      - "**/**.go"
+    generates:
+      - coverage.out.tmp
+  test:coverage:
+    cmds:
+      - cat coverage.out.tmp | egrep -v "kod_|.pb.go|_test.go|example/gateway|pkg/types/" > coverage.out
+      - go tool cover -func=coverage.out
+      - rm coverage.out.tmp coverage.out
+    deps:
+      - test
