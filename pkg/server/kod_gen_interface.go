@@ -6,11 +6,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/nautilus/graphql"
 	"github.com/sysulq/graphql-gateway/pkg/generator"
 	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/protobuf/protoadapt"
 )
 
 // config is a component that implements ConfigComponent.
@@ -26,7 +26,7 @@ type ServerComponent interface {
 // caller is a component that implements Caller.
 type Caller interface {
 	GetDescs() []*desc.FileDescriptor
-	Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error)
+	Call(ctx context.Context, rpc *desc.MethodDescriptor, message protoadapt.MessageV1) (protoadapt.MessageV1, error)
 }
 
 // queryer is a component that implements Queryer.

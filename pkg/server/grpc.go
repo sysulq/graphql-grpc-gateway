@@ -12,8 +12,9 @@ import (
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/protoadapt"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic/grpcdynamic"
 	"google.golang.org/grpc"
@@ -97,12 +98,12 @@ func (c *caller) GetDescs() []*desc.FileDescriptor {
 	return c.descs
 }
 
-func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error) {
+func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message protoadapt.MessageV1) (protoadapt.MessageV1, error) {
 	if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
 		hash := Hash64.Get()
 		defer Hash64.Put(hash)
 
-		msg, err := proto.Marshal(message)
+		msg, err := proto.Marshal(protoadapt.MessageV2Of(message))
 		if err != nil {
 			return nil, err
 		}
@@ -120,7 +121,7 @@ func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message p
 			return nil, err
 		}
 
-		return res.(proto.Message), nil
+		return res.(protoadapt.MessageV1), nil
 	}
 
 	res, err := c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)

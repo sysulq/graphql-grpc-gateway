@@ -9,14 +9,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/stretchr/testify/require"
 	pb "github.com/sysulq/graphql-gateway/api/test"
 	"github.com/sysulq/graphql-gateway/pkg/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/protoadapt"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/runtime/protoiface"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
@@ -102,14 +104,14 @@ type constructsServiceMock struct {
 }
 
 // FilterMessageFields 根据 FieldMask 过滤并返回指定字段的消息
-func FilterMessageFields(original proto.Message, mask *fieldmaskpb.FieldMask) proto.Message {
+func FilterMessageFields(original protoiface.MessageV1, mask *fieldmaskpb.FieldMask) protoiface.MessageV1 {
 	if mask == nil {
 		return original
 	}
 
 	// 创建一个新的空消息，用于存储筛选后的字段
-	filtered := proto.Clone(original)
-	filteredReflect := proto.MessageReflect(filtered)
+	filtered := proto.Clone(protoadapt.MessageV2Of(original))
+	filteredReflect := filtered.ProtoReflect()
 
 	maskMap := make(map[string]struct{})
 	for _, path := range mask.GetPaths() {
@@ -124,7 +126,7 @@ func FilterMessageFields(original proto.Message, mask *fieldmaskpb.FieldMask) pr
 		return true
 	})
 
-	return filtered
+	return protoadapt.MessageV1Of(filtered)
 }
 
 func (c constructsServiceMock) Scalars_(ctx context.Context, scalars *pb.Scalars) (*pb.Scalars, error) {

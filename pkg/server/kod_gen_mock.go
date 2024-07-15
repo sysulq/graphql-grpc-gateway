@@ -14,12 +14,12 @@ import (
 	http "net/http"
 	reflect "reflect"
 
-	proto "github.com/golang/protobuf/proto"
 	desc "github.com/jhump/protoreflect/desc"
 	graphql "github.com/nautilus/graphql"
 	generator "github.com/sysulq/graphql-gateway/pkg/generator"
 	ast "github.com/vektah/gqlparser/v2/ast"
 	gomock "go.uber.org/mock/gomock"
+	protoadapt "google.golang.org/protobuf/protoadapt"
 )
 
 // MockConfigComponent is a mock of ConfigComponent interface.
@@ -121,10 +121,10 @@ func (m *MockCaller) EXPECT() *MockCallerMockRecorder {
 }
 
 // Call mocks base method.
-func (m *MockCaller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message proto.Message) (proto.Message, error) {
+func (m *MockCaller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message protoadapt.MessageV1) (protoadapt.MessageV1, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Call", ctx, rpc, message)
-	ret0, _ := ret[0].(proto.Message)
+	ret0, _ := ret[0].(protoadapt.MessageV1)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

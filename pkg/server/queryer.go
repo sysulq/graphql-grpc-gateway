@@ -10,13 +10,13 @@ import (
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kratelimit"
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
 	"github.com/nautilus/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/protobuf/protoadapt"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
@@ -188,7 +188,7 @@ func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.
 	return q.pbDecode(field, msg)
 }
 
-func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
+func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (protoadapt.MessageV1, error) {
 	inputMsg := dynamic.NewMessage(in)
 	inArg := field.Arguments.ForName("in")
 	if inArg == nil {
@@ -403,7 +403,7 @@ func (q *queryer) pbDecodeOneofField(desc *desc.MessageDescriptor, dynamicMsg *d
 	return oneof, nil
 }
 
-func (q *queryer) pbDecode(field *ast.Field, msg proto.Message) (res interface{}, err error) {
+func (q *queryer) pbDecode(field *ast.Field, msg protoadapt.MessageV1) (res interface{}, err error) {
 	switch dynamicMsg := msg.(type) {
 	case *dynamic.Message:
 		return q.gqlValue(dynamicMsg, dynamicMsg.GetMessageDescriptor(), nil, field)
