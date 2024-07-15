@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/stretchr/testify/require"
 	pb "github.com/sysulq/graphql-gateway/api/test"
 	"github.com/sysulq/graphql-gateway/pkg/server"
@@ -20,6 +19,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/runtime/protoiface"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
@@ -146,7 +146,7 @@ func (c constructsServiceMock) Any_(ctx context.Context, any *anypb.Any) (*anypb
 	return any, nil
 }
 
-func (c constructsServiceMock) Empty_(ctx context.Context, empty *empty.Empty) (*pb.Empty, error) {
+func (c constructsServiceMock) Empty_(ctx context.Context, empty *emptypb.Empty) (*pb.Empty, error) {
 	return &pb.Empty{}, nil
 }
 

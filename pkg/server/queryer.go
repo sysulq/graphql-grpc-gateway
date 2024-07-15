@@ -10,13 +10,13 @@ import (
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kratelimit"
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
 	"github.com/nautilus/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/protoadapt"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
@@ -275,31 +275,31 @@ func (q *queryer) pbValue(val interface{}, reqDesc *desc.FieldDescriptor) (_ int
 
 	switch v := val.(type) {
 	case float64:
-		if reqDesc.GetType() == descriptor.FieldDescriptorProto_TYPE_FLOAT {
+		if reqDesc.GetType() == descriptorpb.FieldDescriptorProto_TYPE_FLOAT {
 			return float32(v), nil
 		}
 	case int64:
 		switch reqDesc.GetType() {
-		case descriptor.FieldDescriptorProto_TYPE_INT32,
-			descriptor.FieldDescriptorProto_TYPE_SINT32,
-			descriptor.FieldDescriptorProto_TYPE_SFIXED32:
+		case descriptorpb.FieldDescriptorProto_TYPE_INT32,
+			descriptorpb.FieldDescriptorProto_TYPE_SINT32,
+			descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
 			return int32(v), nil
 
-		case descriptor.FieldDescriptorProto_TYPE_UINT32,
-			descriptor.FieldDescriptorProto_TYPE_FIXED32:
+		case descriptorpb.FieldDescriptorProto_TYPE_UINT32,
+			descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
 			return uint32(v), nil
 
-		case descriptor.FieldDescriptorProto_TYPE_UINT64,
-			descriptor.FieldDescriptorProto_TYPE_FIXED64:
+		case descriptorpb.FieldDescriptorProto_TYPE_UINT64,
+			descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
 			return uint64(v), nil
-		case descriptor.FieldDescriptorProto_TYPE_FLOAT:
+		case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
 			return float32(v), nil
-		case descriptor.FieldDescriptorProto_TYPE_DOUBLE:
+		case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
 			return float64(v), nil
 		}
 	case string:
 		switch reqDesc.GetType() {
-		case descriptor.FieldDescriptorProto_TYPE_ENUM:
+		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 			// TODO predefine this
 			enumDesc := reqDesc.GetEnumType()
 			values := map[string]int32{}
@@ -307,7 +307,7 @@ func (q *queryer) pbValue(val interface{}, reqDesc *desc.FieldDescriptor) (_ int
 				values[v.GetName()] = v.GetNumber()
 			}
 			return values[v], nil
-		case descriptor.FieldDescriptorProto_TYPE_BYTES:
+		case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
 			bytes, err := base64.StdEncoding.DecodeString(v)
 			if err != nil {
 				return nil, fmt.Errorf("bytes should be a base64 encoded string")
@@ -515,13 +515,11 @@ func (q *queryer) gqlValue(val interface{}, msgDesc *desc.MessageDescriptor, enu
 }
 
 func (q *queryer) anyMessageToMap(v *anypb.Any) (map[string]interface{}, error) {
-	fqn, err := ptypes.AnyMessageName(v)
-	if err != nil {
-		return nil, err
-	}
+	fqn := string(v.MessageName())
+
 	grpcType, definition := q.registry.Get().FindObjectByFullyQualifiedName(fqn)
 	outputMsg := dynamic.NewMessage(grpcType)
-	if err = outputMsg.Unmarshal(v.Value); err != nil {
+	if err := outputMsg.Unmarshal(v.Value); err != nil {
 		return nil, err
 	}
 	return q.protoMessageToMap(outputMsg, definition)
