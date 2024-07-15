@@ -8,7 +8,6 @@ import (
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
 	"github.com/samber/lo"
-	"github.com/sysulq/graphql-gateway/pkg/protoparser"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc/credentials"
@@ -71,13 +70,7 @@ func (c *caller) Init(ctx context.Context) (err error) {
 				return err
 			}
 		}
-		if e.ProtoFiles != nil {
-			descs, err := protoparser.Parse(config.ImportPaths, e.ProtoFiles)
-			if err != nil {
-				return err
-			}
-			newDescs = append(newDescs, descs...)
-		}
+
 		for _, d := range newDescs {
 			descsconn[d.GetFullyQualifiedName()] = conn
 		}
