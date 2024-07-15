@@ -1,7 +1,6 @@
 package test
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"net"
@@ -12,12 +11,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/require"
 	pb "github.com/sysulq/graphql-gateway/api/test"
 	"github.com/sysulq/graphql-gateway/pkg/server"
-	"github.com/vektah/gqlparser/v2/ast"
-	"github.com/vektah/gqlparser/v2/formatter"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -29,28 +25,6 @@ type (
 	j = map[string]interface{}
 	l = []interface{}
 )
-
-func CompareGraphql(t *testing.T, got, expect *ast.Schema) {
-	t.Helper()
-
-	expectedGraphql := &bytes.Buffer{}
-	actualGraphql := &bytes.Buffer{}
-	formatter.NewFormatter(actualGraphql).FormatSchema(got)
-	formatter.NewFormatter(expectedGraphql).FormatSchema(expect)
-
-	if actualGraphql.String() != expectedGraphql.String() {
-		diff := difflib.UnifiedDiff{
-			A:        difflib.SplitLines(expectedGraphql.String()),
-			B:        difflib.SplitLines(actualGraphql.String()),
-			FromFile: "expect",
-			ToFile:   "got",
-			Context:  3,
-		}
-		t.Errorf("Generated graphql file does not match expectations")
-		str, _ := difflib.GetUnifiedDiffString(diff)
-		t.Errorf("%s", str)
-	}
-}
 
 type DepsInfo struct {
 	OptionsServerAddr    net.Listener

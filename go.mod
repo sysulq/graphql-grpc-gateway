@@ -14,7 +14,6 @@ require (
 	github.com/jhump/protoreflect v1.16.0
 	github.com/nautilus/gateway v0.3.17
 	github.com/nautilus/graphql v0.0.25
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
 	github.com/rs/cors v1.11.0
 	github.com/samber/lo v1.44.0
 	github.com/stretchr/testify v1.9.0
@@ -53,6 +52,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_golang v1.19.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
