@@ -297,6 +297,7 @@ func NewFileBus() (chan *grpc_reflection_v1.ServerReflectionRequest, chan *grpc_
 		request:       request,
 	}
 	go func() {
+		time.Sleep(time.Second)
 		for {
 			select {
 			case res, ok := <-response:

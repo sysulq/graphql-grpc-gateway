@@ -2,7 +2,7 @@ version: '3'
 env:
   GOBIN: { sh: pwd }
   # OTEL_TRACES_EXPORTER: console
-  OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:14318"
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:14318
   OTEL_EXPORTER_OTLP_HEADERS: "uptrace-dsn=http://project2_secret_token@localhost:14318?grpc=14317"
   OTEL_EXPORTER_OTLP_COMPRESSION: gzip
   OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: BASE2_EXPONENTIAL_BUCKET_HISTOGRAM
@@ -27,3 +27,11 @@ tasks:
   optionsserver:
     cmds:
       - go run ./example/gateway/optionsserver  
+
+  bench:
+    cmds:
+      - "ab -n 50000 -kc 100 -T 'application/json' -H 'Accept-Encoding: gzip, deflate, br' -H 'Accept: application/json' -H 'DNT: 1' -H 'Origin: http://localhost:8080' -p test/post2.json http://localhost:8080/query"
+
+  test:
+    cmds:
+      - go test -race -cover -coverprofile=coverage.out -covermode=atomic ./...

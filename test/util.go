@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -82,8 +83,9 @@ func SetupDeps(t testing.TB) DepsInfo {
 	var (
 		optionsServerCh    = make(chan net.Listener)
 		constructsServerCh = make(chan net.Listener)
-		optionsServer      *grpc.Server
-		constructsServer   *grpc.Server
+
+		optionsServer    atomic.Pointer[*grpc.Server]
+		constructsServer atomic.Pointer[*grpc.Server]
 	)
 	go func() {
 		l, err := net.Listen("tcp", "localhost:0")
@@ -96,7 +98,7 @@ func SetupDeps(t testing.TB) DepsInfo {
 		pb.RegisterServiceServer(s, &optionsServiceMock{})
 		pb.RegisterQueryServer(s, &optionsQueryMock{})
 		reflection.Register(s)
-		optionsServer = s
+		optionsServer.Store(&s)
 		s.Serve(l)
 	}()
 	go func() {
@@ -109,15 +111,15 @@ func SetupDeps(t testing.TB) DepsInfo {
 		s := grpc.NewServer()
 		pb.RegisterConstructsServer(s, constructsServiceMock{})
 		reflection.Register(s)
-		constructsServer = s
+		constructsServer.Store(&s)
 		s.Serve(l)
 	}()
 
 	return DepsInfo{
 		OptionsServerAddr:    <-optionsServerCh,
 		ConstructsServerAddr: <-constructsServerCh,
-		OptionServer:         optionsServer,
-		ConstructServer:      constructsServer,
+		OptionServer:         *optionsServer.Load(),
+		ConstructServer:      *constructsServer.Load(),
 	}
 }
 

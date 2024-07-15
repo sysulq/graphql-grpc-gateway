@@ -5,7 +5,6 @@ import (
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/vektah/gqlparser/v2/ast"
-	any "google.golang.org/protobuf/types/known/anypb"
 )
 
 type ObjectDescriptor struct {
@@ -73,5 +72,5 @@ func isEmpty(o *desc.MessageDescriptor, callstack Callstack) bool {
 
 // TODO maybe not compare by strings
 func IsAny(o *desc.MessageDescriptor) bool {
-	return string((&any.Any{}).ProtoReflect().Descriptor().FullName()) == o.GetFullyQualifiedName()
+	return o.GetFullyQualifiedName() == "google.protobuf.Any"
 }

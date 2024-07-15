@@ -7,6 +7,7 @@ import (
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
+	"github.com/samber/lo"
 	"github.com/sysulq/graphql-gateway/pkg/protoparser"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"golang.org/x/sync/singleflight"
@@ -65,7 +66,7 @@ func (c *caller) Init(ctx context.Context) (err error) {
 
 		var newDescs []*desc.FileDescriptor
 		if e.Reflection {
-			newDescs, err = reflection.NewClientWithImportsResolver(conn).ListPackages()
+			newDescs, err = reflection.NewClient(conn).ListPackages()
 			if err != nil {
 				return err
 			}
@@ -88,6 +89,10 @@ func (c *caller) Init(ctx context.Context) (err error) {
 			serviceStub[svc.GetFullyQualifiedName()] = grpcdynamic.NewStub(descsconn[d.GetFullyQualifiedName()])
 		}
 	}
+
+	descs = lo.UniqBy(descs, func(item *desc.FileDescriptor) string {
+		return item.GetFile().GetFullyQualifiedName()
+	})
 
 	c.descs = descs
 	c.serviceStub = serviceStub
