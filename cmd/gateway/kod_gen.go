@@ -14,9 +14,9 @@ func init() {
 	kod.Register(&kod.Registration{
 		Name:      "github.com/go-kod/kod/Main",
 		Interface: reflect.TypeOf((*kod.Main)(nil)).Elem(),
-		Impl:      reflect.TypeOf(gateway{}),
-		Refs: `⟦325d13ab:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-gateway/pkg/server/ConfigComponent⟧,
-⟦e429ec87:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-gateway/pkg/server/ServerComponent⟧`,
+		Impl:      reflect.TypeOf(app{}),
+		Refs: `⟦3cbbe7e2:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-gateway/pkg/server/Config⟧,
+⟦734cf123:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-gateway/pkg/server/Gateway⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -35,7 +35,7 @@ func init() {
 }
 
 // kod.InstanceOf checks.
-var _ kod.InstanceOf[kod.Main] = (*gateway)(nil)
+var _ kod.InstanceOf[kod.Main] = (*app)(nil)
 
 // Local stub implementations.
 

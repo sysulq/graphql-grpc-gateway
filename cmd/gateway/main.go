@@ -14,20 +14,20 @@ import (
 	"github.com/sysulq/graphql-gateway/pkg/server"
 )
 
-type gateway struct {
+type app struct {
 	kod.Implements[kod.Main]
 
-	config kod.Ref[server.ConfigComponent]
-	server kod.Ref[server.ServerComponent]
+	config kod.Ref[server.Config]
+	server kod.Ref[server.Gateway]
 }
 
-func run(ctx context.Context, gw *gateway) error {
-	cfg := gw.config.Get().Config()
+func run(ctx context.Context, app *app) error {
+	cfg := app.config.Get().Config()
 
 	l, err := net.Listen("tcp", cfg.Address)
 	lo.Must0(err)
 	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
-	handler, err := gw.server.Get().BuildServer()
+	handler, err := app.server.Get().BuildServer()
 	lo.Must0(err)
 	if cfg.Tls.Enable {
 		log.Fatal(http.ServeTLS(l, handler, cfg.Tls.Certificate, cfg.Tls.PrivateKey))

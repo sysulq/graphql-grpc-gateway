@@ -18,11 +18,11 @@ import (
 )
 
 type server struct {
-	kod.Implements[ServerComponent]
+	kod.Implements[Gateway]
 
 	profiler *pyroscope.Profiler
 
-	config   kod.Ref[ConfigComponent]
+	config   kod.Ref[Config]
 	queryer  kod.Ref[Queryer]
 	registry kod.Ref[Registry]
 }

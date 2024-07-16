@@ -16,8 +16,8 @@ import (
 func TestSingleFlight(t *testing.T) {
 	infos := test.SetupDeps(t)
 
-	mockConfig := server.NewMockConfigComponent(gomock.NewController(t))
-	mockConfig.EXPECT().Config().Return(&server.Config{
+	mockConfig := server.NewMockConfig(gomock.NewController(t))
+	mockConfig.EXPECT().Config().Return(&server.ConfigInfo{
 		Grpc: server.Grpc{
 			Services: []*server.Service{
 				{
@@ -32,7 +32,7 @@ func TestSingleFlight(t *testing.T) {
 		},
 	}).AnyTimes()
 
-	kod.RunTest(t, func(ctx context.Context, s server.ServerComponent) {
+	kod.RunTest(t, func(ctx context.Context, s server.Gateway) {
 		gatewayUrl := test.SetupGateway(t, s)
 		querier := graphql.NewSingleRequestQueryer(gatewayUrl)
 
@@ -62,5 +62,5 @@ func TestSingleFlight(t *testing.T) {
 			}
 			wg.Wait()
 		})
-	}, kod.WithFakes(kod.Fake[server.ConfigComponent](mockConfig)))
+	}, kod.WithFakes(kod.Fake[server.Config](mockConfig)))
 }

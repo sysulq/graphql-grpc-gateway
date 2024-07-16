@@ -31,7 +31,7 @@ type caller struct {
 	singleflight singleflight.Group
 
 	reflection  kod.Ref[Reflection]
-	config      kod.Ref[ConfigComponent]
+	config      kod.Ref[Config]
 	serviceStub map[string]grpcdynamic.Stub
 
 	descs []*desc.FileDescriptor

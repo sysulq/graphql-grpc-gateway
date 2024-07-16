@@ -26,8 +26,8 @@ type Service struct {
 }
 
 type config struct {
-	kod.Implements[ConfigComponent]
-	kod.WithGlobalConfig[Config]
+	kod.Implements[Config]
+	kod.WithGlobalConfig[ConfigInfo]
 }
 
 type Pyroscope struct {
@@ -40,7 +40,7 @@ type GraphQL struct {
 	Playground bool `json:"playground" yaml:"playground"`
 }
 
-type Config struct {
+type ConfigInfo struct {
 	Pyroscope Pyroscope `json:"pyroscope" yaml:"pyroscope"`
 	Grpc      Grpc      `json:"grpc" yaml:"grpc"`
 	Address   string    `json:"address" yaml:"address"`
@@ -48,8 +48,8 @@ type Config struct {
 	GraphQL   GraphQL   `json:"graphql" yaml:"graphql"`
 }
 
-func defaultConfig() *Config {
-	return &Config{
+func defaultConfig() *ConfigInfo {
+	return &ConfigInfo{
 		Address: ":8080",
 		Pyroscope: Pyroscope{
 			Enable: false,
@@ -68,6 +68,6 @@ func (ins *config) Init(ctx context.Context) error {
 	return mergo.Merge(ins.Config(), defaultConfig())
 }
 
-func (ins *config) Config() *Config {
+func (ins *config) Config() *ConfigInfo {
 	return ins.WithGlobalConfig.Config()
 }

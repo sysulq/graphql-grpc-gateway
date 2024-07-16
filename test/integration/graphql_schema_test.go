@@ -21,8 +21,8 @@ var testGatewayExpectedSchema []byte
 func TestGraphqlSchema(t *testing.T) {
 	infos := test.SetupDeps(t)
 
-	mockConfig := server.NewMockConfigComponent(gomock.NewController(t))
-	mockConfig.EXPECT().Config().Return(&server.Config{
+	mockConfig := server.NewMockConfig(gomock.NewController(t))
+	mockConfig.EXPECT().Config().Return(&server.ConfigInfo{
 		Grpc: server.Grpc{
 			Services: []*server.Service{
 				{
@@ -40,7 +40,7 @@ func TestGraphqlSchema(t *testing.T) {
 		},
 	}).AnyTimes()
 
-	kod.RunTest(t, func(ctx context.Context, s server.ServerComponent) {
+	kod.RunTest(t, func(ctx context.Context, s server.Gateway) {
 		gatewayUrl := test.SetupGateway(t, s)
 		t.Run("schema is correct", func(t *testing.T) {
 			schema, err := graphql.IntrospectRemoteSchema(gatewayUrl)
@@ -57,5 +57,5 @@ func TestGraphqlSchema(t *testing.T) {
 
 			require.Equal(t, string(testGatewayExpectedSchema), string(generated))
 		})
-	}, kod.WithFakes(kod.Fake[server.ConfigComponent](mockConfig)))
+	}, kod.WithFakes(kod.Fake[server.Config](mockConfig)))
 }

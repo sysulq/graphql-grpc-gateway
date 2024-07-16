@@ -14,9 +14,9 @@ import (
 	"google.golang.org/protobuf/protoadapt"
 )
 
-// config is a component that implements ConfigComponent.
-type ConfigComponent interface {
-	Config() *Config
+// config is a component that implements Config.
+type Config interface {
+	Config() *ConfigInfo
 }
 
 // reflection is a component that implements Reflection.
@@ -24,8 +24,8 @@ type Reflection interface {
 	ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]*desc.FileDescriptor, error)
 }
 
-// server is a component that implements ServerComponent.
-type ServerComponent interface {
+// server is a component that implements Gateway.
+type Gateway interface {
 	BuildServer() (http.Handler, error)
 }
 

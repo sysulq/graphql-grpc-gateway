@@ -30,7 +30,7 @@ type DepsInfo struct {
 	ConstructServer      *grpc.Server
 }
 
-func SetupGateway(t testing.TB, s server.ServerComponent) string {
+func SetupGateway(t testing.TB, s server.Gateway) string {
 	serverCh := make(chan net.Addr)
 	go func() {
 		l, err := net.Listen("tcp", ":0")

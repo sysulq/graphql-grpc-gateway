@@ -23,41 +23,41 @@ import (
 	protoadapt "google.golang.org/protobuf/protoadapt"
 )
 
-// MockConfigComponent is a mock of ConfigComponent interface.
-type MockConfigComponent struct {
+// MockConfig is a mock of Config interface.
+type MockConfig struct {
 	ctrl     *gomock.Controller
-	recorder *MockConfigComponentMockRecorder
+	recorder *MockConfigMockRecorder
 }
 
-// MockConfigComponentMockRecorder is the mock recorder for MockConfigComponent.
-type MockConfigComponentMockRecorder struct {
-	mock *MockConfigComponent
+// MockConfigMockRecorder is the mock recorder for MockConfig.
+type MockConfigMockRecorder struct {
+	mock *MockConfig
 }
 
-// NewMockConfigComponent creates a new mock instance.
-func NewMockConfigComponent(ctrl *gomock.Controller) *MockConfigComponent {
-	mock := &MockConfigComponent{ctrl: ctrl}
-	mock.recorder = &MockConfigComponentMockRecorder{mock}
+// NewMockConfig creates a new mock instance.
+func NewMockConfig(ctrl *gomock.Controller) *MockConfig {
+	mock := &MockConfig{ctrl: ctrl}
+	mock.recorder = &MockConfigMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockConfigComponent) EXPECT() *MockConfigComponentMockRecorder {
+func (m *MockConfig) EXPECT() *MockConfigMockRecorder {
 	return m.recorder
 }
 
 // Config mocks base method.
-func (m *MockConfigComponent) Config() *Config {
+func (m *MockConfig) Config() *ConfigInfo {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Config")
-	ret0, _ := ret[0].(*Config)
+	ret0, _ := ret[0].(*ConfigInfo)
 	return ret0
 }
 
 // Config indicates an expected call of Config.
-func (mr *MockConfigComponentMockRecorder) Config() *gomock.Call {
+func (mr *MockConfigMockRecorder) Config() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockConfigComponent)(nil).Config))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockConfig)(nil).Config))
 }
 
 // MockReflection is a mock of Reflection interface.
@@ -98,31 +98,31 @@ func (mr *MockReflectionMockRecorder) ListPackages(ctx, cc any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListPackages", reflect.TypeOf((*MockReflection)(nil).ListPackages), ctx, cc)
 }
 
-// MockServerComponent is a mock of ServerComponent interface.
-type MockServerComponent struct {
+// MockGateway is a mock of Gateway interface.
+type MockGateway struct {
 	ctrl     *gomock.Controller
-	recorder *MockServerComponentMockRecorder
+	recorder *MockGatewayMockRecorder
 }
 
-// MockServerComponentMockRecorder is the mock recorder for MockServerComponent.
-type MockServerComponentMockRecorder struct {
-	mock *MockServerComponent
+// MockGatewayMockRecorder is the mock recorder for MockGateway.
+type MockGatewayMockRecorder struct {
+	mock *MockGateway
 }
 
-// NewMockServerComponent creates a new mock instance.
-func NewMockServerComponent(ctrl *gomock.Controller) *MockServerComponent {
-	mock := &MockServerComponent{ctrl: ctrl}
-	mock.recorder = &MockServerComponentMockRecorder{mock}
+// NewMockGateway creates a new mock instance.
+func NewMockGateway(ctrl *gomock.Controller) *MockGateway {
+	mock := &MockGateway{ctrl: ctrl}
+	mock.recorder = &MockGatewayMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockServerComponent) EXPECT() *MockServerComponentMockRecorder {
+func (m *MockGateway) EXPECT() *MockGatewayMockRecorder {
 	return m.recorder
 }
 
 // BuildServer mocks base method.
-func (m *MockServerComponent) BuildServer() (http.Handler, error) {
+func (m *MockGateway) BuildServer() (http.Handler, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BuildServer")
 	ret0, _ := ret[0].(http.Handler)
@@ -131,9 +131,9 @@ func (m *MockServerComponent) BuildServer() (http.Handler, error) {
 }
 
 // BuildServer indicates an expected call of BuildServer.
-func (mr *MockServerComponentMockRecorder) BuildServer() *gomock.Call {
+func (mr *MockGatewayMockRecorder) BuildServer() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildServer", reflect.TypeOf((*MockServerComponent)(nil).BuildServer))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildServer", reflect.TypeOf((*MockGateway)(nil).BuildServer))
 }
 
 // MockCaller is a mock of Caller interface.
