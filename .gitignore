@@ -85,3 +85,5 @@ Temporary Items
 coverage.out*
 mockgen
 golangci-lint
+kod
+buf

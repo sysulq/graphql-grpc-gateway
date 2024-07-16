@@ -66,20 +66,39 @@ tasks:
     cmd: |
         go install github.com/golangci/golangci-lint/cmd/golangci-lint@{{.VERSION}}
 
+  install:buf:
+    vars:
+      VERSION: v1.34.0
+    status:
+      - test -f buf
+      - go version -m $GOBIN/buf | grep buf.build | grep {{.VERSION}}
+    cmd: |
+      curl -sSL \
+      "https://github.com/bufbuild/buf/releases/download/{{.VERSION}}/buf-$(uname -s)-$(uname -m)" \
+      -o "$GOBIN/buf" && \
+      chmod +x "$GOBIN/buf"
+
+  install:kod:
+    vars:
+      VERSION: 
+        sh: |
+          cat go.mod|egrep "github.com/go-kod/kod " |awk -F ' ' '{print $2}'
+    status:
+      - test -f kod
+      - go version -m $GOBIN/kod | grep github.com/go-kod/kod | grep {{.VERSION}}
+    cmd: |
+        go install github.com/go-kod/kod/cmd/kod@{{.VERSION}}
+
   mod:
     cmds:
       - go mod tidy
 
   default:
     cmds:
-      - go generate
+      - task generate
       - task golangci-lint
       - task test:coverage
       - task clean
-    deps:
-      - mod
-      - install:golangci-lint
-      - install:mockgen
 
   clean:
     cmds: 
@@ -90,3 +109,13 @@ tasks:
       - $GOBIN/golangci-lint run -v
     deps:
       - install:golangci-lint
+
+  generate:
+    cmds:
+      - $GOBIN/buf generate
+      - kod generate -s ./...
+    deps:
+      - mod
+      - install:mockgen
+      - install:buf
+      - install:kod
