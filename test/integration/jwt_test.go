@@ -42,9 +42,10 @@ func TestJwt(t *testing.T) {
 
 	kod.RunTest(t, func(ctx context.Context, s server.Gateway) {
 		gatewayUrl := test.SetupGateway(t, s)
-		querier := graphql.NewSingleRequestQueryer(gatewayUrl)
 
 		t.Run("jwt auth", func(t *testing.T) {
+			querier := graphql.NewSingleRequestQueryer(gatewayUrl)
+
 			recv := map[string]interface{}{}
 			querier.WithMiddlewares([]graphql.NetworkMiddleware{
 				func(r *http.Request) error {
@@ -65,6 +66,7 @@ func TestJwt(t *testing.T) {
 		})
 
 		t.Run("jwt auth failed", func(t *testing.T) {
+			querier := graphql.NewSingleRequestQueryer(gatewayUrl)
 			recv := map[string]interface{}{}
 			querier.WithMiddlewares([]graphql.NetworkMiddleware{
 				func(r *http.Request) error {
@@ -75,6 +77,17 @@ func TestJwt(t *testing.T) {
 					return nil
 				},
 			})
+
+			if err := querier.Query(context.Background(), &graphql.QueryInput{
+				Query: contructsMultipleQuery,
+			}, &recv); err != nil {
+				require.NotNil(t, err)
+			}
+		})
+
+		t.Run("not authorization", func(t *testing.T) {
+			querier := graphql.NewSingleRequestQueryer(gatewayUrl)
+			recv := map[string]interface{}{}
 
 			if err := querier.Query(context.Background(), &graphql.QueryInput{
 				Query: contructsMultipleQuery,
