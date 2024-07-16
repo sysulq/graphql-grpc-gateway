@@ -6,7 +6,6 @@ import (
 	"dario.cat/mergo"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/ext/client/kpyroscope"
-	"github.com/rs/cors"
 )
 
 type Tls struct {
@@ -31,24 +30,37 @@ type config struct {
 	kod.WithGlobalConfig[Config]
 }
 
+type Pyroscope struct {
+	kpyroscope.Config
+	Enable bool
+}
+
+type GraphQL struct {
+	Disable    bool `json:"disable" yaml:"disable"`
+	Playground bool `json:"playground" yaml:"playground"`
+}
+
 type Config struct {
-	Pyroscope  kpyroscope.Config `json:"pyroscope" yaml:"pyroscope"`
-	Grpc       Grpc              `json:"grpc" yaml:"grpc"`
-	Cors       cors.Options      `json:"cors" yaml:"cors"`
-	Playground bool              `json:"playground" yaml:"playground"`
-	Address    string            `json:"address" yaml:"address"`
-	Tls        Tls               `json:"tls" yaml:"tls"`
+	Pyroscope Pyroscope `json:"pyroscope" yaml:"pyroscope"`
+	Grpc      Grpc      `json:"grpc" yaml:"grpc"`
+	Address   string    `json:"address" yaml:"address"`
+	Tls       Tls       `json:"tls" yaml:"tls"`
+	GraphQL   GraphQL   `json:"graphql" yaml:"graphql"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
 		Address: ":8080",
-		Pyroscope: kpyroscope.Config{
-			ServerAddress: "http://localhost:4040",
+		Pyroscope: Pyroscope{
+			Enable: false,
+			Config: kpyroscope.Config{
+				ServerAddress: "http://localhost:4040",
+			},
 		},
-		Cors:       cors.Options{},
-		Grpc:       Grpc{},
-		Playground: true,
+		Grpc: Grpc{},
+		GraphQL: GraphQL{
+			Playground: true,
+		},
 	}
 }
 

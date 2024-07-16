@@ -35,7 +35,9 @@ func TestGraphqlSchema(t *testing.T) {
 				},
 			},
 		},
-		Playground: true,
+		GraphQL: server.GraphQL{
+			Playground: true,
+		},
 	}).AnyTimes()
 
 	kod.RunTest(t, func(ctx context.Context, s server.ServerComponent) {

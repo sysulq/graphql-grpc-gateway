@@ -4,7 +4,6 @@ go 1.22.4
 
 require (
 	dario.cat/mergo v1.0.0
-	github.com/99designs/gqlgen v0.17.49
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/go-kod/kod v0.11.1-0.20240710063632-3f988b916777
 	github.com/go-kod/kod/ext v0.11.0
@@ -13,7 +12,6 @@ require (
 	github.com/jhump/protoreflect v1.16.0
 	github.com/nautilus/gateway v0.3.17
 	github.com/nautilus/graphql v0.0.25
-	github.com/rs/cors v1.11.0
 	github.com/samber/lo v1.44.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vektah/gqlparser/v2 v2.5.16
@@ -21,11 +19,13 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
 	go.uber.org/mock v0.4.0
 	golang.org/x/sync v0.7.0
+	golang.org/x/text v0.16.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 )
 
 require (
+	github.com/99designs/gqlgen v0.17.49 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.10.0 // indirect
@@ -65,7 +65,6 @@ require (
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.7.0 // indirect
 	github.com/sony/gobreaker v1.0.0 // indirect
-	github.com/sosodev/duration v1.3.1 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
@@ -104,7 +103,6 @@ require (
 	golang.org/x/mod v0.18.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240701130421-f6361c86f094 // indirect

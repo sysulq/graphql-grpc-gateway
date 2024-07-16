@@ -1,22 +1,16 @@
-docs: true
-cors:
 address: ":8080"
+
 pyroscope:
+  enable: true
   serverAddress: "http://localhost:4040"
+
 grpc:
-  #  import_paths:
-  #    - ./api
   services:
     - address: "localhost:8081"
-      #      authentication:
-      #        tls:
-      #          certificate: ""
-      #          privateKey: ""
       reflection: true
     - address: "localhost:8082"
       reflection: true
-#      authentication:
-#        insecure: true
-#      proto_files:
-#        - ./constructs.proto
-#        - ./options.proto
+
+graphql:
+  disable: false
+  playground: true

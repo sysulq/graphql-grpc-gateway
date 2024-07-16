@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/nautilus/gateway"
 	"github.com/nautilus/graphql"
-	"github.com/rs/cors"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
@@ -31,12 +30,15 @@ type server struct {
 }
 
 func (ins *server) Init(ctx context.Context) error {
-	profiler, err := ins.config.Get().Config().Pyroscope.Build(ctx)
-	if err != nil {
-		return err
-	}
+	cfg := ins.config.Get().Config()
+	if cfg.Pyroscope.Enable {
+		profiler, err := ins.config.Get().Config().Pyroscope.Build(ctx)
+		if err != nil {
+			return err
+		}
 
-	ins.profiler = profiler
+		ins.profiler = profiler
+	}
 
 	return nil
 }
@@ -66,17 +68,19 @@ func (s *server) BuildServer() (http.Handler, error) {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/query", g.GraphQLHandler)
-
 	cfg := s.config.Get().Config()
-	if cfg.Playground {
-		mux.HandleFunc("/playground", g.PlaygroundHandler)
+
+	if !cfg.GraphQL.Disable {
+		mux.HandleFunc("/query", g.GraphQLHandler)
+		if cfg.GraphQL.Playground {
+			mux.HandleFunc("/playground", g.PlaygroundHandler)
+		}
 	}
 
 	var handler http.Handler = addHeader(mux)
 	handler = otelhttp.NewMiddleware("graphql-gateway")(handler)
 
-	return cors.New(cfg.Cors).Handler(handler), nil
+	return handler, nil
 }
 
 func addHeader(handler http.Handler) http.Handler {

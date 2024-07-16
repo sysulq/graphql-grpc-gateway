@@ -29,6 +29,9 @@ func TestGraphql2Grpc(t *testing.T) {
 				},
 			},
 		},
+		GraphQL: server.GraphQL{
+			Playground: true,
+		},
 	}).AnyTimes()
 
 	kod.RunTest(t, func(ctx context.Context, s server.ServerComponent) {
