@@ -71,7 +71,6 @@ tasks:
       VERSION: v1.34.0
     status:
       - test -f buf
-      - go version -m $GOBIN/buf | grep buf.build | grep {{.VERSION}}
     cmd: |
       curl -sSL \
       "https://github.com/bufbuild/buf/releases/download/{{.VERSION}}/buf-$(uname -s)-$(uname -m)" \
