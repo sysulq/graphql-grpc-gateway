@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"google.golang.org/grpc/metadata"
-
 	"github.com/go-kod/kod"
 	"github.com/grafana/pyroscope-go"
 	"github.com/hashicorp/golang-lru/v2/expirable"
@@ -78,15 +76,11 @@ func (s *server) BuildServer() (http.Handler, error) {
 	var handler http.Handler = addHeader(mux)
 	handler = otelhttp.NewMiddleware("graphql-gateway")(handler)
 
-	return handler, nil
-}
+	if cfg.Jwt.Enable {
+		handler = s.jwtAuthHandler(handler)
+	}
 
-func addHeader(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		md := httpHeadersToGRPCMetadata(r.Header)
-		ctx := metadata.NewOutgoingContext(r.Context(), md)
-		handler.ServeHTTP(w, r.WithContext(ctx))
-	})
+	return handler, nil
 }
 
 type noopLogger struct {

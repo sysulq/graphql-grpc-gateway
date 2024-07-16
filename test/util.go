@@ -13,6 +13,7 @@ import (
 	pb "github.com/sysulq/graphql-grpc-gateway/api/test"
 	"github.com/sysulq/graphql-grpc-gateway/pkg/server"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
@@ -194,9 +195,11 @@ type optionsQueryMock struct {
 }
 
 func (o *optionsQueryMock) Query1(ctx context.Context, data *pb.Data) (*pb.Data, error) {
+	fmt.Println(metadata.FromIncomingContext(ctx))
 	return data, nil
 }
 
 func (o *optionsQueryMock) Query2(ctx context.Context, data *pb.Data) (*pb.Data, error) {
+	fmt.Println(metadata.FromIncomingContext(ctx))
 	return data, nil
 }

@@ -40,12 +40,24 @@ type GraphQL struct {
 	Playground bool `json:"playground" yaml:"playground"`
 }
 
+type Jwt struct {
+	Enable               bool   `json:"enable" yaml:"enable"`
+	LocalJwks            string `json:"local_jwks" yaml:"local_jwks"`
+	ForwardPayloadHeader string `json:"forward_payload_header" yaml:"forward_payload_header"`
+}
+
+type JwtClaimToHeader struct {
+	HeaderName string `json:"header_name" yaml:"header_name"`
+	ClaimName  string `json:"claim_name" yaml:"claim_name"`
+}
+
 type ConfigInfo struct {
 	Pyroscope Pyroscope `json:"pyroscope" yaml:"pyroscope"`
 	Grpc      Grpc      `json:"grpc" yaml:"grpc"`
 	Address   string    `json:"address" yaml:"address"`
 	Tls       Tls       `json:"tls" yaml:"tls"`
 	GraphQL   GraphQL   `json:"graphql" yaml:"graphql"`
+	Jwt       Jwt       `json:"jwt" yaml:"jwt"`
 }
 
 func defaultConfig() *ConfigInfo {
