@@ -10,11 +10,11 @@ import (
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kratelimit"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
 	"github.com/nautilus/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -260,12 +260,7 @@ func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars ma
 	}
 
 	if anyObj != nil {
-		// anyMsgDesc := q.pm.messages[in.DescriptorProto]
-		// anyMsg := dynamic.NewMessage(q.pm.messages[in.DescriptorProto])
-		// typeUrl := anyMsgDesc.FindFieldByName("type_url")
-		// value := anyMsgDesc.FindFieldByName("value")
-		// anyMsg.SetField(typeUrl, anyObj.GetFullyQualifiedName())
-		return ptypes.MarshalAny(inputMsg)
+		return marshalAny(inputMsg)
 	}
 	return inputMsg, nil
 }
@@ -373,7 +368,7 @@ func (q *queryer) pbValue(val interface{}, reqDesc *desc.FieldDescriptor) (_ int
 			msg.SetField(fieldDesc, vv2)
 		}
 		if anyTypeDescriptor != nil {
-			return ptypes.MarshalAny(msg)
+			return marshalAny(msg)
 		}
 		return msg, nil
 	}
@@ -607,4 +602,13 @@ func nameOrAlias(field *ast.Field) string {
 	}
 
 	return field.Name
+}
+
+func marshalAny(inputMsg *dynamic.Message) (*anypb.Any, error) {
+	b, err := proto.Marshal(protoadapt.MessageV2Of(inputMsg))
+	if err != nil {
+		return nil, err
+	}
+
+	return &anypb.Any{TypeUrl: "type.googleapis.com/" + string(inputMsg.GetMessageDescriptor().Unwrap().FullName()), Value: b}, nil
 }

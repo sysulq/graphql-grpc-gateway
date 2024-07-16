@@ -8,7 +8,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/go-kod/kod v0.11.1-0.20240710063632-3f988b916777
 	github.com/go-kod/kod/ext v0.11.0
-	github.com/golang/protobuf v1.5.4
 	github.com/grafana/pyroscope-go v1.1.1
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jhump/protoreflect v1.16.0
@@ -38,6 +37,7 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.6 // indirect
 	github.com/graph-gophers/dataloader v5.0.0+incompatible // indirect
