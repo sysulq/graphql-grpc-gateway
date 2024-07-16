@@ -20,7 +20,7 @@ type app struct {
 }
 
 func main() {
-	kod.Run(context.Background(), func(ctx context.Context, app *app) error {
+	_ = kod.Run(context.Background(), func(ctx context.Context, app *app) error {
 		l, err := net.Listen("tcp", ":8081")
 		if err != nil {
 			log.Fatal(err)

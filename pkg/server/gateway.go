@@ -43,7 +43,7 @@ func (ins *server) Init(ctx context.Context) error {
 
 func (ins *server) Shutdown(ctx context.Context) error {
 	if ins.profiler != nil {
-		ins.profiler.Stop()
+		_ = ins.profiler.Stop()
 	}
 
 	return nil

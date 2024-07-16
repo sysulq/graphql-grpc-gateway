@@ -50,16 +50,15 @@ func TestSingleFlight(t *testing.T) {
 			wg := sync.WaitGroup{}
 			wg.Add(2)
 			for i := 0; i < 2; i++ {
-				go func() {
+				go func(t *testing.T) {
 					defer wg.Done()
 					recv := map[string]interface{}{}
-					if err := querier.Query(context.Background(), &graphql.QueryInput{
+					err := querier.Query(context.Background(), &graphql.QueryInput{
 						Query: contructsMultipleSameQuery,
-					}, &recv); err != nil {
-						t.Fatal(err)
-					}
+					}, &recv)
+					assert.Nil(t, err)
 					assert.EqualValues(t, constructsMultipleSameResponse, recv)
-				}()
+				}(t)
 			}
 			wg.Wait()
 		})

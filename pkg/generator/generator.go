@@ -26,10 +26,6 @@ const (
 )
 
 func NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool, plugin *protogen.Plugin) (schemas SchemaDescriptorList, err error) {
-	var files []*descriptor.FileDescriptorProto
-	for _, d := range descs {
-		files = append(files, d.AsFileDescriptorProto())
-	}
 	var goref GoRef
 	if plugin != nil {
 		goref, err = NewGoRef(plugin)
@@ -144,8 +140,6 @@ type SchemaDescriptor struct {
 	Directives      map[string]*ast.DirectiveDefinition
 	FileDescriptors []*desc.FileDescriptor
 
-	files []*desc.FileDescriptor
-
 	query        *RootDefinition
 	mutation     *RootDefinition
 	subscription *RootDefinition
@@ -228,11 +222,12 @@ func (s *SchemaDescriptor) uniqueName(d desc.Descriptor, input bool) (name strin
 	if _, ok := d.(*desc.MessageDescriptor); input && ok {
 		suffix = inputSuffix
 	}
-	name = strings.Title(CamelCaseSlice(strings.Split(strings.TrimPrefix(d.GetFullyQualifiedName(), d.GetFile().GetPackage()+packageSep), packageSep)) + suffix)
+
+	name = Title(CamelCaseSlice(strings.Split(strings.TrimPrefix(d.GetFullyQualifiedName(), d.GetFile().GetPackage()+packageSep), packageSep)) + suffix)
 
 	if _, ok := d.(*desc.FieldDescriptor); ok {
 		collisionPrefix = fieldPrefix
-		name = CamelCaseSlice(strings.Split(strings.Trim(d.GetParent().GetName()+packageSep+strings.Title(d.GetName()), packageSep), packageSep))
+		name = CamelCaseSlice(strings.Split(strings.Trim(d.GetParent().GetName()+packageSep+Title(d.GetName()), packageSep), packageSep))
 	} else {
 		collisionPrefix = CamelCaseSlice(strings.Split(d.GetFile().GetPackage(), packageSep))
 	}
@@ -461,9 +456,9 @@ func (r *RootDefinition) UniqueName(svc *descriptor.ServiceDescriptorProto, rpc 
 	if rpcOpts != nil && rpcOpts.Name != "" {
 		name = rpcOpts.Name
 	} else if svcOpts != nil && svcOpts.Name != "" {
-		name = svcOpts.Name + strings.Title(rpc.GetName())
+		name = svcOpts.Name + Title(rpc.GetName())
 	} else {
-		name = ToLowerFirst(svc.GetName()) + strings.Title(rpc.GetName())
+		name = ToLowerFirst(svc.GetName()) + Title(rpc.GetName())
 	}
 
 	originalName := name

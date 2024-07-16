@@ -1,8 +1,6 @@
 package generator
 
 import (
-	"strings"
-
 	"github.com/jhump/protoreflect/desc"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -18,10 +16,6 @@ type ObjectDescriptor struct {
 
 func (o *ObjectDescriptor) AsGraphql() *ast.Definition {
 	return o.Definition
-}
-
-func (o *ObjectDescriptor) uniqueName(f *desc.FieldDescriptor) string {
-	return strings.Title(f.GetName())
 }
 
 func (o *ObjectDescriptor) IsInput() bool {

@@ -11,9 +11,8 @@ func NewCallstack() Callstack {
 }
 
 type callstack struct {
-	stack  map[interface{}]int
-	sorted []string
-	index  int
+	stack map[interface{}]int
+	index int
 }
 
 func (c *callstack) Pop(entry interface{}) {
