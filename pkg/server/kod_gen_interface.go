@@ -10,12 +10,18 @@ import (
 	"github.com/nautilus/graphql"
 	"github.com/sysulq/graphql-gateway/pkg/generator"
 	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/protoadapt"
 )
 
 // config is a component that implements ConfigComponent.
 type ConfigComponent interface {
 	Config() *Config
+}
+
+// reflection is a component that implements Reflection.
+type Reflection interface {
+	ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]*desc.FileDescriptor, error)
 }
 
 // server is a component that implements ServerComponent.

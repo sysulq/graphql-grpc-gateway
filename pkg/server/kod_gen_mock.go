@@ -19,6 +19,7 @@ import (
 	generator "github.com/sysulq/graphql-gateway/pkg/generator"
 	ast "github.com/vektah/gqlparser/v2/ast"
 	gomock "go.uber.org/mock/gomock"
+	grpc "google.golang.org/grpc"
 	protoadapt "google.golang.org/protobuf/protoadapt"
 )
 
@@ -57,6 +58,44 @@ func (m *MockConfigComponent) Config() *Config {
 func (mr *MockConfigComponentMockRecorder) Config() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockConfigComponent)(nil).Config))
+}
+
+// MockReflection is a mock of Reflection interface.
+type MockReflection struct {
+	ctrl     *gomock.Controller
+	recorder *MockReflectionMockRecorder
+}
+
+// MockReflectionMockRecorder is the mock recorder for MockReflection.
+type MockReflectionMockRecorder struct {
+	mock *MockReflection
+}
+
+// NewMockReflection creates a new mock instance.
+func NewMockReflection(ctrl *gomock.Controller) *MockReflection {
+	mock := &MockReflection{ctrl: ctrl}
+	mock.recorder = &MockReflectionMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockReflection) EXPECT() *MockReflectionMockRecorder {
+	return m.recorder
+}
+
+// ListPackages mocks base method.
+func (m *MockReflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]*desc.FileDescriptor, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListPackages", ctx, cc)
+	ret0, _ := ret[0].([]*desc.FileDescriptor)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListPackages indicates an expected call of ListPackages.
+func (mr *MockReflectionMockRecorder) ListPackages(ctx, cc any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListPackages", reflect.TypeOf((*MockReflection)(nil).ListPackages), ctx, cc)
 }
 
 // MockServerComponent is a mock of ServerComponent interface.

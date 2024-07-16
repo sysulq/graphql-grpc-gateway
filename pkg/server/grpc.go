@@ -18,8 +18,6 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic/grpcdynamic"
 	"google.golang.org/grpc"
-
-	"github.com/sysulq/graphql-gateway/pkg/reflection"
 )
 
 type Grpc struct {
@@ -32,6 +30,7 @@ type caller struct {
 
 	singleflight singleflight.Group
 
+	reflection  kod.Ref[Reflection]
 	config      kod.Ref[ConfigComponent]
 	serviceStub map[string]grpcdynamic.Stub
 
@@ -66,7 +65,7 @@ func (c *caller) Init(ctx context.Context) (err error) {
 
 		var newDescs []*desc.FileDescriptor
 		if e.Reflection {
-			newDescs, err = reflection.NewClient(conn).ListPackages()
+			newDescs, err = c.reflection.Get().ListPackages(ctx, conn)
 			if err != nil {
 				return err
 			}

@@ -1,4 +1,4 @@
-package reflection
+package server
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/go-kod/kod"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/grpcreflect"
 	"google.golang.org/grpc"
@@ -21,28 +22,13 @@ func isReflectionServiceName(name string) bool {
 
 var ErrTLSHandshakeFailed = errors.New("TLS handshake failed")
 
-// Client defines gRPC reflection client.
-type Client interface {
-	// ListPackages lists file descriptors from the gRPC reflection server.
-	// ListPackages returns these errors:
-	//   - ErrTLSHandshakeFailed: TLS misconfig.
-	ListPackages() ([]*desc.FileDescriptor, error)
+type reflection struct {
+	kod.Implements[Reflection]
 }
 
-type client struct {
-	client *grpcreflect.Client
-}
-
-// NewClient returns an instance of gRPC reflection client for gRPC protocol.
-func NewClient(conn grpc.ClientConnInterface) Client {
-	return &client{
-		client: grpcreflect.NewClientAuto(context.Background(), conn),
-	}
-}
-
-func (c *client) ListPackages() ([]*desc.FileDescriptor, error) {
-	// c.client.FileContainingExtension()
-	ssvcs, err := c.client.ListServices()
+func (ins *reflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]*desc.FileDescriptor, error) {
+	client := grpcreflect.NewClientAuto(ctx, cc)
+	ssvcs, err := client.ListServices()
 	if err != nil {
 		msg := status.Convert(err).Message()
 		// Check whether the error message contains TLS related error.
@@ -61,7 +47,7 @@ func (c *client) ListPackages() ([]*desc.FileDescriptor, error) {
 		if isReflectionServiceName(s) {
 			continue
 		}
-		svc, err := c.client.ResolveService(s)
+		svc, err := client.ResolveService(s)
 		if err != nil {
 			return nil, err
 		}
@@ -70,8 +56,4 @@ func (c *client) ListPackages() ([]*desc.FileDescriptor, error) {
 		fds = append(fds, fd)
 	}
 	return fds, nil
-}
-
-func (c *client) Reset() {
-	c.client.Reset()
 }

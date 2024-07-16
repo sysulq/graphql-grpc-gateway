@@ -11,6 +11,7 @@ import (
 	"github.com/nautilus/graphql"
 	"github.com/sysulq/graphql-gateway/pkg/generator"
 	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/runtime/protoiface"
 	"net/http"
 	"reflect"
@@ -21,7 +22,8 @@ func init() {
 		Name:      "github.com/sysulq/graphql-gateway/pkg/server/Caller",
 		Interface: reflect.TypeOf((*Caller)(nil)).Elem(),
 		Impl:      reflect.TypeOf(caller{}),
-		Refs:      `⟦5f5ebf18:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/Caller→github.com/sysulq/graphql-gateway/pkg/server/ConfigComponent⟧`,
+		Refs: `⟦4569fce7:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/Caller→github.com/sysulq/graphql-gateway/pkg/server/Reflection⟧,
+⟦5f5ebf18:KoDeDgE:github.com/sysulq/graphql-gateway/pkg/server/Caller→github.com/sysulq/graphql-gateway/pkg/server/ConfigComponent⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -79,6 +81,26 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-gateway/pkg/server/Reflection",
+		Interface: reflect.TypeOf((*Reflection)(nil)).Elem(),
+		Impl:      reflect.TypeOf(reflection{}),
+		Refs:      ``,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			interceptors := info.Interceptors
+			if h, ok := info.Impl.(interface {
+				Interceptors() []interceptor.Interceptor
+			}); ok {
+				interceptors = append(interceptors, h.Interceptors()...)
+			}
+
+			return reflection_local_stub{
+				impl:        info.Impl.(Reflection),
+				interceptor: interceptor.Chain(interceptors),
+				name:        info.Name,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
 		Name:      "github.com/sysulq/graphql-gateway/pkg/server/Registry",
 		Interface: reflect.TypeOf((*Registry)(nil)).Elem(),
 		Impl:      reflect.TypeOf(repository{}),
@@ -126,6 +148,7 @@ func init() {
 var _ kod.InstanceOf[Caller] = (*caller)(nil)
 var _ kod.InstanceOf[ConfigComponent] = (*config)(nil)
 var _ kod.InstanceOf[Queryer] = (*queryer)(nil)
+var _ kod.InstanceOf[Reflection] = (*reflection)(nil)
 var _ kod.InstanceOf[Registry] = (*repository)(nil)
 var _ kod.InstanceOf[ServerComponent] = (*server)(nil)
 
@@ -214,6 +237,39 @@ func (s queryer_local_stub) Query(ctx context.Context, a1 *graphql.QueryInput, a
 	}
 
 	err = s.interceptor(ctx, info, []any{a1, a2}, []any{}, call)
+	return
+}
+
+type reflection_local_stub struct {
+	impl        Reflection
+	name        string
+	interceptor interceptor.Interceptor
+}
+
+// Check that reflection_local_stub implements the Reflection interface.
+var _ Reflection = (*reflection_local_stub)(nil)
+
+func (s reflection_local_stub) ListPackages(ctx context.Context, a1 grpc.ClientConnInterface) (r0 []*desc.FileDescriptor, err error) {
+
+	if s.interceptor == nil {
+		r0, err = s.impl.ListPackages(ctx, a1)
+		return
+	}
+
+	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
+		r0, err = s.impl.ListPackages(ctx, a1)
+		res[0] = r0
+		return
+	}
+
+	info := interceptor.CallInfo{
+		Impl:       s.impl,
+		Component:  s.name,
+		FullMethod: "github.com/sysulq/graphql-gateway/pkg/server/Reflection.ListPackages",
+		Method:     "ListPackages",
+	}
+
+	err = s.interceptor(ctx, info, []any{a1}, []any{r0}, call)
 	return
 }
 

@@ -73,6 +73,7 @@ tasks:
   default:
     cmds:
       - go generate
+      - task golangci-lint
       - task test:coverage
       - task clean
     deps:
@@ -83,3 +84,9 @@ tasks:
   clean:
     cmds: 
       - rm -f coverage.out*
+
+  golangci-lint:
+    cmds:
+      - $GOBIN/golangci-lint run -v
+    deps:
+      - install:golangci-lint
