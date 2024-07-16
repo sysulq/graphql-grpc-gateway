@@ -16,7 +16,7 @@ import (
 
 	desc "github.com/jhump/protoreflect/desc"
 	graphql "github.com/nautilus/graphql"
-	generator "github.com/sysulq/graphql-gateway/pkg/generator"
+	generator "github.com/sysulq/graphql-grpc-gateway/pkg/generator"
 	ast "github.com/vektah/gqlparser/v2/ast"
 	gomock "go.uber.org/mock/gomock"
 	grpc "google.golang.org/grpc"

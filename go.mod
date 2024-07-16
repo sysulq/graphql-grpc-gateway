@@ -1,4 +1,4 @@
-module github.com/sysulq/graphql-gateway
+module github.com/sysulq/graphql-grpc-gateway
 
 go 1.22.4
 

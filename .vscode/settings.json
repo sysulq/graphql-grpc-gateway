@@ -1,6 +1,6 @@
 {
     "go.testFlags": [
         "-v",
-        "-coverpkg=github.com/sysulq/graphql-gateway/..."
+        "-coverpkg=github.com/sysulq/graphql-grpc-gateway/..."
     ]
 }

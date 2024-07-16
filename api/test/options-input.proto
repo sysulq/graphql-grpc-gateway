@@ -1,6 +1,6 @@
 syntax = "proto3";
 package options;
-option go_package = "github.com/sysulq/graphql-gateway/example;pb";
+option go_package = "github.com/sysulq/graphql-grpc-gateway/example;pb";
 
 import "graphql/v1/extend.proto";
 

@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-kod/kod"
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-gateway/pkg/server"
-	"github.com/sysulq/graphql-gateway/test"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/server"
+	"github.com/sysulq/graphql-grpc-gateway/test"
 	"go.uber.org/mock/gomock"
 )
 

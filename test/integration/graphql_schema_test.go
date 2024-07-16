@@ -9,8 +9,8 @@ import (
 	"github.com/go-kod/kod"
 	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/require"
-	"github.com/sysulq/graphql-gateway/pkg/server"
-	"github.com/sysulq/graphql-gateway/test"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/server"
+	"github.com/sysulq/graphql-grpc-gateway/test"
 	"github.com/vektah/gqlparser/v2/formatter"
 	"go.uber.org/mock/gomock"
 )

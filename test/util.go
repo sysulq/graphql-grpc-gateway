@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	pb "github.com/sysulq/graphql-gateway/api/test"
-	"github.com/sysulq/graphql-gateway/pkg/server"
+	pb "github.com/sysulq/graphql-grpc-gateway/api/test"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/proto"

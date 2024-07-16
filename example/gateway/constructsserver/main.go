@@ -12,7 +12,7 @@ import (
 	empty "google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/go-kod/kod"
-	pb "github.com/sysulq/graphql-gateway/api/example/constructsserver"
+	pb "github.com/sysulq/graphql-grpc-gateway/api/example/constructsserver"
 )
 
 type app struct {
