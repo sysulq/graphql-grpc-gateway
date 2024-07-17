@@ -9,7 +9,7 @@ import (
 	"github.com/go-kod/kod/interceptor"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/generator"
+	"github.com/sysulq/graphql-grpc-gateway/internal/generator"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/runtime/protoiface"
@@ -19,11 +19,11 @@ import (
 
 func init() {
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/pkg/server/Caller",
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Caller",
 		Interface: reflect.TypeOf((*Caller)(nil)).Elem(),
 		Impl:      reflect.TypeOf(caller{}),
-		Refs: `⟦c1b8ae7c:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/pkg/server/Caller→github.com/sysulq/graphql-grpc-gateway/pkg/server/Reflection⟧,
-⟦4ba3c4e5:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/pkg/server/Caller→github.com/sysulq/graphql-grpc-gateway/pkg/server/Config⟧`,
+		Refs: `⟦3c3527ea:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Caller→github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection⟧,
+⟦1f57c603:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Caller→github.com/sysulq/graphql-grpc-gateway/internal/server/Config⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -40,7 +40,7 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/pkg/server/Config",
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Config",
 		Interface: reflect.TypeOf((*Config)(nil)).Elem(),
 		Impl:      reflect.TypeOf(config{}),
 		Refs:      ``,
@@ -60,12 +60,12 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/pkg/server/Gateway",
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway",
 		Interface: reflect.TypeOf((*Gateway)(nil)).Elem(),
 		Impl:      reflect.TypeOf(server{}),
-		Refs: `⟦6d641151:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/pkg/server/Gateway→github.com/sysulq/graphql-grpc-gateway/pkg/server/Config⟧,
-⟦40f6878e:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/pkg/server/Gateway→github.com/sysulq/graphql-grpc-gateway/pkg/server/Queryer⟧,
-⟦dc558453:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/pkg/server/Gateway→github.com/sysulq/graphql-grpc-gateway/pkg/server/Registry⟧`,
+		Refs: `⟦db90cb27:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Config⟧,
+⟦b39287d6:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer⟧,
+⟦93c735b8:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Registry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -82,11 +82,11 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/pkg/server/Queryer",
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer",
 		Interface: reflect.TypeOf((*Queryer)(nil)).Elem(),
 		Impl:      reflect.TypeOf(queryer{}),
-		Refs: `⟦83d7056d:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/pkg/server/Queryer→github.com/sysulq/graphql-grpc-gateway/pkg/server/Registry⟧,
-⟦79dd1377:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/pkg/server/Queryer→github.com/sysulq/graphql-grpc-gateway/pkg/server/Caller⟧`,
+		Refs: `⟦c2374838:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer→github.com/sysulq/graphql-grpc-gateway/internal/server/Registry⟧,
+⟦8d32f9dd:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -103,7 +103,7 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/pkg/server/Reflection",
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection",
 		Interface: reflect.TypeOf((*Reflection)(nil)).Elem(),
 		Impl:      reflect.TypeOf(reflection{}),
 		Refs:      ``,
@@ -123,10 +123,10 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/pkg/server/Registry",
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Registry",
 		Interface: reflect.TypeOf((*Registry)(nil)).Elem(),
 		Impl:      reflect.TypeOf(repository{}),
-		Refs:      `⟦fc583f38:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/pkg/server/Registry→github.com/sysulq/graphql-grpc-gateway/pkg/server/Caller⟧`,
+		Refs:      `⟦09a889ca:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -179,7 +179,7 @@ func (s caller_local_stub) Call(ctx context.Context, a1 *desc.MethodDescriptor, 
 	info := interceptor.CallInfo{
 		Impl:       s.impl,
 		Component:  s.name,
-		FullMethod: "github.com/sysulq/graphql-grpc-gateway/pkg/server/Caller.Call",
+		FullMethod: "github.com/sysulq/graphql-grpc-gateway/internal/server/Caller.Call",
 		Method:     "Call",
 	}
 
@@ -247,7 +247,7 @@ func (s queryer_local_stub) Query(ctx context.Context, a1 *graphql.QueryInput, a
 	info := interceptor.CallInfo{
 		Impl:       s.impl,
 		Component:  s.name,
-		FullMethod: "github.com/sysulq/graphql-grpc-gateway/pkg/server/Queryer.Query",
+		FullMethod: "github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer.Query",
 		Method:     "Query",
 	}
 
@@ -280,7 +280,7 @@ func (s reflection_local_stub) ListPackages(ctx context.Context, a1 grpc.ClientC
 	info := interceptor.CallInfo{
 		Impl:       s.impl,
 		Component:  s.name,
-		FullMethod: "github.com/sysulq/graphql-grpc-gateway/pkg/server/Reflection.ListPackages",
+		FullMethod: "github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection.ListPackages",
 		Method:     "ListPackages",
 	}
 

@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/require"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/server"
+	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 	"github.com/sysulq/graphql-grpc-gateway/test"
 	"go.uber.org/mock/gomock"
 )

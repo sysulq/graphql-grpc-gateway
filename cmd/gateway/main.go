@@ -11,7 +11,7 @@ import (
 	"github.com/go-kod/kod/interceptor/krecovery"
 	"github.com/go-kod/kod/interceptor/ktrace"
 	"github.com/samber/lo"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/server"
+	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 )
 
 type app struct {

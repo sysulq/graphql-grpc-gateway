@@ -15,8 +15,8 @@ func init() {
 		Name:      "github.com/go-kod/kod/Main",
 		Interface: reflect.TypeOf((*kod.Main)(nil)).Elem(),
 		Impl:      reflect.TypeOf(app{}),
-		Refs: `⟦c9055ae9:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-grpc-gateway/pkg/server/Config⟧,
-⟦56d61424:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-grpc-gateway/pkg/server/Gateway⟧`,
+		Refs: `⟦c2e28e49:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-grpc-gateway/internal/server/Config⟧,
+⟦040e1d89:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	pb "github.com/sysulq/graphql-grpc-gateway/api/test"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/server"
+	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
