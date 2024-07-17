@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/go-kod/kod"
+	"github.com/go-kod/kod/ext/client/kgrpc"
 	"github.com/nautilus/graphql"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
@@ -22,14 +23,12 @@ func TestReflectionExit(t *testing.T) {
 			GenerateUnboundMethods: true,
 		},
 		Grpc: config.Grpc{
-			Services: []*config.Service{
+			Services: []kgrpc.Config{
 				{
-					Address:    infos.ConstructsServerAddr.Addr().String(),
-					Reflection: true,
+					Target: infos.ConstructsServerAddr.Addr().String(),
 				},
 				{
-					Address:    infos.OptionsServerAddr.Addr().String(),
-					Reflection: true,
+					Target: infos.OptionsServerAddr.Addr().String(),
 				},
 			},
 		},

@@ -5,25 +5,10 @@ import (
 
 	"dario.cat/mergo"
 	"github.com/go-kod/kod"
+	"github.com/go-kod/kod/ext/client/kgrpc"
 	"github.com/go-kod/kod/ext/client/kpyroscope"
+	"github.com/go-kod/kod/ext/registry/etcdv3"
 )
-
-type Tls struct {
-	Enable      bool   `json:"enable" yaml:"enable"`
-	Certificate string `json:"certificate" yaml:"certificate"`
-	PrivateKey  string `json:"private_key" yaml:"private_key"`
-}
-
-type Authentication struct {
-	Tls *Tls `json:"tls" yaml:"tls"`
-}
-
-type Service struct {
-	Address        string          `json:"address" yaml:"address"`
-	Authentication *Authentication `json:"authentication" yaml:"authentication"`
-	Reflection     bool            `json:"reflection" yaml:"reflection"`
-	ProtoFiles     []string        `json:"proto_files" yaml:"proto_files"`
-}
 
 type config struct {
 	kod.Implements[Config]
@@ -36,8 +21,10 @@ type Pyroscope struct {
 }
 
 type GraphQL struct {
-	Disable    bool `json:"disable" yaml:"disable"`
-	Playground bool `json:"playground" yaml:"playground"`
+	Address    string `json:"address" yaml:"address"`
+	Disable    bool   `json:"disable" yaml:"disable"`
+	Playground bool   `json:"playground" yaml:"playground"`
+	Jwt        Jwt    `json:"jwt" yaml:"jwt"`
 }
 
 type Jwt struct {
@@ -59,15 +46,12 @@ type EngineConfig struct {
 type ConfigInfo struct {
 	Engine  EngineConfig `json:"gateway" yaml:"gateway"`
 	Grpc    Grpc         `json:"grpc" yaml:"grpc"`
-	Address string       `json:"address" yaml:"address"`
-	Tls     Tls          `json:"tls" yaml:"tls"`
 	GraphQL GraphQL      `json:"graphql" yaml:"graphql"`
-	Jwt     Jwt          `json:"jwt" yaml:"jwt"`
 }
 
 type Grpc struct {
-	Services    []*Service
-	ImportPaths []string
+	Etcd     etcdv3.Config
+	Services []kgrpc.Config
 }
 
 func defaultConfig() *ConfigInfo {
@@ -81,9 +65,9 @@ func defaultConfig() *ConfigInfo {
 				},
 			},
 		},
-		Address: ":8080",
-		Grpc:    Grpc{},
+		Grpc: Grpc{},
 		GraphQL: GraphQL{
+			Address:    ":8080",
 			Playground: true,
 		},
 	}

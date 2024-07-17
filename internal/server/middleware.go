@@ -41,7 +41,7 @@ func (ins *server) jwtAuthHandler(handler http.Handler) http.Handler {
 			md = metadata.New(nil)
 		}
 
-		forwardPayloadHeader := ins.config.Get().Config().Jwt.ForwardPayloadHeader
+		forwardPayloadHeader := ins.config.Get().Config().GraphQL.Jwt.ForwardPayloadHeader
 		if len(forwardPayloadHeader) > 0 {
 			md.Set(forwardPayloadHeader, strings.Split(token.Raw, ".")[1])
 		}
@@ -54,7 +54,7 @@ func (ins *server) jwtAuthHandler(handler http.Handler) http.Handler {
 
 func (ins *server) verifyToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(ins.config.Get().Config().Jwt.LocalJwks), nil
+		return []byte(ins.config.Get().Config().GraphQL.Jwt.LocalJwks), nil
 	})
 	if err != nil {
 		return nil, err

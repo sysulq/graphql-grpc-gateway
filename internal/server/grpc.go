@@ -5,8 +5,7 @@ import (
 	"strconv"
 
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/ext/client/kgrpc"
-	"github.com/go-kod/kod/ext/registry/etcdv3"
+	"github.com/go-kod/kod/ext/registry"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
 	"github.com/samber/lo"
@@ -38,19 +37,23 @@ func (c *caller) Init(ctx context.Context) (err error) {
 	serviceStub := map[string]grpcdynamic.Stub{}
 	descs := make([]*desc.FileDescriptor, 0)
 	descsconn := map[string]*grpc.ClientConn{}
+	var etcd registry.Registry
 
-	etcd := lo.Must(etcdv3.Config{Endpoints: []string{"localhost:2379"}}.Build(ctx))
+	if len(c.config.Get().Config().Grpc.Etcd.Endpoints) > 0 {
+		etcd = lo.Must(c.config.Get().Config().Grpc.Etcd.Build(ctx))
+	}
 
-	for _, e := range config.Services {
+	for _, service := range config.Services {
 
-		conn := kgrpc.Config{Target: e.Address}.WithRegistry(etcd).Build()
+		if etcd != nil {
+			service = service.WithRegistry(etcd)
+		}
 
-		var newDescs []*desc.FileDescriptor
-		if e.Reflection {
-			newDescs, err = c.reflection.Get().ListPackages(ctx, conn)
-			if err != nil {
-				return err
-			}
+		conn := service.Build()
+
+		newDescs, err := c.reflection.Get().ListPackages(ctx, conn)
+		if err != nil {
+			return err
 		}
 
 		for _, d := range newDescs {

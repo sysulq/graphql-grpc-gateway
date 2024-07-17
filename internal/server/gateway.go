@@ -77,7 +77,7 @@ func (s *server) BuildServer() (http.Handler, error) {
 	var handler http.Handler = addHeader(mux)
 	handler = otelhttp.NewMiddleware("graphql-gateway")(handler)
 
-	if cfg.Jwt.Enable {
+	if cfg.GraphQL.Jwt.Enable {
 		handler = s.jwtAuthHandler(handler)
 	}
 

@@ -1,4 +1,7 @@
-address: ":8080"
+graphql:
+  address: ":8080"
+  disable: false
+  playground: true
 
 engine:
   generate_unbound_method: false
@@ -7,12 +10,12 @@ engine:
     serverAddress: "http://localhost:4040"
 
 grpc:
-  services:
-    - address: "etcd:///local/optionsserver/grpc"
-      reflection: true
-    - address: "etcd:///local/constructsserver/grpc"
-      reflection: true
+  etcd: 
+    endpoints: ["localhost:2379"]
+    timeout: "3s"
 
-graphql:
-  disable: false
-  playground: true
+  services:
+    - target: "etcd:///local/optionsserver/grpc"
+      timeout: "1s"
+    - target: "etcd:///local/constructsserver/grpc"
+      timeout: "1s"
