@@ -83,35 +83,37 @@ func (c *caller) GetDescs() []*desc.FileDescriptor {
 }
 
 func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message protoadapt.MessageV1) (protoadapt.MessageV1, error) {
-	if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
-		hash := Hash64.Get()
-		defer Hash64.Put(hash)
+	if c.config.Get().Config().Engine.SingleFlight {
+		if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
+			hash := Hash64.Get()
+			defer Hash64.Put(hash)
 
-		msg, err := proto.Marshal(protoadapt.MessageV2Of(message))
-		if err != nil {
-			return nil, err
-		}
+			msg, err := proto.Marshal(protoadapt.MessageV2Of(message))
+			if err != nil {
+				return nil, err
+			}
 
-		// generate hash based on rpc pointer
-		_, err = hash.Write([]byte(rpc.GetFullyQualifiedName()))
-		if err != nil {
-			return nil, err
-		}
-		_, err = hash.Write(msg)
-		if err != nil {
-			return nil, err
-		}
-		sum := hash.Sum64()
-		key := strconv.FormatUint(sum, 10)
+			// generate hash based on rpc pointer
+			_, err = hash.Write([]byte(rpc.GetFullyQualifiedName()))
+			if err != nil {
+				return nil, err
+			}
+			_, err = hash.Write(msg)
+			if err != nil {
+				return nil, err
+			}
+			sum := hash.Sum64()
+			key := strconv.FormatUint(sum, 10)
 
-		res, err, _ := c.singleflight.Do(key, func() (interface{}, error) {
-			return c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
-		})
-		if err != nil {
-			return nil, err
-		}
+			res, err, _ := c.singleflight.Do(key, func() (interface{}, error) {
+				return c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
+			})
+			if err != nil {
+				return nil, err
+			}
 
-		return res.(protoadapt.MessageV1), nil
+			return res.(protoadapt.MessageV1), nil
+		}
 	}
 
 	res, err := c.serviceStub[rpc.GetService().GetFullyQualifiedName()].InvokeRpc(ctx, rpc, message)
@@ -119,9 +121,12 @@ func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message p
 }
 
 func (c *caller) Interceptors() []interceptor.Interceptor {
-	return []interceptor.Interceptor{
-		kcircuitbreaker.Interceptor(),
+	if c.config.Get().Config().Engine.CircuitBreaker {
+		return []interceptor.Interceptor{
+			kcircuitbreaker.Interceptor(),
+		}
 	}
+	return nil
 }
 
 var allowSingleFlightKey struct{}

@@ -5,9 +5,13 @@ graphql:
 
 engine:
   generate_unbound_method: false
+  rate_limit: true
+  circuit_breaker: true
+  query_cache: true
+  single_flight: true
   pyroscope:
     enable: true
-    serverAddress: "http://localhost:4040"
+    server_address: "http://localhost:4040"
 
 grpc:
   etcd: 

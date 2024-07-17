@@ -56,10 +56,15 @@ func (s *server) BuildServer() (http.Handler, error) {
 	sources := []*graphql.RemoteSchema{{URL: "url1"}}
 	sources[0].Schema = s.registry.Get().SchemaDescriptorList().AsGraphql()[0]
 
-	g, err := gateway.New(sources,
+	opts := []gateway.Option{
 		gateway.WithLogger(&noopLogger{}),
-		gateway.WithQueryPlanCache(NewQueryPlanCacher()),
-		gateway.WithQueryerFactory(&queryFactory))
+		gateway.WithQueryerFactory(&queryFactory),
+	}
+	if s.config.Get().Config().Engine.QueryCache {
+		opts = append(opts, gateway.WithQueryPlanCache(NewQueryPlanCacher()))
+	}
+
+	g, err := gateway.New(sources, opts...)
 	if err != nil {
 		return nil, err
 	}

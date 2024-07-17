@@ -41,6 +41,10 @@ type JwtClaimToHeader struct {
 type EngineConfig struct {
 	GenerateUnboundMethods bool      `json:"generate_unbound_methods" yaml:"generate_unbound_methods"`
 	Pyroscope              Pyroscope `json:"pyroscope" yaml:"pyroscope"`
+	RateLimit              bool      `json:"rate_limit" yaml:"rate_limit"`
+	CircuitBreaker         bool      `json:"circuit_breaker" yaml:"circuit_breaker"`
+	QueryCache             bool      `json:"query_cache" yaml:"query_cache"`
+	SingleFlight           bool      `json:"single_flight" yaml:"single_flight"`
 }
 
 type ConfigInfo struct {
@@ -64,6 +68,10 @@ func defaultConfig() *ConfigInfo {
 					ServerAddress: "http://localhost:4040",
 				},
 			},
+			RateLimit:      true,
+			CircuitBreaker: true,
+			QueryCache:     true,
+			SingleFlight:   true,
 		},
 		Grpc: Grpc{},
 		GraphQL: GraphQL{

@@ -20,6 +20,7 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/generator"
 )
 
@@ -28,14 +29,19 @@ type anyMap = map[string]interface{}
 type queryer struct {
 	kod.Implements[Queryer]
 
+	config   kod.Ref[config.Config]
 	registry kod.Ref[Registry]
 	caller   kod.Ref[Caller]
 }
 
 func (q *queryer) Interceptors() []interceptor.Interceptor {
-	return []interceptor.Interceptor{
-		kratelimit.Interceptor(),
+	if q.config.Get().Config().Engine.RateLimit {
+		return []interceptor.Interceptor{
+			kratelimit.Interceptor(),
+		}
 	}
+
+	return nil
 }
 
 func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error {

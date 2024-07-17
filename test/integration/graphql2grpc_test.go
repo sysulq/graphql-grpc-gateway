@@ -21,6 +21,10 @@ func TestGraphql2Grpc(t *testing.T) {
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
 		Engine: config.EngineConfig{
 			GenerateUnboundMethods: true,
+			RateLimit:              true,
+			CircuitBreaker:         true,
+			SingleFlight:           true,
+			QueryCache:             true,
 		},
 		Grpc: config.Grpc{
 			Services: []kgrpc.Config{
