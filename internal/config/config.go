@@ -1,9 +1,6 @@
 package config
 
 import (
-	"context"
-
-	"dario.cat/mergo"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/ext/client/kgrpc"
 	"github.com/go-kod/kod/ext/client/kpyroscope"
@@ -16,73 +13,46 @@ type config struct {
 }
 
 type Pyroscope struct {
-	kpyroscope.Config
-	Enable bool
+	kpyroscope.Config `mapstructure:",squash"`
+	Enable            bool
 }
 
 type GraphQL struct {
-	Address    string `json:"address" yaml:"address"`
-	Disable    bool   `json:"disable" yaml:"disable"`
-	Playground bool   `json:"playground" yaml:"playground"`
-	Jwt        Jwt    `json:"jwt" yaml:"jwt"`
+	Address    string
+	Disable    bool
+	Playground bool
+	Jwt        Jwt
 }
 
 type Jwt struct {
-	Enable               bool   `json:"enable" yaml:"enable"`
-	LocalJwks            string `json:"local_jwks" yaml:"local_jwks"`
-	ForwardPayloadHeader string `json:"forward_payload_header" yaml:"forward_payload_header"`
+	Enable               bool
+	LocalJwks            string
+	ForwardPayloadHeader string
 }
 
 type JwtClaimToHeader struct {
-	HeaderName string `json:"header_name" yaml:"header_name"`
-	ClaimName  string `json:"claim_name" yaml:"claim_name"`
+	HeaderName string
+	ClaimName  string
 }
 
 type EngineConfig struct {
-	GenerateUnboundMethods bool      `json:"generate_unbound_methods" yaml:"generate_unbound_methods"`
-	Pyroscope              Pyroscope `json:"pyroscope" yaml:"pyroscope"`
-	RateLimit              bool      `json:"rate_limit" yaml:"rate_limit"`
-	CircuitBreaker         bool      `json:"circuit_breaker" yaml:"circuit_breaker"`
-	QueryCache             bool      `json:"query_cache" yaml:"query_cache"`
-	SingleFlight           bool      `json:"single_flight" yaml:"single_flight"`
+	GenerateUnboundMethods bool
+	Pyroscope              Pyroscope
+	RateLimit              bool
+	CircuitBreaker         bool
+	QueryCache             bool
+	SingleFlight           bool
 }
 
 type ConfigInfo struct {
-	Engine  EngineConfig `json:"gateway" yaml:"gateway"`
-	Grpc    Grpc         `json:"grpc" yaml:"grpc"`
-	GraphQL GraphQL      `json:"graphql" yaml:"graphql"`
+	Engine  EngineConfig
+	Grpc    Grpc
+	GraphQL GraphQL
 }
 
 type Grpc struct {
 	Etcd     etcdv3.Config
 	Services []kgrpc.Config
-}
-
-func defaultConfig() *ConfigInfo {
-	return &ConfigInfo{
-		Engine: EngineConfig{
-			GenerateUnboundMethods: false,
-			Pyroscope: Pyroscope{
-				Enable: false,
-				Config: kpyroscope.Config{
-					ServerAddress: "http://localhost:4040",
-				},
-			},
-			RateLimit:      true,
-			CircuitBreaker: true,
-			QueryCache:     true,
-			SingleFlight:   true,
-		},
-		Grpc: Grpc{},
-		GraphQL: GraphQL{
-			Address:    ":8080",
-			Playground: true,
-		},
-	}
-}
-
-func (ins *config) Init(ctx context.Context) error {
-	return mergo.Merge(ins.Config(), defaultConfig())
 }
 
 func (ins *config) Config() *ConfigInfo {

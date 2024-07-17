@@ -3,7 +3,6 @@ module github.com/sysulq/graphql-grpc-gateway
 go 1.22.4
 
 require (
-	dario.cat/mergo v1.0.0
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/go-kod/kod v0.11.1-0.20240710063632-3f988b916777
 	github.com/go-kod/kod/ext v0.11.0
@@ -25,6 +24,7 @@ require (
 )
 
 require (
+	dario.cat/mergo v1.0.0 // indirect
 	github.com/99designs/gqlgen v0.17.49 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

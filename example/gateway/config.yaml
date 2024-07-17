@@ -4,14 +4,14 @@ graphql:
   playground: true
 
 engine:
-  generate_unbound_method: false
-  rate_limit: true
-  circuit_breaker: true
-  query_cache: true
-  single_flight: true
+  generateUnboundMethod: false
+  rateLimit: true
+  circuitBreaker: true
+  queryCache: true
+  singleFlight: true
   pyroscope:
     enable: true
-    server_address: "http://localhost:4040"
+    serverAddress: "http://localhost:4040"
 
 grpc:
   etcd: 
