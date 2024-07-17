@@ -100,11 +100,11 @@ func TestGraphqlSchemaWithoutUnboundMethod(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			file, err := os.Create("gateway-generate-without-unbound-method.graphql")
+			file, err := os.Create("testdata/gateway-generate-without-unbound-method.graphql")
 			require.Nil(t, err)
 			formatter.NewFormatter(file).FormatSchema(schema.Schema)
 
-			generated, err := os.ReadFile("gateway-generate-without-unbound-method.graphql")
+			generated, err := os.ReadFile("testdata/gateway-generate-without-unbound-method.graphql")
 			require.Nil(t, err)
 
 			require.Equal(t, string(testGatewayExpectedSchemaWithoutUnboundMethod), string(generated))
