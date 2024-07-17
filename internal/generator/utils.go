@@ -23,16 +23,6 @@ func GraphqlMethodOptions(opts proto.Message) *gqlpb.Rpc {
 	return nil
 }
 
-func GraphqlServiceOptions(opts proto.Message) *gqlpb.Svc {
-	if opts != nil {
-		v := proto.GetExtension(opts, gqlpb.E_Svc)
-		if v != nil {
-			return v.(*gqlpb.Svc)
-		}
-	}
-	return nil
-}
-
 func GraphqlFieldOptions(opts proto.Message) *gqlpb.Field {
 	if opts != nil {
 		v := proto.GetExtension(opts, gqlpb.E_Field)
@@ -95,13 +85,11 @@ func GoCamelCase(s string) string {
 	return string(b)
 }
 
-func GetRequestType(rpcOpts *gqlpb.Rpc, svcOpts *gqlpb.Svc) gqlpb.Type {
+func GetRequestType(rpcOpts *gqlpb.Rpc) gqlpb.Type {
 	if rpcOpts != nil {
 		return rpcOpts.Type
 	}
-	if svcOpts != nil {
-		return svcOpts.Type
-	}
+
 	return gqlpb.Type_DEFAULT
 }
 

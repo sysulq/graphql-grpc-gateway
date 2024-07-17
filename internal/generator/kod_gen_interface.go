@@ -4,15 +4,10 @@ package generator
 
 import (
 	"github.com/jhump/protoreflect/desc"
-	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/protobuf/compiler/protogen"
 )
 
-// repository is a component that implements Registry.
-type Registry interface {
-	FindMethodByName(op ast.Operation, name string) *desc.MethodDescriptor
-	FindObjectByName(name string) *desc.MessageDescriptor
-	FindObjectByFullyQualifiedName(fqn string) (*desc.MessageDescriptor, *ast.Definition)
-	FindFieldByName(msg desc.Descriptor, name string) *desc.FieldDescriptor
-	FindUnionFieldByMessageFQNAndName(fqn, name string) *desc.FieldDescriptor
-	FindGraphqlFieldByProtoField(msg *ast.Definition, name string) *ast.FieldDefinition
+// generator is a component that implements Generator.
+type Generator interface {
+	NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool, plugin *protogen.Plugin) (schemas SchemaDescriptorList, err error)
 }

@@ -23,7 +23,7 @@ func init() {
 		Interface: reflect.TypeOf((*Caller)(nil)).Elem(),
 		Impl:      reflect.TypeOf(caller{}),
 		Refs: `⟦3c3527ea:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Caller→github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection⟧,
-⟦1f57c603:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Caller→github.com/sysulq/graphql-grpc-gateway/internal/server/Config⟧`,
+⟦6b1d0901:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Caller→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -40,30 +40,10 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Config",
-		Interface: reflect.TypeOf((*Config)(nil)).Elem(),
-		Impl:      reflect.TypeOf(config{}),
-		Refs:      ``,
-		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			interceptors := info.Interceptors
-			if h, ok := info.Impl.(interface {
-				Interceptors() []interceptor.Interceptor
-			}); ok {
-				interceptors = append(interceptors, h.Interceptors()...)
-			}
-
-			return config_local_stub{
-				impl:        info.Impl.(Config),
-				interceptor: interceptor.Chain(interceptors),
-				name:        info.Name,
-			}
-		},
-	})
-	kod.Register(&kod.Registration{
 		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway",
 		Interface: reflect.TypeOf((*Gateway)(nil)).Elem(),
 		Impl:      reflect.TypeOf(server{}),
-		Refs: `⟦db90cb27:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Config⟧,
+		Refs: `⟦88a4dee9:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
 ⟦b39287d6:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer⟧,
 ⟦93c735b8:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Registry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
@@ -126,7 +106,8 @@ func init() {
 		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Registry",
 		Interface: reflect.TypeOf((*Registry)(nil)).Elem(),
 		Impl:      reflect.TypeOf(repository{}),
-		Refs:      `⟦09a889ca:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧`,
+		Refs: `⟦09a889ca:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧,
+⟦eedceb52:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/generator/Generator⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -146,7 +127,6 @@ func init() {
 
 // kod.InstanceOf checks.
 var _ kod.InstanceOf[Caller] = (*caller)(nil)
-var _ kod.InstanceOf[Config] = (*config)(nil)
 var _ kod.InstanceOf[Gateway] = (*server)(nil)
 var _ kod.InstanceOf[Queryer] = (*queryer)(nil)
 var _ kod.InstanceOf[Reflection] = (*reflection)(nil)
@@ -190,21 +170,6 @@ func (s caller_local_stub) Call(ctx context.Context, a1 *desc.MethodDescriptor, 
 func (s caller_local_stub) GetDescs() (r0 []*desc.FileDescriptor) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0 = s.impl.GetDescs()
-	return
-}
-
-type config_local_stub struct {
-	impl        Config
-	name        string
-	interceptor interceptor.Interceptor
-}
-
-// Check that config_local_stub implements the Config interface.
-var _ Config = (*config_local_stub)(nil)
-
-func (s config_local_stub) Config() (r0 *ConfigInfo) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.Config()
 	return
 }
 

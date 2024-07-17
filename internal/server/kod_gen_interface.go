@@ -14,11 +14,6 @@ import (
 	"google.golang.org/protobuf/protoadapt"
 )
 
-// config is a component that implements Config.
-type Config interface {
-	Config() *ConfigInfo
-}
-
 // reflection is a component that implements Reflection.
 type Reflection interface {
 	ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]*desc.FileDescriptor, error)

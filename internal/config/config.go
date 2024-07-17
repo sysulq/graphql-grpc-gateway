@@ -1,4 +1,4 @@
-package server
+package config
 
 import (
 	"context"
@@ -51,25 +51,38 @@ type JwtClaimToHeader struct {
 	ClaimName  string `json:"claim_name" yaml:"claim_name"`
 }
 
+type EngineConfig struct {
+	GenerateUnboundMethods bool      `json:"generate_unbound_methods" yaml:"generate_unbound_methods"`
+	Pyroscope              Pyroscope `json:"pyroscope" yaml:"pyroscope"`
+}
+
 type ConfigInfo struct {
-	Pyroscope Pyroscope `json:"pyroscope" yaml:"pyroscope"`
-	Grpc      Grpc      `json:"grpc" yaml:"grpc"`
-	Address   string    `json:"address" yaml:"address"`
-	Tls       Tls       `json:"tls" yaml:"tls"`
-	GraphQL   GraphQL   `json:"graphql" yaml:"graphql"`
-	Jwt       Jwt       `json:"jwt" yaml:"jwt"`
+	Engine  EngineConfig `json:"gateway" yaml:"gateway"`
+	Grpc    Grpc         `json:"grpc" yaml:"grpc"`
+	Address string       `json:"address" yaml:"address"`
+	Tls     Tls          `json:"tls" yaml:"tls"`
+	GraphQL GraphQL      `json:"graphql" yaml:"graphql"`
+	Jwt     Jwt          `json:"jwt" yaml:"jwt"`
+}
+
+type Grpc struct {
+	Services    []*Service
+	ImportPaths []string
 }
 
 func defaultConfig() *ConfigInfo {
 	return &ConfigInfo{
-		Address: ":8080",
-		Pyroscope: Pyroscope{
-			Enable: false,
-			Config: kpyroscope.Config{
-				ServerAddress: "http://localhost:4040",
+		Engine: EngineConfig{
+			GenerateUnboundMethods: false,
+			Pyroscope: Pyroscope{
+				Enable: false,
+				Config: kpyroscope.Config{
+					ServerAddress: "http://localhost:4040",
+				},
 			},
 		},
-		Grpc: Grpc{},
+		Address: ":8080",
+		Grpc:    Grpc{},
 		GraphQL: GraphQL{
 			Playground: true,
 		},

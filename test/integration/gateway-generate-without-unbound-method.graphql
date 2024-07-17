@@ -1,0 +1,58 @@
+directive @Query on FIELD_DEFINITION
+directive @Service on FIELD_DEFINITION
+"""
+The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer.
+"""
+directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+"""
+The @specifiedBy built-in directive is used within the type system definition language to provide a scalar specification URL for specifying the behavior of custom scalar types.
+"""
+directive @specifiedBy(url: String!) on SCALAR
+type Data {
+	stringX: String!
+	foo: Foo2!
+	double: [Float!]!
+	string2: String
+	foo2: Foo2
+	double2: [Float!]
+	bars: String
+	str: String
+}
+input DataInput {
+	stringX: String!
+	foo: Foo2Input!
+	double: [Float!]!
+	string2: String
+	foo2: Foo2Input
+	double2: [Float!]
+	bars: String
+	str: String
+}
+type Foo2 {
+	param1: String
+}
+input Foo2Input {
+	param1: String
+}
+type Mutation {
+	serviceInvalidSubscribe3(in: DataInput): Data
+	servicePubSub2(in: DataInput): Data
+	newName(in: DataInput): Data
+	queryMutate1(in: DataInput): Data
+}
+interface Node {
+	id: ID!
+}
+type Query {
+	serviceQuery1(in: DataInput): Data
+	serviceInvalidSubscribe1(in: DataInput): Data
+	queryQuery1(in: DataInput): Data
+	queryQuery2(in: DataInput): Data
+	node(id: ID!): Node
+}
+type Subscription {
+	serviceInvalidSubscribe2(in: DataInput): Data
+	serviceInvalidSubscribe3(in: DataInput): Data
+	servicePubSub2(in: DataInput): Data
+}

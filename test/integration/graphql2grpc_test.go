@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-kod/kod"
 	"github.com/nautilus/graphql"
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 	"github.com/sysulq/graphql-grpc-gateway/test"
 	"go.uber.org/mock/gomock"
@@ -15,10 +16,13 @@ import (
 func TestGraphql2Grpc(t *testing.T) {
 	infos := test.SetupDeps(t)
 
-	mockConfig := server.NewMockConfig(gomock.NewController(t))
-	mockConfig.EXPECT().Config().Return(&server.ConfigInfo{
-		Grpc: server.Grpc{
-			Services: []*server.Service{
+	mockConfig := config.NewMockConfig(gomock.NewController(t))
+	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
+		Engine: config.EngineConfig{
+			GenerateUnboundMethods: true,
+		},
+		Grpc: config.Grpc{
+			Services: []*config.Service{
 				{
 					Address:    infos.ConstructsServerAddr.Addr().String(),
 					Reflection: true,
@@ -29,7 +33,7 @@ func TestGraphql2Grpc(t *testing.T) {
 				},
 			},
 		},
-		GraphQL: server.GraphQL{
+		GraphQL: config.GraphQL{
 			Playground: true,
 		},
 	}).AnyTimes()
@@ -78,5 +82,5 @@ func TestGraphql2Grpc(t *testing.T) {
 				t.Errorf("mutation failed: expected: %s got: %s", tc.wantResponse, recv)
 			}
 		}
-	}, kod.WithFakes(kod.Fake[server.Config](mockConfig)))
+	}, kod.WithFakes(kod.Fake[config.Config](mockConfig)))
 }

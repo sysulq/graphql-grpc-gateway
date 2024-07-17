@@ -11,11 +11,6 @@ extend google.protobuf.MethodOptions {
     Rpc rpc = 65030;
 }
 
-// The options for the service
-extend google.protobuf.ServiceOptions {
-    Svc svc = 65030;
-}
-
 // The options for the field
 extend google.protobuf.FieldOptions {
     Field field = 65030;
@@ -26,39 +21,28 @@ extend google.protobuf.OneofOptions {
 }
 
 message Oneof {
-    bool ignore = 4;
-    string name = 5;
+    bool ignore = 1;
+    string name = 2;
 }
 
 message Field {
     bool required = 1;
-    string params = 2;
-    string dirs = 3;
-    bool ignore = 4;
-    string name = 5;
+    string name = 2;
+    bool ignore = 3;
 }
 
 message Rpc {
     Type type = 1;
-    bool ignore = 2;
-    string name = 3;
+    string name = 2;
+    bool ignore = 3;
 }
 
-message Svc {
-    Type type = 1;
-    bool ignore = 2;
-    string name = 3;
-    Upstream upstream = 4;
-}
-
+// Type of the graphql operation
 enum Type {
+    // DEFAULT invalid type
     DEFAULT = 0;
-    MUTATION = 1;
-    QUERY = 2;
-}
-
-enum Upstream {
-  UPSTREAM_UNSPECIFIED = 0;
-  UPSTREAM_SERVER = 1;
-  UPSTREAM_CLIENT = 2;
+    // QUERY query type
+    QUERY = 1;
+    // MUTATION mutation type
+    MUTATION = 2;
 }

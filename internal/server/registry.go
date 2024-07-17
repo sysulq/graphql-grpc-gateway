@@ -13,9 +13,11 @@ import (
 type repository struct {
 	kod.Implements[Registry]
 
-	caller kod.Ref[Caller]
-	files  generator.SchemaDescriptorList
-	mu     *sync.RWMutex
+	caller    kod.Ref[Caller]
+	generator kod.Ref[generator.Generator]
+
+	files generator.SchemaDescriptorList
+	mu    *sync.RWMutex
 
 	methodsByName            map[ast.Operation]map[string]*desc.MethodDescriptor
 	objectsByName            map[string]*desc.MessageDescriptor
@@ -36,7 +38,7 @@ func (v *repository) Init(ctx context.Context) error {
 
 	descs := v.caller.Get().GetDescs()
 
-	gqlDesc, err := generator.NewSchemas(descs, true, true, nil)
+	gqlDesc, err := v.generator.Get().NewSchemas(descs, true, true, nil)
 	if err != nil {
 		return err
 	}

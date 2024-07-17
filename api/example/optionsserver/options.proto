@@ -31,10 +31,6 @@ service Service {
         option (graphql.v1.rpc) = {type: DEFAULT};
     }; // must ignore
 
-    rpc Ignore (Data) returns (Data) {
-        option (graphql.v1.rpc) = {ignore: true};
-    }; // must ignore
-
     rpc Name (Data) returns (Data) {
         option (graphql.v1.rpc) = {name: "newName"};
     }; // method name should be "newName"
@@ -43,12 +39,9 @@ service Service {
 service Test {
     rpc Name (Data) returns (Data); // expect service name to be "name"
     rpc NewName (Data) returns (Data); // expect service name to be "newName1" since it collides with a name from a different service
-
-    option (graphql.v1.svc) = {name: ""};
 }
 
 service Query {
-    option (graphql.v1.svc) = {type: QUERY};
     rpc Query1 (Data) returns (Data); // must be a query
     rpc Query2 (Data) returns (Data); // must be a query
     rpc Mutate1 (Data) returns (Data) {

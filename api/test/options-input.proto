@@ -40,14 +40,15 @@ service Service {
 service Test {
     rpc Name (Data) returns (Data); // expect service name to be "name"
     rpc NewName (Data) returns (Data); // expect service name to be "newName1" since it collides with a name from a different service
-
-    option (graphql.v1.svc) = {name: ""};
 }
 
 service Query {
-    option (graphql.v1.svc) = {type: QUERY};
-    rpc Query1 (Data) returns (Data); // must be a query
-    rpc Query2 (Data) returns (Data); // must be a query
+    rpc Query1 (Data) returns (Data) {
+        option (graphql.v1.rpc) = {type: QUERY, name: "queryQuery1"};
+    }; // must be a query
+    rpc Query2 (Data) returns (Data) {
+        option (graphql.v1.rpc) = {type: QUERY, name: "queryQuery2"};
+    }; // must be a query
     rpc Mutate1 (Data) returns (Data) {
         option (graphql.v1.rpc) = {type: MUTATION};
     } // must be a mutation
@@ -63,7 +64,6 @@ message Data {
     repeated double double2 = 6; // simple
     string bar = 7 [(graphql.v1.field) = {name: "bars"}];
     string string = 8 [(graphql.v1.field) = {name: "str"}];
-    string ignore = 9 [(graphql.v1.field) = {ignore: true}];
 }
 
 message Foo2 {

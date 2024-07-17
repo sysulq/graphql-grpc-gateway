@@ -11,13 +11,14 @@ import (
 	"github.com/go-kod/kod/interceptor/krecovery"
 	"github.com/go-kod/kod/interceptor/ktrace"
 	"github.com/samber/lo"
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 )
 
 type app struct {
 	kod.Implements[kod.Main]
 
-	config kod.Ref[server.Config]
+	config kod.Ref[config.Config]
 	server kod.Ref[server.Gateway]
 }
 

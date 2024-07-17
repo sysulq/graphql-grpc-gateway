@@ -30,7 +30,6 @@ const (
 	Service_InvalidSubscribe2_FullMethodName = "/optionsserver.Service/InvalidSubscribe2"
 	Service_InvalidSubscribe3_FullMethodName = "/optionsserver.Service/InvalidSubscribe3"
 	Service_PubSub2_FullMethodName           = "/optionsserver.Service/PubSub2"
-	Service_Ignore_FullMethodName            = "/optionsserver.Service/Ignore"
 	Service_Name_FullMethodName              = "/optionsserver.Service/Name"
 )
 
@@ -49,7 +48,6 @@ type ServiceClient interface {
 	InvalidSubscribe2(ctx context.Context, in *Data, opts ...grpc.CallOption) (Service_InvalidSubscribe2Client, error)
 	InvalidSubscribe3(ctx context.Context, opts ...grpc.CallOption) (Service_InvalidSubscribe3Client, error)
 	PubSub2(ctx context.Context, opts ...grpc.CallOption) (Service_PubSub2Client, error)
-	Ignore(ctx context.Context, in *Data, opts ...grpc.CallOption) (*Data, error)
 	Name(ctx context.Context, in *Data, opts ...grpc.CallOption) (*Data, error)
 }
 
@@ -322,15 +320,6 @@ func (x *servicePubSub2Client) Recv() (*Data, error) {
 	return m, nil
 }
 
-func (c *serviceClient) Ignore(ctx context.Context, in *Data, opts ...grpc.CallOption) (*Data, error) {
-	out := new(Data)
-	err := c.cc.Invoke(ctx, Service_Ignore_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *serviceClient) Name(ctx context.Context, in *Data, opts ...grpc.CallOption) (*Data, error) {
 	out := new(Data)
 	err := c.cc.Invoke(ctx, Service_Name_FullMethodName, in, out, opts...)
@@ -355,7 +344,6 @@ type ServiceServer interface {
 	InvalidSubscribe2(*Data, Service_InvalidSubscribe2Server) error
 	InvalidSubscribe3(Service_InvalidSubscribe3Server) error
 	PubSub2(Service_PubSub2Server) error
-	Ignore(context.Context, *Data) (*Data, error)
 	Name(context.Context, *Data) (*Data, error)
 }
 
@@ -395,9 +383,6 @@ func (UnimplementedServiceServer) InvalidSubscribe3(Service_InvalidSubscribe3Ser
 }
 func (UnimplementedServiceServer) PubSub2(Service_PubSub2Server) error {
 	return status.Errorf(codes.Unimplemented, "method PubSub2 not implemented")
-}
-func (UnimplementedServiceServer) Ignore(context.Context, *Data) (*Data, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Ignore not implemented")
 }
 func (UnimplementedServiceServer) Name(context.Context, *Data) (*Data, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Name not implemented")
@@ -658,24 +643,6 @@ func (x *servicePubSub2Server) Recv() (*Data, error) {
 	return m, nil
 }
 
-func _Service_Ignore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Data)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ServiceServer).Ignore(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Service_Ignore_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).Ignore(ctx, req.(*Data))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Service_Name_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Data)
 	if err := dec(in); err != nil {
@@ -716,10 +683,6 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Query2",
 			Handler:    _Service_Query2_Handler,
-		},
-		{
-			MethodName: "Ignore",
-			Handler:    _Service_Ignore_Handler,
 		},
 		{
 			MethodName: "Name",

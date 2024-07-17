@@ -10,6 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/require"
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 	"github.com/sysulq/graphql-grpc-gateway/test"
 	"go.uber.org/mock/gomock"
@@ -18,10 +19,13 @@ import (
 func TestJwt(t *testing.T) {
 	infos := test.SetupDeps(t)
 
-	mockConfig := server.NewMockConfig(gomock.NewController(t))
-	mockConfig.EXPECT().Config().Return(&server.ConfigInfo{
-		Grpc: server.Grpc{
-			Services: []*server.Service{
+	mockConfig := config.NewMockConfig(gomock.NewController(t))
+	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
+		Engine: config.EngineConfig{
+			GenerateUnboundMethods: true,
+		},
+		Grpc: config.Grpc{
+			Services: []*config.Service{
 				{
 					Address:    infos.ConstructsServerAddr.Addr().String(),
 					Reflection: true,
@@ -32,7 +36,7 @@ func TestJwt(t *testing.T) {
 				},
 			},
 		},
-		Jwt: server.Jwt{
+		Jwt: config.Jwt{
 			Enable:               true,
 			LocalJwks:            "key",
 			ForwardPayloadHeader: "x-jwt-payload",
@@ -111,7 +115,7 @@ func TestJwt(t *testing.T) {
 			require.NotNil(t, err)
 			require.ErrorContains(t, err, "response was not successful with status code: 401")
 		})
-	}, kod.WithFakes(kod.Fake[server.Config](mockConfig)))
+	}, kod.WithFakes(kod.Fake[config.Config](mockConfig)))
 }
 
 func createToken(username string, secretKey string) (string, error) {

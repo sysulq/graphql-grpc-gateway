@@ -8,6 +8,7 @@ import (
 	"github.com/go-kod/kod"
 	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/assert"
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 	"github.com/sysulq/graphql-grpc-gateway/test"
 	"go.uber.org/mock/gomock"
@@ -16,10 +17,13 @@ import (
 func TestSingleFlight(t *testing.T) {
 	infos := test.SetupDeps(t)
 
-	mockConfig := server.NewMockConfig(gomock.NewController(t))
-	mockConfig.EXPECT().Config().Return(&server.ConfigInfo{
-		Grpc: server.Grpc{
-			Services: []*server.Service{
+	mockConfig := config.NewMockConfig(gomock.NewController(t))
+	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
+		Engine: config.EngineConfig{
+			GenerateUnboundMethods: true,
+		},
+		Grpc: config.Grpc{
+			Services: []*config.Service{
 				{
 					Address:    infos.ConstructsServerAddr.Addr().String(),
 					Reflection: true,
@@ -62,5 +66,5 @@ func TestSingleFlight(t *testing.T) {
 			}
 			wg.Wait()
 		})
-	}, kod.WithFakes(kod.Fake[server.Config](mockConfig)))
+	}, kod.WithFakes(kod.Fake[config.Config](mockConfig)))
 }

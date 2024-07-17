@@ -5,12 +5,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-kod/kod"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/compiler/protogen"
 	descriptor "google.golang.org/protobuf/types/descriptorpb"
 
 	gqlpb "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1"
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 )
 
 const (
@@ -25,7 +27,13 @@ const (
 	DefaultExtension = "graphql"
 )
 
-func NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool, plugin *protogen.Plugin) (schemas SchemaDescriptorList, err error) {
+type generator struct {
+	kod.Implements[Generator]
+
+	config kod.Ref[config.Config]
+}
+
+func (ins *generator) NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool, plugin *protogen.Plugin) (schemas SchemaDescriptorList, err error) {
 	var goref GoRef
 	if plugin != nil {
 		goref, err = NewGoRef(plugin)
@@ -37,7 +45,7 @@ func NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool,
 	if mergeSchemas {
 		schema := NewSchemaDescriptor(genServiceDesc, goref)
 		for _, file := range descs {
-			err := generateFile(file, schema)
+			err := generateFile(ins.config.Get(), file, schema)
 			if err != nil {
 				return nil, err
 			}
@@ -48,7 +56,7 @@ func NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool,
 
 	for _, file := range descs {
 		schema := NewSchemaDescriptor(genServiceDesc, goref)
-		err := generateFile(file, schema)
+		err := generateFile(ins.config.Get(), file, schema)
 		if err != nil {
 			return nil, err
 		}
@@ -59,19 +67,20 @@ func NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool,
 	return
 }
 
-func generateFile(file *desc.FileDescriptor, schema *SchemaDescriptor) error {
+func generateFile(config config.Config, file *desc.FileDescriptor, schema *SchemaDescriptor) error {
 	schema.FileDescriptors = append(schema.FileDescriptors, file)
 
 	for _, svc := range file.GetServices() {
-		svcOpts := GraphqlServiceOptions(svc.AsServiceDescriptorProto().GetOptions())
-		if svcOpts != nil && svcOpts.Ignore {
-			continue
-		}
 		for _, rpc := range svc.GetMethods() {
 			rpcOpts := GraphqlMethodOptions(rpc.AsMethodDescriptorProto().GetOptions())
+			if rpcOpts == nil && !config.Config().Engine.GenerateUnboundMethods {
+				continue
+			}
+
 			if rpcOpts != nil && rpcOpts.Ignore {
 				continue
 			}
+
 			in, err := schema.CreateObjects(rpc.GetInputType(), true)
 			if err != nil {
 				return err
@@ -89,7 +98,7 @@ func generateFile(file *desc.FileDescriptor, schema *SchemaDescriptor) error {
 			if rpc.IsServerStreaming() {
 				schema.GetSubscription().addMethod(svc, rpc, in, out)
 			} else {
-				switch GetRequestType(rpcOpts, svcOpts) {
+				switch GetRequestType(rpcOpts) {
 				case gqlpb.Type_QUERY:
 					schema.GetQuery().addMethod(svc, rpc, in, out)
 				default:
@@ -452,11 +461,8 @@ type ServiceAndMethod struct {
 
 func (r *RootDefinition) UniqueName(svc *descriptor.ServiceDescriptorProto, rpc *descriptor.MethodDescriptorProto) (name string) {
 	rpcOpts := GraphqlMethodOptions(rpc.GetOptions())
-	svcOpts := GraphqlServiceOptions(svc.GetOptions())
 	if rpcOpts != nil && rpcOpts.Name != "" {
 		name = rpcOpts.Name
-	} else if svcOpts != nil && svcOpts.Name != "" {
-		name = svcOpts.Name + Title(rpc.GetName())
 	} else {
 		name = ToLowerFirst(svc.GetName()) + Title(rpc.GetName())
 	}

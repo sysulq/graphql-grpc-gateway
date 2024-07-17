@@ -8,6 +8,7 @@ import (
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
 	"github.com/samber/lo"
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc/credentials"
@@ -20,18 +21,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Grpc struct {
-	Services    []*Service
-	ImportPaths []string
-}
-
 type caller struct {
 	kod.Implements[Caller]
 
 	singleflight singleflight.Group
 
 	reflection  kod.Ref[Reflection]
-	config      kod.Ref[Config]
+	config      kod.Ref[config.Config]
 	serviceStub map[string]grpcdynamic.Stub
 
 	descs []*desc.FileDescriptor

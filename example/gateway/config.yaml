@@ -1,8 +1,10 @@
 address: ":8080"
 
-pyroscope:
-  enable: true
-  serverAddress: "http://localhost:4040"
+engine:
+  generate_unbound_method: true
+  pyroscope:
+    enable: true
+    serverAddress: "http://localhost:4040"
 
 grpc:
   services:

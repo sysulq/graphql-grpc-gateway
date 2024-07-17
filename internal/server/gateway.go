@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/nautilus/gateway"
 	"github.com/nautilus/graphql"
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
@@ -20,15 +21,15 @@ type server struct {
 
 	profiler *pyroscope.Profiler
 
-	config   kod.Ref[Config]
+	config   kod.Ref[config.Config]
 	queryer  kod.Ref[Queryer]
 	registry kod.Ref[Registry]
 }
 
 func (ins *server) Init(ctx context.Context) error {
 	cfg := ins.config.Get().Config()
-	if cfg.Pyroscope.Enable {
-		profiler, err := ins.config.Get().Config().Pyroscope.Build(ctx)
+	if cfg.Engine.Pyroscope.Enable {
+		profiler, err := ins.config.Get().Config().Engine.Pyroscope.Build(ctx)
 		if err != nil {
 			return err
 		}
