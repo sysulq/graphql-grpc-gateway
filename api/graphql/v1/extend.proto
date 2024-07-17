@@ -8,32 +8,46 @@ import "google/protobuf/descriptor.proto";
 
 // The options for the method
 extend google.protobuf.MethodOptions {
-    Rpc rpc = 65030;
+    // rpc defines the graphql information for the method
+    Rpc rpc = 9527;
 }
 
 // The options for the field
 extend google.protobuf.FieldOptions {
-    Field field = 65030;
+    // field defines the graphql information for the field
+    Field field = 9527;
 }
 
 extend google.protobuf.OneofOptions {
-    Oneof oneof = 65030;
+    // oneof defines the graphql information for the oneof
+    Oneof oneof = 9527;
 }
 
+// The options for the oneof
 message Oneof {
+    // ignore the oneof
     bool ignore = 1;
+    // name of the oneof
     string name = 2;
 }
 
+// The options for the field
 message Field {
+    // required the field is required
     bool required = 1;
+    // name of the field
     string name = 2;
+    // ignore the field
     bool ignore = 3;
 }
 
+// The options for the rpc
 message Rpc {
+    // type of the graphql operation
     Type type = 1;
+    // name of the graphql operation
     string name = 2;
+    // ignore the rpc
     bool ignore = 3;
 }
 
