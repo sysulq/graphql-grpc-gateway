@@ -9,18 +9,18 @@ import "google/protobuf/descriptor.proto";
 // The options for the method
 extend google.protobuf.MethodOptions {
     // rpc defines the graphql information for the method
-    Rpc rpc = 9527;
+    Rpc rpc = 95279528;
 }
 
 // The options for the field
 extend google.protobuf.FieldOptions {
     // field defines the graphql information for the field
-    Field field = 9527;
+    Field field = 95279528;
 }
 
 extend google.protobuf.OneofOptions {
     // oneof defines the graphql information for the oneof
-    Oneof oneof = 9527;
+    Oneof oneof = 95279528;
 }
 
 // The options for the oneof
