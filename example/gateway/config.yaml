@@ -1,16 +1,16 @@
 address: ":8080"
 
 engine:
-  generate_unbound_method: true
+  generate_unbound_method: false
   pyroscope:
     enable: true
     serverAddress: "http://localhost:4040"
 
 grpc:
   services:
-    - address: "localhost:8081"
+    - address: "etcd:///local/optionsserver/grpc"
       reflection: true
-    - address: "localhost:8082"
+    - address: "etcd:///local/constructsserver/grpc"
       reflection: true
 
 graphql:

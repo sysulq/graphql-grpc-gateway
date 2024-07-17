@@ -5,14 +5,13 @@ import (
 	"strconv"
 
 	"github.com/go-kod/kod"
+	"github.com/go-kod/kod/ext/client/kgrpc"
+	"github.com/go-kod/kod/ext/registry/etcdv3"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
 	"github.com/samber/lo"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"golang.org/x/sync/singleflight"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
 
@@ -40,24 +39,11 @@ func (c *caller) Init(ctx context.Context) (err error) {
 	descs := make([]*desc.FileDescriptor, 0)
 	descsconn := map[string]*grpc.ClientConn{}
 
+	etcd := lo.Must(etcdv3.Config{Endpoints: []string{"localhost:2379"}}.Build(ctx))
+
 	for _, e := range config.Services {
 
-		options := []grpc.DialOption{
-			grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
-		}
-		if e.Authentication != nil && e.Authentication.Tls != nil {
-			cred, err := credentials.NewServerTLSFromFile(e.Authentication.Tls.Certificate, e.Authentication.Tls.PrivateKey)
-			if err != nil {
-				return err
-			}
-			options = append(options, grpc.WithTransportCredentials(cred))
-		} else {
-			options = append(options, grpc.WithCredentialsBundle(insecure.NewBundle()))
-		}
-		conn, err := grpc.NewClient(e.Address, options...)
-		if err != nil {
-			return err
-		}
+		conn := kgrpc.Config{Target: e.Address}.WithRegistry(etcd).Build()
 
 		var newDescs []*desc.FileDescriptor
 		if e.Reflection {

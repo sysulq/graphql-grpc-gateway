@@ -3,13 +3,11 @@ package main
 import (
 	"context"
 	"log"
-	"net"
-
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 
 	"github.com/go-kod/kod"
+	"github.com/go-kod/kod/ext/registry/etcdv3"
+	"github.com/go-kod/kod/ext/server/kgrpc"
+	"github.com/samber/lo"
 	pb "github.com/sysulq/graphql-grpc-gateway/api/example/optionsserver"
 )
 
@@ -19,19 +17,13 @@ type app struct {
 
 func main() {
 	_ = kod.Run(context.Background(), func(ctx context.Context, app *app) error {
-		l, err := net.Listen("tcp", ":8082")
-		if err != nil {
-			log.Fatal(err)
-		}
+		etcd := lo.Must(etcdv3.Config{Endpoints: []string{"localhost:2379"}}.Build(ctx))
 
-		s := grpc.NewServer(
-			grpc.ServerOption(
-				grpc.StatsHandler(otelgrpc.NewServerHandler()),
-			),
-		)
+		s := kgrpc.Config{
+			Address: ":8082",
+		}.Build().WithRegistry(etcd)
 		pb.RegisterServiceServer(s, &service{})
-		reflection.Register(s)
-		log.Fatal(s.Serve(l))
+		log.Fatal(s.Run(ctx))
 
 		return nil
 	})

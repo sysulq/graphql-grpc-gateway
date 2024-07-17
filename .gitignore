@@ -87,3 +87,4 @@ mockgen
 golangci-lint
 kod
 buf
+default.etcd/
