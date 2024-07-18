@@ -22,6 +22,7 @@ func TestSingleFlight(t *testing.T) {
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
 		Engine: config.EngineConfig{
 			GenerateUnboundMethods: true,
+			SingleFlight:           true,
 		},
 		Grpc: config.Grpc{
 			Services: []kgrpc.Config{

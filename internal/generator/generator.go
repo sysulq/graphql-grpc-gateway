@@ -98,8 +98,8 @@ func generateFile(config config.Config, file *desc.FileDescriptor, schema *Schem
 			if rpc.IsServerStreaming() {
 				schema.GetSubscription().addMethod(svc, rpc, in, out)
 			} else {
-				switch GetRequestType(rpcOpts) {
-				case gqlpb.Type_QUERY:
+				switch rpcOpts.GetPattern().(type) {
+				case *gqlpb.Rpc_Query:
 					schema.GetQuery().addMethod(svc, rpc, in, out)
 				default:
 					schema.GetMutation().addMethod(svc, rpc, in, out)
@@ -461,8 +461,8 @@ type ServiceAndMethod struct {
 
 func (r *RootDefinition) UniqueName(svc *descriptor.ServiceDescriptorProto, rpc *descriptor.MethodDescriptorProto) (name string) {
 	rpcOpts := GraphqlMethodOptions(rpc.GetOptions())
-	if rpcOpts != nil && rpcOpts.Name != "" {
-		name = rpcOpts.Name
+	if operation := GetRequestOperation(rpcOpts); operation != "" {
+		name = operation
 	} else {
 		name = ToLowerFirst(svc.GetName()) + Title(rpc.GetName())
 	}

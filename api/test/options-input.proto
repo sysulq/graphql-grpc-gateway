@@ -8,7 +8,7 @@ service Service {
     rpc Mutate1 (Data) returns (Data); // must be a mutation
     rpc Mutate2 (Data) returns (Data); // must be a mutation
     rpc Query1 (Data) returns (Data) {
-        option (graphql.v1.rpc) = {type: QUERY};
+        option (graphql.v1.rpc) = {query: ""};
     } // must be a query
 
     rpc Publish (stream Data) returns (Data); // must be a mutation
@@ -16,16 +16,16 @@ service Service {
     rpc PubSub1 (stream Data) returns (stream Data); // must be a mutation and a subscription
 
     rpc InvalidSubscribe1 (stream Data) returns (Data) {
-        option (graphql.v1.rpc) = {type: QUERY};
+        option (graphql.v1.rpc) = {query: ""};
     }; // must ignore
     rpc InvalidSubscribe2 (Data) returns (stream Data) {
-        option (graphql.v1.rpc) = {type: MUTATION};
+        option (graphql.v1.rpc) = {mutation: ""};
     }; // must ignore
     rpc InvalidSubscribe3 (stream Data) returns (stream Data) {
-        option (graphql.v1.rpc) = {type: QUERY};
+        option (graphql.v1.rpc) = {query: ""};
     }; // must ignore
     rpc PubSub2 (stream Data) returns (stream Data) {
-        option (graphql.v1.rpc) = {type: DEFAULT};
+        option (graphql.v1.rpc) = {mutation: ""};
     }; // must ignore
 
     rpc Ignore (Data) returns (Data) {
@@ -33,7 +33,7 @@ service Service {
     }; // must ignore
 
     rpc Name (Data) returns (Data) {
-        option (graphql.v1.rpc) = {name: "newName"};
+        option (graphql.v1.rpc) = {mutation: "newName"};
     }; // method name should be "newName"
 }
 
@@ -44,13 +44,13 @@ service Test {
 
 service Query {
     rpc Query1 (Data) returns (Data) {
-        option (graphql.v1.rpc) = {type: QUERY, name: "queryQuery1"};
+        option (graphql.v1.rpc) = {query: "queryQuery1"};
     }; // must be a query
     rpc Query2 (Data) returns (Data) {
-        option (graphql.v1.rpc) = {type: QUERY, name: "queryQuery2"};
+        option (graphql.v1.rpc) = {query: "queryQuery2"};
     }; // must be a query
     rpc Mutate1 (Data) returns (Data) {
-        option (graphql.v1.rpc) = {type: MUTATION};
+        option (graphql.v1.rpc) = {mutation: ""};
     } // must be a mutation
     rpc Subscribe (Data) returns (stream Data); // must be a subscription
 }

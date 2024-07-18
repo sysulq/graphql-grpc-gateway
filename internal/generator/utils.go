@@ -85,12 +85,17 @@ func GoCamelCase(s string) string {
 	return string(b)
 }
 
-func GetRequestType(rpcOpts *gqlpb.Rpc) gqlpb.Type {
+func GetRequestOperation(rpcOpts *gqlpb.Rpc) string {
 	if rpcOpts != nil {
-		return rpcOpts.Type
+		switch pattern := rpcOpts.GetPattern().(type) {
+		case *gqlpb.Rpc_Query:
+			return pattern.Query
+		case *gqlpb.Rpc_Mutation:
+			return pattern.Mutation
+		}
 	}
 
-	return gqlpb.Type_DEFAULT
+	return ""
 }
 
 func CreateDescriptorsFromProto(req *pluginpb.CodeGeneratorRequest) (descs []*desc.FileDescriptor, err error) {

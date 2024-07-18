@@ -43,20 +43,13 @@ message Field {
 
 // The options for the rpc
 message Rpc {
-    // type of the graphql operation
-    Type type = 1;
-    // name of the graphql operation
-    string name = 2;
+    // pattern
+    oneof pattern {
+        // query is the graphql query
+        string query = 1;
+        // mutation is the graphql mutation
+        string mutation = 2;
+    }
     // ignore the rpc
     bool ignore = 3;
-}
-
-// Type of the graphql operation
-enum Type {
-    // DEFAULT invalid type
-    DEFAULT = 0;
-    // QUERY query type
-    QUERY = 1;
-    // MUTATION mutation type
-    MUTATION = 2;
 }
