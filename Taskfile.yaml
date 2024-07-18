@@ -11,14 +11,15 @@ env:
   OTEL_TRACES_SAMPLER_ARG: 0.001
 
 tasks:
-  gateway:
-    cmds:
-      - KOD_CONFIG=./example/gateway/config.yaml go run ./cmd/gateway
-
-  deps:
+  run:
     deps:
       - constructsserver
       - optionsserver
+      - gateway
+
+  gateway:
+    cmds:
+      - KOD_CONFIG=./example/gateway/config.yaml go run ./cmd/gateway
 
   constructsserver:
     cmds:
@@ -31,6 +32,10 @@ tasks:
   bench:
     cmds:
       - "ab -n 50000 -kc 100 -T 'application/json' -H 'Accept-Encoding: gzip, deflate, br' -H 'Accept: application/json' -H 'DNT: 1' -H 'Origin: http://localhost:8080' -p test/post2.json http://localhost:8080/query"
+
+  curl:
+    cmds:
+      - "curl 'http://localhost:8080/playground' -H 'Content-Type: application/json' --data-binary @test/post2.json -v"
 
   test:
     cmds:
