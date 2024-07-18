@@ -5,14 +5,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-kod/kod"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/compiler/protogen"
 	descriptor "google.golang.org/protobuf/types/descriptorpb"
 
 	gqlpb "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1"
-	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 )
 
 const (
@@ -27,25 +25,26 @@ const (
 	DefaultExtension = "graphql"
 )
 
-type generator struct {
-	kod.Implements[Generator]
-
-	config kod.Ref[config.Config]
+type Options struct {
+	MergeSchemas           bool
+	GenServiceDesc         bool
+	GenerateUnboundMethods bool
+	Plugin                 *protogen.Plugin
 }
 
-func (ins *generator) NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, genServiceDesc bool, plugin *protogen.Plugin) (schemas SchemaDescriptorList, err error) {
+func NewSchemas(descs []*desc.FileDescriptor, opts Options) (schemas SchemaDescriptorList, err error) {
 	var goref GoRef
-	if plugin != nil {
-		goref, err = NewGoRef(plugin)
+	if opts.Plugin != nil {
+		goref, err = NewGoRef(opts.Plugin)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if mergeSchemas {
-		schema := NewSchemaDescriptor(genServiceDesc, goref)
+	if opts.MergeSchemas {
+		schema := NewSchemaDescriptor(opts.GenServiceDesc, goref)
 		for _, file := range descs {
-			err := generateFile(ins.config.Get(), file, schema)
+			err := generateFile(opts.GenerateUnboundMethods, file, schema)
 			if err != nil {
 				return nil, err
 			}
@@ -55,8 +54,8 @@ func (ins *generator) NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, gen
 	}
 
 	for _, file := range descs {
-		schema := NewSchemaDescriptor(genServiceDesc, goref)
-		err := generateFile(ins.config.Get(), file, schema)
+		schema := NewSchemaDescriptor(opts.GenServiceDesc, goref)
+		err := generateFile(opts.GenerateUnboundMethods, file, schema)
 		if err != nil {
 			return nil, err
 		}
@@ -67,13 +66,13 @@ func (ins *generator) NewSchemas(descs []*desc.FileDescriptor, mergeSchemas, gen
 	return
 }
 
-func generateFile(config config.Config, file *desc.FileDescriptor, schema *SchemaDescriptor) error {
+func generateFile(generateUnboundMethods bool, file *desc.FileDescriptor, schema *SchemaDescriptor) error {
 	schema.FileDescriptors = append(schema.FileDescriptors, file)
 
 	for _, svc := range file.GetServices() {
 		for _, rpc := range svc.GetMethods() {
 			rpcOpts := GraphqlMethodOptions(rpc.AsMethodDescriptorProto().GetOptions())
-			if rpcOpts == nil && !config.Config().Engine.GenerateUnboundMethods {
+			if rpcOpts == nil && !generateUnboundMethods {
 				continue
 			}
 

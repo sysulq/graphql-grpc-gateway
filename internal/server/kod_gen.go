@@ -108,7 +108,7 @@ func init() {
 		Interface: reflect.TypeOf((*Registry)(nil)).Elem(),
 		Impl:      reflect.TypeOf(repository{}),
 		Refs: `⟦09a889ca:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧,
-⟦eedceb52:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/generator/Generator⟧`,
+⟦4607e1cb:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {

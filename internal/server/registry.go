@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-kod/kod"
 	"github.com/jhump/protoreflect/desc"
+	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/generator"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -13,8 +14,8 @@ import (
 type repository struct {
 	kod.Implements[Registry]
 
-	caller    kod.Ref[Caller]
-	generator kod.Ref[generator.Generator]
+	caller kod.Ref[Caller]
+	config kod.Ref[config.Config]
 
 	files generator.SchemaDescriptorList
 	mu    *sync.RWMutex
@@ -38,7 +39,11 @@ func (v *repository) Init(ctx context.Context) error {
 
 	descs := v.caller.Get().GetDescs()
 
-	gqlDesc, err := v.generator.Get().NewSchemas(descs, true, true, nil)
+	gqlDesc, err := generator.NewSchemas(descs, generator.Options{
+		GenServiceDesc:         true,
+		MergeSchemas:           true,
+		GenerateUnboundMethods: v.config.Get().Config().Engine.GenerateUnboundMethods,
+	})
 	if err != nil {
 		return err
 	}
