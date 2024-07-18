@@ -7,7 +7,7 @@ import (
 	"github.com/go-kod/kod"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"github.com/sysulq/graphql-grpc-gateway/internal/generator"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/generator"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 

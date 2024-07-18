@@ -21,7 +21,7 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"github.com/sysulq/graphql-grpc-gateway/internal/generator"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/generator"
 )
 
 type anyMap = map[string]interface{}

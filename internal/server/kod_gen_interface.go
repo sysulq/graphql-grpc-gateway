@@ -8,7 +8,7 @@ import (
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-grpc-gateway/internal/generator"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/generator"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/protoadapt"
