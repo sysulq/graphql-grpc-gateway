@@ -1,0 +1,120 @@
+version: '3'
+env:
+  GOBIN: { sh: pwd }
+  # OTEL_TRACES_EXPORTER: console
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:14318
+  OTEL_EXPORTER_OTLP_HEADERS: "uptrace-dsn=http://project2_secret_token@localhost:14318?grpc=14317"
+  OTEL_EXPORTER_OTLP_COMPRESSION: gzip
+  OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: BASE2_EXPONENTIAL_BUCKET_HISTOGRAM
+  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: DELTA
+  OTEL_TRACES_SAMPLER: parentbased_traceidratio
+  OTEL_TRACES_SAMPLER_ARG: 0.001
+
+tasks:
+  run:
+    deps:
+      - constructsserver
+      - optionsserver
+      - gateway
+
+  gateway:
+    cmds:
+      - KOD_CONFIG=./example/gateway/config.yaml go run ./cmd/gateway
+
+  constructsserver:
+    cmds:
+      - go run ./example/gateway/constructsserver 
+  
+  optionsserver:
+    cmds:
+      - go run ./example/gateway/optionsserver  
+
+  bench:
+    cmds:
+      - "ab -n 50000 -kc 500 -T 'application/json' -p test/post1.json http://localhost:8080/query"
+
+  curl:
+    cmds:
+      - "curl 'http://localhost:8080/playground' -H 'Content-Type: application/json' --data-binary @test/post2.json -v"
+
+  test:
+    cmds:
+      - go test -race -cover -coverprofile=coverage.out.tmp -covermode=atomic ./...
+    sources:
+      - "**/**.go"
+    generates:
+      - coverage.out.tmp
+  test:coverage:
+    cmds:
+      - cat coverage.out.tmp | egrep -v "kod_|.pb.go|_test.go|example/gateway|pkg/types/|/test" > coverage.out
+      - go tool cover -func=coverage.out
+    deps:
+      - test
+
+  install:mockgen:
+    vars:
+      VERSION: 
+        sh: |
+          cat go.mod|grep go.uber.org/mock |awk -F ' ' '{print $2}'
+    status:
+      - test -f mockgen
+      - go version -m $GOBIN/mockgen | grep go.uber.org/mock | grep {{.VERSION}}
+    cmd: |
+        go install go.uber.org/mock/mockgen@{{.VERSION}}
+
+  install:golangci-lint:
+    vars:
+      VERSION: v1.59.1
+    status:
+      - test -f golangci-lint
+      - go version -m $GOBIN/golangci-lint | grep github.com/golangci/golangci-lint | grep {{.VERSION}}
+    cmd: |
+        go install github.com/golangci/golangci-lint/cmd/golangci-lint@{{.VERSION}}
+
+  install:buf:
+    vars:
+      VERSION: v1.34.0
+    status:
+      - test -f buf
+    cmd: |
+      curl -sSL \
+      "https://github.com/bufbuild/buf/releases/download/{{.VERSION}}/buf-$(uname -s)-$(uname -m)" \
+      -o "$GOBIN/buf" && \
+      chmod +x "$GOBIN/buf"
+
+  install:kod:
+    vars:
+      VERSION: 
+        sh: |
+          cat go.mod|egrep "github.com/go-kod/kod " |awk -F ' ' '{print $2}'
+    status:
+      - test -f kod
+      - go version -m $GOBIN/kod | grep github.com/go-kod/kod | grep {{.VERSION}}
+    cmd: |
+        go install github.com/go-kod/kod/cmd/kod@{{.VERSION}}
+
+  mod:
+    cmds:
+      - go mod tidy
+
+  default:
+    cmds:
+      - task generate
+      - task golangci-lint
+      - task test:coverage
+
+  golangci-lint:
+    cmds:
+      - $GOBIN/golangci-lint run -v
+    deps:
+      - install:golangci-lint
+
+  generate:
+    cmds:
+      - $GOBIN/buf generate
+      - $GOBIN/kod generate -s ./...
+    deps:
+      - mod
+      - install:mockgen
+      - install:buf
+      - install:kod

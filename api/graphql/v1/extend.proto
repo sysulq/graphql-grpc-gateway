@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package graphql.v1;
+
+option go_package = "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1;graphqlv1";
+
+import "google/protobuf/descriptor.proto";
+
+// The options for the method
+extend google.protobuf.MethodOptions {
+    // rpc defines the graphql information for the method
+    Rpc rpc = 95279528;
+}
+
+// The options for the field
+extend google.protobuf.FieldOptions {
+    // field defines the graphql information for the field
+    Field field = 95279528;
+}
+
+extend google.protobuf.OneofOptions {
+    // oneof defines the graphql information for the oneof
+    Oneof oneof = 95279528;
+}
+
+// The options for the oneof
+message Oneof {
+    // ignore the oneof
+    bool ignore = 1;
+    // name of the oneof
+    string name = 2;
+}
+
+// The options for the field
+message Field {
+    // required the field is required
+    bool required = 1;
+    // name of the field
+    string name = 2;
+    // ignore the field
+    bool ignore = 3;
+}
+
+// The options for the rpc
+message Rpc {
+    // pattern
+    oneof pattern {
+        // query is the graphql query
+        string query = 1;
+        // mutation is the graphql mutation
+        string mutation = 2;
+    }
+    // ignore the rpc
+    bool ignore = 3;
+}

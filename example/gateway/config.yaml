@@ -1,0 +1,25 @@
+graphql:
+  address: ":8080"
+  disable: false
+  playground: true
+  generateUnboundMethod: false
+  queryCache: true
+  singleFlight: true
+
+engine:
+  rateLimit: true
+  circuitBreaker: true
+  pyroscope:
+    enable: true
+    serverAddress: "http://localhost:4040"
+
+grpc:
+  etcd: 
+    endpoints: ["localhost:2379"]
+    timeout: "3s"
+
+  services:
+    - target: "etcd:///local/optionsserver/grpc"
+      timeout: "1s"
+    - target: "etcd:///local/constructsserver/grpc"
+      timeout: "1s"
