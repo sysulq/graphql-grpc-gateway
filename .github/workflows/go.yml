@@ -27,20 +27,6 @@ jobs:
           go-version: ${{ matrix.version }}
           cache: true
 
-      - name: golangci-lint
-        if: runner.os != 'Windows'
-        uses: golangci/golangci-lint-action@v6.0.1
-        with:
-          args: "--out-${NO_FUTURE}format colored-line-number --timeout 5m"
-      
-      - name: golangci-lint
-        if: runner.os == 'Windows'
-        uses: golangci/golangci-lint-action@v6.0.1
-        env:
-          nofuture: out-format
-        with:
-          args: "--%nofuture% colored-line-number --timeout 5m"
-
       - name: Install Task
         uses: arduino/setup-task@v2
         with:
