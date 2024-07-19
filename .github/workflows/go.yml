@@ -39,5 +39,5 @@ jobs:
 
       - uses: codecov/codecov-action@v4
         with:
-          files: ./coverage.out # optional
+          files: ./coverage.out.final # optional
           token: ${{ secrets.CODECOV_TOKEN }}
