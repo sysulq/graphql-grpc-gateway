@@ -12,7 +12,7 @@ require (
 	github.com/jhump/protoreflect v1.16.0
 	github.com/nautilus/gateway v0.3.17
 	github.com/nautilus/graphql v0.0.25
-	github.com/samber/lo v1.44.0
+	github.com/samber/lo v1.46.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vektah/gqlparser/v2 v2.5.16
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
