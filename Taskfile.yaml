@@ -43,7 +43,7 @@ tasks:
     sources:
       - "**/**.go"
     generates:
-      - coverage.out*
+      - coverage.out.tmp
   test:coverage:
     cmds:
       - cat coverage.out.tmp | egrep -v "kod_|.pb.go|_test.go|example/gateway|pkg/types/|/test" > coverage.out
@@ -102,11 +102,6 @@ tasks:
       - task generate
       - task golangci-lint
       - task test:coverage
-      - task clean
-
-  clean:
-    cmds: 
-      - rm -f coverage.out*
 
   golangci-lint:
     cmds:
@@ -117,7 +112,7 @@ tasks:
   generate:
     cmds:
       - $GOBIN/buf generate
-      - kod generate -s ./...
+      - $GOBIN/kod generate -s ./...
     deps:
       - mod
       - install:mockgen
