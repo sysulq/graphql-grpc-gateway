@@ -42,7 +42,7 @@ func (v *repository) Init(ctx context.Context) error {
 	gqlDesc, err := generator.NewSchemas(descs, generator.Options{
 		GenServiceDesc:         true,
 		MergeSchemas:           true,
-		GenerateUnboundMethods: v.config.Get().Config().Engine.GenerateUnboundMethods,
+		GenerateUnboundMethods: v.config.Get().Config().GraphQL.GenerateUnboundMethods,
 	})
 	if err != nil {
 		return err

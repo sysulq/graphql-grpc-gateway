@@ -18,10 +18,13 @@ type Pyroscope struct {
 }
 
 type GraphQL struct {
-	Address    string
-	Disable    bool
-	Playground bool
-	Jwt        Jwt
+	Address                string
+	Disable                bool
+	Playground             bool
+	Jwt                    Jwt
+	GenerateUnboundMethods bool
+	QueryCache             bool
+	SingleFlight           bool
 }
 
 type Jwt struct {
@@ -36,12 +39,9 @@ type JwtClaimToHeader struct {
 }
 
 type EngineConfig struct {
-	GenerateUnboundMethods bool
-	Pyroscope              Pyroscope
-	RateLimit              bool
-	CircuitBreaker         bool
-	QueryCache             bool
-	SingleFlight           bool
+	Pyroscope      Pyroscope
+	RateLimit      bool
+	CircuitBreaker bool
 }
 
 type ConfigInfo struct {

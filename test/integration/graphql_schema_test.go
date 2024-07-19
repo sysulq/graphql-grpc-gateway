@@ -28,9 +28,6 @@ func TestGraphqlSchema(t *testing.T) {
 
 	mockConfig := config.NewMockConfig(gomock.NewController(t))
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
-		Engine: config.EngineConfig{
-			GenerateUnboundMethods: true,
-		},
 		Grpc: config.Grpc{
 			Services: []kgrpc.Config{
 				{
@@ -42,7 +39,8 @@ func TestGraphqlSchema(t *testing.T) {
 			},
 		},
 		GraphQL: config.GraphQL{
-			Playground: true,
+			GenerateUnboundMethods: true,
+			Playground:             true,
 		},
 	}).AnyTimes()
 
@@ -71,9 +69,6 @@ func TestGraphqlSchemaWithoutUnboundMethod(t *testing.T) {
 
 	mockConfig := config.NewMockConfig(gomock.NewController(t))
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
-		Engine: config.EngineConfig{
-			GenerateUnboundMethods: false,
-		},
 		Grpc: config.Grpc{
 			Services: []kgrpc.Config{
 				{
@@ -85,7 +80,8 @@ func TestGraphqlSchemaWithoutUnboundMethod(t *testing.T) {
 			},
 		},
 		GraphQL: config.GraphQL{
-			Playground: true,
+			Playground:             true,
+			GenerateUnboundMethods: false,
 		},
 	}).AnyTimes()
 

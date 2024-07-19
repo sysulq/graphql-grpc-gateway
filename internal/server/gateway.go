@@ -60,7 +60,7 @@ func (s *server) BuildServer() (http.Handler, error) {
 		gateway.WithLogger(&noopLogger{}),
 		gateway.WithQueryerFactory(&queryFactory),
 	}
-	if s.config.Get().Config().Engine.QueryCache {
+	if s.config.Get().Config().GraphQL.QueryCache {
 		opts = append(opts, gateway.WithQueryPlanCache(NewQueryPlanCacher()))
 	}
 

@@ -16,15 +16,21 @@ func TestConfig(t *testing.T) {
 	kod.RunTest(t, func(ctx context.Context, c Config) {
 		require.Equal(t, &ConfigInfo{
 			Engine: EngineConfig{
-				GenerateUnboundMethods: false,
-				RateLimit:              true,
-				CircuitBreaker:         true,
-				QueryCache:             true,
-				SingleFlight:           true,
+				RateLimit:      true,
+				CircuitBreaker: true,
+
 				Pyroscope: Pyroscope{
 					Enable: true,
 					Config: kpyroscope.Config{ServerAddress: "http://localhost:4040"},
 				},
+			},
+			GraphQL: GraphQL{
+				Address:                ":8080",
+				Disable:                false,
+				Playground:             true,
+				GenerateUnboundMethods: false,
+				QueryCache:             true,
+				SingleFlight:           true,
 			},
 			Grpc: Grpc{
 				Etcd: etcdv3.Config{
@@ -41,11 +47,6 @@ func TestConfig(t *testing.T) {
 						Timeout: time.Second,
 					},
 				},
-			},
-			GraphQL: GraphQL{
-				Address:    ":8080",
-				Disable:    false,
-				Playground: true,
 			},
 		}, c.Config())
 	}, kod.WithConfigFile("../../example/gateway/config.yaml"))

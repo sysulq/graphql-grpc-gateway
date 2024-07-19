@@ -22,9 +22,7 @@ func TestJwt(t *testing.T) {
 
 	mockConfig := config.NewMockConfig(gomock.NewController(t))
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
-		Engine: config.EngineConfig{
-			GenerateUnboundMethods: true,
-		},
+		Engine: config.EngineConfig{},
 		Grpc: config.Grpc{
 			Services: []kgrpc.Config{
 				{
@@ -36,6 +34,7 @@ func TestJwt(t *testing.T) {
 			},
 		},
 		GraphQL: config.GraphQL{
+			GenerateUnboundMethods: true,
 			Jwt: config.Jwt{
 				Enable:               true,
 				LocalJwks:            "key",

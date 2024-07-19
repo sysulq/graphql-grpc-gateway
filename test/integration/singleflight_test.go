@@ -20,10 +20,7 @@ func TestSingleFlight(t *testing.T) {
 
 	mockConfig := config.NewMockConfig(gomock.NewController(t))
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
-		Engine: config.EngineConfig{
-			GenerateUnboundMethods: true,
-			SingleFlight:           true,
-		},
+		Engine: config.EngineConfig{},
 		Grpc: config.Grpc{
 			Services: []kgrpc.Config{
 				{
@@ -33,6 +30,10 @@ func TestSingleFlight(t *testing.T) {
 					Target: infos.OptionsServerAddr.Addr().String(),
 				},
 			},
+		},
+		GraphQL: config.GraphQL{
+			GenerateUnboundMethods: true,
+			SingleFlight:           true,
 		},
 	}).AnyTimes()
 

@@ -83,7 +83,7 @@ func (c *caller) GetDescs() []*desc.FileDescriptor {
 }
 
 func (c *caller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message protoadapt.MessageV1) (protoadapt.MessageV1, error) {
-	if c.config.Get().Config().Engine.SingleFlight {
+	if c.config.Get().Config().GraphQL.SingleFlight {
 		if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
 			hash := Hash64.Get()
 			defer Hash64.Put(hash)

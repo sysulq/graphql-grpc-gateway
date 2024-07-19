@@ -2,13 +2,13 @@ graphql:
   address: ":8080"
   disable: false
   playground: true
-
-engine:
   generateUnboundMethod: false
-  rateLimit: true
-  circuitBreaker: true
   queryCache: true
   singleFlight: true
+
+engine:
+  rateLimit: true
+  circuitBreaker: true
   pyroscope:
     enable: true
     serverAddress: "http://localhost:4040"
