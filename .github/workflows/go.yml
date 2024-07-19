@@ -38,7 +38,6 @@ jobs:
             task
 
       - uses: codecov/codecov-action@v4
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: ./coverage.out # optional
+          token: ${{ secrets.CODECOV_TOKEN }}
