@@ -46,7 +46,7 @@ tasks:
       - coverage.out
   test:coverage:
     cmds:
-      - cat coverage.out | egrep -v "kod_|.pb.go|_test.go|example/gateway|/test" > coverage.out.tmp
+      - cat coverage.out | egrep -v "kod_|.pb.go|_test.go|example/gateway|/test|main.go" > coverage.out.tmp
       - mv coverage.out.tmp coverage.out
       - go tool cover -func=coverage.out
     deps:
