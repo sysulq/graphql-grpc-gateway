@@ -158,25 +158,22 @@ func (schema *SchemaDescriptor) GenerateFile(generateUnboundMethods bool, file p
 }
 
 func (s *SchemaDescriptor) AsGraphQL() *ast.Schema {
-	queryDef := *s.Query
-	mutationDef := *s.Mutation
-	subscriptionsDef := *s.Subscription
 	schema := &ast.Schema{Types: map[string]*ast.Definition{}, Directives: s.Directives}
 	schema.Types = s.Types
 
-	if len(queryDef.Fields) > 0 {
-		schema.Query = &queryDef
-		schema.Types["Query"] = &queryDef
+	if len(s.Query.Fields) > 0 {
+		schema.Query = s.Query
+		schema.Types["Query"] = s.Query
 	}
 
-	if len(mutationDef.Fields) > 0 {
-		schema.Mutation = &mutationDef
-		schema.Types["Mutation"] = &mutationDef
+	if len(s.Mutation.Fields) > 0 {
+		schema.Mutation = s.Mutation
+		schema.Types["Mutation"] = s.Mutation
 	}
 
-	if len(subscriptionsDef.Fields) > 0 {
-		schema.Subscription = &subscriptionsDef
-		schema.Types["Subscription"] = &subscriptionsDef
+	if len(s.Subscription.Fields) > 0 {
+		schema.Subscription = s.Subscription
+		schema.Types["Subscription"] = s.Subscription
 	}
 
 	return schema
