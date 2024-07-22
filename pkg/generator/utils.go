@@ -3,12 +3,8 @@ package generator
 import (
 	"strings"
 	"unicode"
-	"unicode/utf8"
 
-	"github.com/jhump/protoreflect/desc"
 	"google.golang.org/protobuf/proto"
-	descriptor "google.golang.org/protobuf/types/descriptorpb"
-	"google.golang.org/protobuf/types/pluginpb"
 
 	gqlpb "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1"
 )
@@ -43,47 +39,47 @@ func GraphqlOneofOptions(opts proto.Message) *gqlpb.Oneof {
 	return nil
 }
 
-// GoCamelCase camel-cases a protobuf name for use as a Go identifier.
-//
-// If there is an interior underscore followed by a lower case letter,
-// drop the underscore and convert the letter to upper case.
-func GoCamelCase(s string) string {
-	// Invariant: if the next letter is lower case, it must be converted
-	// to upper case.
-	// That is, we process a word at a time, where words are marked by _ or
-	// upper case letter. Digits are treated as words.
-	var b []byte
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		switch {
-		case c == '.' && i+1 < len(s) && isASCIILower(s[i+1]):
-			// Skip over '.' in ".{{lowercase}}".
-		case c == '.':
-			b = append(b, '_') // convert '.' to '_'
-		case c == '_' && (i == 0 || s[i-1] == '.'):
-			// Convert initial '_' to ensure we start with a capital letter.
-			// Do the same for '_' after '.' to match historic behavior.
-			b = append(b, 'X') // convert '_' to 'X'
-		case c == '_' && i+1 < len(s) && isASCIILower(s[i+1]):
-			// Skip over '_' in "_{{lowercase}}".
-		case isASCIIDigit(c):
-			b = append(b, c)
-		default:
-			// Assume we have a letter now - if not, it's a bogus identifier.
-			// The next word is a sequence of characters that must start upper case.
-			if isASCIILower(c) {
-				c -= 'a' - 'A' // convert lowercase to uppercase
-			}
-			b = append(b, c)
+// // GoCamelCase camel-cases a protobuf name for use as a Go identifier.
+// //
+// // If there is an interior underscore followed by a lower case letter,
+// // drop the underscore and convert the letter to upper case.
+// func GoCamelCase(s string) string {
+// 	// Invariant: if the next letter is lower case, it must be converted
+// 	// to upper case.
+// 	// That is, we process a word at a time, where words are marked by _ or
+// 	// upper case letter. Digits are treated as words.
+// 	var b []byte
+// 	for i := 0; i < len(s); i++ {
+// 		c := s[i]
+// 		switch {
+// 		case c == '.' && i+1 < len(s) && isASCIILower(s[i+1]):
+// 			// Skip over '.' in ".{{lowercase}}".
+// 		case c == '.':
+// 			b = append(b, '_') // convert '.' to '_'
+// 		case c == '_' && (i == 0 || s[i-1] == '.'):
+// 			// Convert initial '_' to ensure we start with a capital letter.
+// 			// Do the same for '_' after '.' to match historic behavior.
+// 			b = append(b, 'X') // convert '_' to 'X'
+// 		case c == '_' && i+1 < len(s) && isASCIILower(s[i+1]):
+// 			// Skip over '_' in "_{{lowercase}}".
+// 		case isASCIIDigit(c):
+// 			b = append(b, c)
+// 		default:
+// 			// Assume we have a letter now - if not, it's a bogus identifier.
+// 			// The next word is a sequence of characters that must start upper case.
+// 			if isASCIILower(c) {
+// 				c -= 'a' - 'A' // convert lowercase to uppercase
+// 			}
+// 			b = append(b, c)
 
-			// Accept lower case sequence that follows.
-			for ; i+1 < len(s) && isASCIILower(s[i+1]); i++ {
-				b = append(b, s[i+1])
-			}
-		}
-	}
-	return string(b)
-}
+// 			// Accept lower case sequence that follows.
+// 			for ; i+1 < len(s) && isASCIILower(s[i+1]); i++ {
+// 				b = append(b, s[i+1])
+// 			}
+// 		}
+// 	}
+// 	return string(b)
+// }
 
 func GetRequestOperation(rpcOpts *gqlpb.Rpc) string {
 	if rpcOpts != nil {
@@ -98,40 +94,40 @@ func GetRequestOperation(rpcOpts *gqlpb.Rpc) string {
 	return ""
 }
 
-func CreateDescriptorsFromProto(req *pluginpb.CodeGeneratorRequest) (descs []*desc.FileDescriptor, err error) {
-	dd, err := desc.CreateFileDescriptorsFromSet(&descriptor.FileDescriptorSet{
-		File: req.GetProtoFile(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	for _, d := range dd {
-		for _, filename := range req.FileToGenerate {
-			if filename == d.GetName() {
-				descs = append(descs, d)
-			}
-		}
-	}
-	return
-}
+// func CreateDescriptorsFromProto(req *pluginpb.CodeGeneratorRequest) (descs []*desc.FileDescriptor, err error) {
+// 	dd, err := desc.CreateFileDescriptorsFromSet(&descriptor.FileDescriptorSet{
+// 		File: req.GetProtoFile(),
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	for _, d := range dd {
+// 		for _, filename := range req.FileToGenerate {
+// 			if filename == d.GetName() {
+// 				descs = append(descs, d)
+// 			}
+// 		}
+// 	}
+// 	return
+// }
 
-func ResolveProtoFilesRecursively(descs []*desc.FileDescriptor) (files FileDescriptors) {
-	for _, f := range descs {
-		files = append(files, ResolveProtoFilesRecursively(f.GetDependencies())...)
-		files = append(files, f)
-	}
+// func ResolveProtoFilesRecursively(descs []*desc.FileDescriptor) (files FileDescriptors) {
+// 	for _, f := range descs {
+// 		files = append(files, ResolveProtoFilesRecursively(f.GetDependencies())...)
+// 		files = append(files, f)
+// 	}
 
-	return files
-}
+// 	return files
+// }
 
-type FileDescriptors []*desc.FileDescriptor
+// type FileDescriptors []*desc.FileDescriptor
 
-func (ds FileDescriptors) AsFileDescriptorProto() (files []*descriptor.FileDescriptorProto) {
-	for _, d := range ds {
-		files = append(files, d.AsFileDescriptorProto())
-	}
-	return
-}
+// func (ds FileDescriptors) AsFileDescriptorProto() (files []*descriptor.FileDescriptorProto) {
+// 	for _, d := range ds {
+// 		files = append(files, d.AsFileDescriptorProto())
+// 	}
+// 	return
+// }
 
 // Split splits the camelcase word and returns a list of words. It also
 // supports digits. Both lower camel case and upper camel case are supported.
@@ -170,50 +166,50 @@ func (ds FileDescriptors) AsFileDescriptorProto() (files []*descriptor.FileDescr
 //     if subsequent string is lower case:
 //     move last character of upper case string to beginning of
 //     lower case string
-func SplitCamelCase(src string) (entries []string) {
-	// don't split invalid utf8
-	if !utf8.ValidString(src) {
-		return []string{src}
-	}
-	entries = []string{}
-	var runes [][]rune
-	lastClass := 0
-	class := 0
-	// split into fields based on class of unicode character
-	for _, r := range src {
-		switch true {
-		case unicode.IsLower(r):
-			class = 1
-		case unicode.IsUpper(r):
-			class = 2
-		case unicode.IsDigit(r):
-			class = 3
-		default:
-			class = 4
-		}
-		if class == lastClass {
-			runes[len(runes)-1] = append(runes[len(runes)-1], r)
-		} else {
-			runes = append(runes, []rune{r})
-		}
-		lastClass = class
-	}
-	// handle upper case -> lower case sequences, e.g.
-	// "PDFL", "oader" -> "PDF", "Loader"
-	for i := 0; i < len(runes)-1; i++ {
-		if unicode.IsUpper(runes[i][0]) && unicode.IsLower(runes[i+1][0]) {
-			runes[i+1] = append([]rune{runes[i][len(runes[i])-1]}, runes[i+1]...)
-			runes[i] = runes[i][:len(runes[i])-1]
-		}
-	}
-	// construct []string from results
-	for _, s := range runes {
-		if len(s) > 0 {
-			entries = append(entries, string(s))
-		}
-	}
-	return
-}
+// func SplitCamelCase(src string) (entries []string) {
+// 	// don't split invalid utf8
+// 	if !utf8.ValidString(src) {
+// 		return []string{src}
+// 	}
+// 	entries = []string{}
+// 	var runes [][]rune
+// 	lastClass := 0
+// 	class := 0
+// 	// split into fields based on class of unicode character
+// 	for _, r := range src {
+// 		switch true {
+// 		case unicode.IsLower(r):
+// 			class = 1
+// 		case unicode.IsUpper(r):
+// 			class = 2
+// 		case unicode.IsDigit(r):
+// 			class = 3
+// 		default:
+// 			class = 4
+// 		}
+// 		if class == lastClass {
+// 			runes[len(runes)-1] = append(runes[len(runes)-1], r)
+// 		} else {
+// 			runes = append(runes, []rune{r})
+// 		}
+// 		lastClass = class
+// 	}
+// 	// handle upper case -> lower case sequences, e.g.
+// 	// "PDFL", "oader" -> "PDF", "Loader"
+// 	for i := 0; i < len(runes)-1; i++ {
+// 		if unicode.IsUpper(runes[i][0]) && unicode.IsLower(runes[i+1][0]) {
+// 			runes[i+1] = append([]rune{runes[i][len(runes[i])-1]}, runes[i+1]...)
+// 			runes[i] = runes[i][:len(runes[i])-1]
+// 		}
+// 	}
+// 	// construct []string from results
+// 	for _, s := range runes {
+// 		if len(s) > 0 {
+// 			entries = append(entries, string(s))
+// 		}
+// 	}
+// 	return
+// }
 
 // CamelCase returns the CamelCased name.
 // If there is an interior underscore followed by a lower case letter,
