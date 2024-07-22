@@ -16,12 +16,10 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
-	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/generator"
+	v2 "github.com/sysulq/graphql-grpc-gateway/pkg/generator/v2"
 )
 
 type anyMap = map[string]interface{}
@@ -181,12 +179,15 @@ func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.
 		return nil, errors.New("method not found")
 	}
 
-	inputMsg, err := q.pbEncode(method.GetInputType(), field, vars)
-	if err != nil {
-		return nil, err
-	}
+	g := &v2.Generator{}
+	inputMsg, err := g.GraphQL2Proto(method.GetInputType().UnwrapMessage(), field, vars)
 
-	msg, err := q.caller.Get().Call(ctx, method, inputMsg)
+	// inputMsg, err := q.pbEncode(method.GetInputType(), field, vars)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	msg, err := q.caller.Get().Call(ctx, method, protoadapt.MessageV1Of(inputMsg))
 	if err != nil {
 		return nil, err
 	}
@@ -194,193 +195,193 @@ func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.
 	return q.pbDecode(field, msg)
 }
 
-func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (protoadapt.MessageV1, error) {
-	inputMsg := dynamic.NewMessage(in)
-	inArg := field.Arguments.ForName("in")
-	if inArg == nil {
-		return inputMsg, nil
-	}
+// func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (protoadapt.MessageV1, error) {
+// 	inputMsg := dynamic.NewMessage(in)
+// 	inArg := field.Arguments.ForName("in")
+// 	if inArg == nil {
+// 		return inputMsg, nil
+// 	}
 
-	var anyObj *desc.MessageDescriptor
-	if generator.IsAny(in) {
-		if len(inArg.Value.Children) == 0 {
-			return nil, errors.New("no '__typename' provided")
-		}
-		typename := inArg.Value.Children.ForName("__typename")
-		if typename == nil {
-			return nil, errors.New("no '__typename' provided")
-		}
+// 	var anyObj *desc.MessageDescriptor
+// 	if generator.IsAny(in) {
+// 		if len(inArg.Value.Children) == 0 {
+// 			return nil, errors.New("no '__typename' provided")
+// 		}
+// 		typename := inArg.Value.Children.ForName("__typename")
+// 		if typename == nil {
+// 			return nil, errors.New("no '__typename' provided")
+// 		}
 
-		vv, err := typename.Value(vars)
-		if err != nil {
-			return nil, errors.New("no '__typename' provided")
-		}
-		vvv, ok := vv.(string)
-		if !ok {
-			return nil, errors.New("no '__typename' provided")
-		}
+// 		vv, err := typename.Value(vars)
+// 		if err != nil {
+// 			return nil, errors.New("no '__typename' provided")
+// 		}
+// 		vvv, ok := vv.(string)
+// 		if !ok {
+// 			return nil, errors.New("no '__typename' provided")
+// 		}
 
-		obj := q.registry.Get().FindObjectByName(vvv)
-		if obj == nil {
-			return nil, errors.New("__typename should be a valid typename")
-		}
-		anyObj = obj
-		inputMsg = dynamic.NewMessage(anyObj)
-	}
+// 		obj := q.registry.Get().FindObjectByName(vvv)
+// 		if obj == nil {
+// 			return nil, errors.New("__typename should be a valid typename")
+// 		}
+// 		anyObj = obj
+// 		inputMsg = dynamic.NewMessage(anyObj)
+// 	}
 
-	for _, arg := range inArg.Value.Children {
-		val, err := arg.Value.Value(vars)
-		if err != nil {
-			return nil, err
-		}
-		if arg.Name == "__typename" {
-			continue
-		}
+// 	for _, arg := range inArg.Value.Children {
+// 		val, err := arg.Value.Value(vars)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		if arg.Name == "__typename" {
+// 			continue
+// 		}
 
-		var reqDesc *desc.FieldDescriptor
-		if anyObj != nil {
-			reqDesc = q.registry.Get().FindFieldByName(anyObj, arg.Name)
-		} else {
-			reqDesc = q.registry.Get().FindFieldByName(in, arg.Name)
-		}
+// 		var reqDesc *desc.FieldDescriptor
+// 		if anyObj != nil {
+// 			reqDesc = q.registry.Get().FindFieldByName(anyObj, arg.Name)
+// 		} else {
+// 			reqDesc = q.registry.Get().FindFieldByName(in, arg.Name)
+// 		}
 
-		if val, err = q.pbValue(val, reqDesc); err != nil {
-			return nil, err
-		}
+// 		if val, err = q.pbValue(val, reqDesc); err != nil {
+// 			return nil, err
+// 		}
 
-		if reqDesc.IsRepeated() && reflect.TypeOf(val).Kind() != reflect.Slice {
-			inputMsg.AddRepeatedField(reqDesc, val)
-		} else {
-			inputMsg.SetField(reqDesc, val)
-		}
-	}
+// 		if reqDesc.IsRepeated() && reflect.TypeOf(val).Kind() != reflect.Slice {
+// 			inputMsg.AddRepeatedField(reqDesc, val)
+// 		} else {
+// 			inputMsg.SetField(reqDesc, val)
+// 		}
+// 	}
 
-	// set fieldmask based on the selection set
-	for _, v := range inputMsg.GetKnownFields() {
-		if v.GetMessageType() != nil && v.UnwrapField().Message().FullName() == "google.protobuf.FieldMask" {
-			fm := &fieldmaskpb.FieldMask{
-				Paths: getSelectionSet(field.SelectionSet, ""),
-			}
-			inputMsg.SetField(v, fm)
-		}
-	}
+// 	// set fieldmask based on the selection set
+// 	for _, v := range inputMsg.GetKnownFields() {
+// 		if v.GetMessageType() != nil && v.UnwrapField().Message().FullName() == "google.protobuf.FieldMask" {
+// 			fm := &fieldmaskpb.FieldMask{
+// 				Paths: getSelectionSet(field.SelectionSet, ""),
+// 			}
+// 			inputMsg.SetField(v, fm)
+// 		}
+// 	}
 
-	if anyObj != nil {
-		return marshalAny(inputMsg)
-	}
-	return inputMsg, nil
-}
+// 	if anyObj != nil {
+// 		return marshalAny(inputMsg)
+// 	}
+// 	return inputMsg, nil
+// }
 
-func (q *queryer) pbValue(val interface{}, reqDesc *desc.FieldDescriptor) (_ interface{}, err error) {
-	msgDesc := reqDesc.GetMessageType()
+// func (q *queryer) pbValue(val interface{}, reqDesc *desc.FieldDescriptor) (_ interface{}, err error) {
+// 	msgDesc := reqDesc.GetMessageType()
 
-	switch v := val.(type) {
-	case float64:
-		if reqDesc.GetType() == descriptorpb.FieldDescriptorProto_TYPE_FLOAT {
-			return float32(v), nil
-		}
-	case int64:
-		switch reqDesc.GetType() {
-		case descriptorpb.FieldDescriptorProto_TYPE_INT32,
-			descriptorpb.FieldDescriptorProto_TYPE_SINT32,
-			descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
-			return int32(v), nil
+// 	switch v := val.(type) {
+// 	case float64:
+// 		if reqDesc.GetType() == descriptorpb.FieldDescriptorProto_TYPE_FLOAT {
+// 			return float32(v), nil
+// 		}
+// 	case int64:
+// 		switch reqDesc.GetType() {
+// 		case descriptorpb.FieldDescriptorProto_TYPE_INT32,
+// 			descriptorpb.FieldDescriptorProto_TYPE_SINT32,
+// 			descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+// 			return int32(v), nil
 
-		case descriptorpb.FieldDescriptorProto_TYPE_UINT32,
-			descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
-			return uint32(v), nil
+// 		case descriptorpb.FieldDescriptorProto_TYPE_UINT32,
+// 			descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
+// 			return uint32(v), nil
 
-		case descriptorpb.FieldDescriptorProto_TYPE_UINT64,
-			descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
-			return uint64(v), nil
-		case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
-			return float32(v), nil
-		case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
-			return float64(v), nil
-		}
-	case string:
-		switch reqDesc.GetType() {
-		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
-			// TODO predefine this
-			enumDesc := reqDesc.GetEnumType()
-			values := map[string]int32{}
-			for _, v := range enumDesc.GetValues() {
-				values[v.GetName()] = v.GetNumber()
-			}
-			return values[v], nil
-		case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
-			bytes, err := base64.StdEncoding.DecodeString(v)
-			if err != nil {
-				return nil, fmt.Errorf("bytes should be a base64 encoded string")
-			}
-			return bytes, nil
-		}
-	case []interface{}:
-		v2 := make([]interface{}, len(v))
-		for i, vv := range v {
-			v2[i], err = q.pbValue(vv, reqDesc)
-			if err != nil {
-				return nil, err
-			}
-		}
-		return v2, nil
-	case map[string]interface{}:
-		var anyTypeDescriptor *desc.MessageDescriptor
-		var vvv string
-		var ok bool
-		for kk, vv := range v {
-			if kk == "__typename" {
-				vvv, ok = vv.(string)
-				if !ok {
-					return nil, errors.New("'__typename' must be a string")
-				}
-				delete(v, "__typename")
-				break
-			}
-		}
-		var msg *dynamic.Message
-		protoDesc := msgDesc
-		if generator.IsAny(protoDesc) {
-			anyTypeDescriptor = q.registry.Get().FindObjectByName(vvv)
-			if anyTypeDescriptor == nil {
-				return nil, errors.New("'__typename' must be a valid INPUT_OBJECT")
-			}
-			msg = dynamic.NewMessage(anyTypeDescriptor)
-		} else {
-			msg = dynamic.NewMessage(protoDesc)
-		}
-		oneofValidate := map[*desc.OneOfDescriptor]struct{}{}
-		for kk, vv := range v {
+// 		case descriptorpb.FieldDescriptorProto_TYPE_UINT64,
+// 			descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
+// 			return uint64(v), nil
+// 		case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
+// 			return float32(v), nil
+// 		case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
+// 			return float64(v), nil
+// 		}
+// 	case string:
+// 		switch reqDesc.GetType() {
+// 		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+// 			// TODO predefine this
+// 			enumDesc := reqDesc.GetEnumType()
+// 			values := map[string]int32{}
+// 			for _, v := range enumDesc.GetValues() {
+// 				values[v.GetName()] = v.GetNumber()
+// 			}
+// 			return values[v], nil
+// 		case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
+// 			bytes, err := base64.StdEncoding.DecodeString(v)
+// 			if err != nil {
+// 				return nil, fmt.Errorf("bytes should be a base64 encoded string")
+// 			}
+// 			return bytes, nil
+// 		}
+// 	case []interface{}:
+// 		v2 := make([]interface{}, len(v))
+// 		for i, vv := range v {
+// 			v2[i], err = q.pbValue(vv, reqDesc)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 		}
+// 		return v2, nil
+// 	case map[string]interface{}:
+// 		var anyTypeDescriptor *desc.MessageDescriptor
+// 		var vvv string
+// 		var ok bool
+// 		for kk, vv := range v {
+// 			if kk == "__typename" {
+// 				vvv, ok = vv.(string)
+// 				if !ok {
+// 					return nil, errors.New("'__typename' must be a string")
+// 				}
+// 				delete(v, "__typename")
+// 				break
+// 			}
+// 		}
+// 		var msg *dynamic.Message
+// 		protoDesc := msgDesc
+// 		if generator.IsAny(protoDesc) {
+// 			anyTypeDescriptor = q.registry.Get().FindObjectByName(vvv)
+// 			if anyTypeDescriptor == nil {
+// 				return nil, errors.New("'__typename' must be a valid INPUT_OBJECT")
+// 			}
+// 			msg = dynamic.NewMessage(anyTypeDescriptor)
+// 		} else {
+// 			msg = dynamic.NewMessage(protoDesc)
+// 		}
+// 		oneofValidate := map[*desc.OneOfDescriptor]struct{}{}
+// 		for kk, vv := range v {
 
-			if anyTypeDescriptor != nil {
-				msgDesc = anyTypeDescriptor
-			}
-			// plugType := q.pm.inputs[msgDesc]
-			// fieldDesc := q.pm.fields[q.p.FieldBack(plugType.DescriptorProto, kk)]
-			fieldDesc := q.registry.Get().FindFieldByName(msgDesc, kk)
-			oneof := fieldDesc.GetOneOf()
-			if oneof != nil {
-				_, ok := oneofValidate[oneof]
-				if ok {
-					return nil, fmt.Errorf("field with name %q on Object %q can't be set", kk, msgDesc.GetName())
-				}
-				oneofValidate[oneof] = struct{}{}
-			}
+// 			if anyTypeDescriptor != nil {
+// 				msgDesc = anyTypeDescriptor
+// 			}
+// 			// plugType := q.pm.inputs[msgDesc]
+// 			// fieldDesc := q.pm.fields[q.p.FieldBack(plugType.DescriptorProto, kk)]
+// 			fieldDesc := q.registry.Get().FindFieldByName(msgDesc, kk)
+// 			oneof := fieldDesc.GetOneOf()
+// 			if oneof != nil {
+// 				_, ok := oneofValidate[oneof]
+// 				if ok {
+// 					return nil, fmt.Errorf("field with name %q on Object %q can't be set", kk, msgDesc.GetName())
+// 				}
+// 				oneofValidate[oneof] = struct{}{}
+// 			}
 
-			vv2, err := q.pbValue(vv, fieldDesc)
-			if err != nil {
-				return nil, err
-			}
-			msg.SetField(fieldDesc, vv2)
-		}
-		if anyTypeDescriptor != nil {
-			return marshalAny(msg)
-		}
-		return msg, nil
-	}
+// 			vv2, err := q.pbValue(vv, fieldDesc)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 			msg.SetField(fieldDesc, vv2)
+// 		}
+// 		if anyTypeDescriptor != nil {
+// 			return marshalAny(msg)
+// 		}
+// 		return msg, nil
+// 	}
 
-	return val, nil
-}
+// 	return val, nil
+// }
 
 func (q *queryer) pbDecodeOneofField(desc *desc.MessageDescriptor, dynamicMsg *dynamic.Message, selection ast.SelectionSet) (oneof anyMap, err error) {
 	oneof = anyMap{}
