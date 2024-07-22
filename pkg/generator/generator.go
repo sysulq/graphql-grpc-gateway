@@ -412,10 +412,6 @@ type FieldDescriptor struct {
 	typ *ObjectDescriptor
 }
 
-func (f *FieldDescriptor) GetType() *ObjectDescriptor {
-	return f.typ
-}
-
 type MethodDescriptor struct {
 	*desc.ServiceDescriptor
 	*desc.MethodDescriptor
@@ -428,14 +424,6 @@ type MethodDescriptor struct {
 
 func (m *MethodDescriptor) AsGraphql() *ast.FieldDefinition {
 	return m.FieldDefinition
-}
-
-func (m *MethodDescriptor) GetInput() *ObjectDescriptor {
-	return m.input
-}
-
-func (m *MethodDescriptor) GetOutput() *ObjectDescriptor {
-	return m.output
 }
 
 type RootDefinition struct {
@@ -554,10 +542,10 @@ func getDescription(descs ...desc.Descriptor) string {
 			continue
 		}
 		if info.LeadingComments != nil {
-			description = append(description, *info.LeadingComments)
+			description = append(description, info.GetLeadingComments())
 		}
 		if info.TrailingComments != nil {
-			description = append(description, *info.TrailingComments)
+			description = append(description, info.GetTrailingComments())
 		}
 	}
 
