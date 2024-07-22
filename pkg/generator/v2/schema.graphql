@@ -1,8 +1,231 @@
 type Any {
-	type_url: Int!
+	type_url: String
 	value: String
 }
-input AnyInput {
-	type_url: String!
+type AnyInput {
+	type_url: String
 	value: String
+}
+type Data {
+	string_x: String
+	foo: optionsFoo2
+	double: Float
+	string2: String
+	foo2: optionsFoo2
+	double2: Float
+	bar: String
+	string: String
+}
+type DataInput {
+	string_x: String
+	foo: optionsFoo2
+	double: Float
+	string2: String
+	foo2: optionsFoo2
+	double2: Float
+	bar: String
+	string: String
+}
+type Empty
+type Empty3 {
+	i: constructsEmpty3Int
+}
+type Empty3Input {
+	i: constructsEmpty3Int
+}
+type EmptyInput
+type EmptyNested {
+	nested1: constructsEmptyNestedEmptyNested1
+}
+type EmptyRecursiveInput {
+	nested1: googleprotobufEmpty
+	empty: constructsEmptyRecursive
+}
+type Maps {
+	int32_int32: constructsMapsInt32Int32Entry
+	int64_int64: constructsMapsInt64Int64Entry
+	uint32_uint32: constructsMapsUint32Uint32Entry
+	uint64_uint64: constructsMapsUint64Uint64Entry
+	sint32_sint32: constructsMapsSint32Sint32Entry
+	sint64_sint64: constructsMapsSint64Sint64Entry
+	fixed32_fixed32: constructsMapsFixed32Fixed32Entry
+	fixed64_fixed64: constructsMapsFixed64Fixed64Entry
+	sfixed32_sfixed32: constructsMapsSfixed32Sfixed32Entry
+	sfixed64_sfixed64: constructsMapsSfixed64Sfixed64Entry
+	bool_bool: constructsMapsBoolBoolEntry
+	string_string: constructsMapsStringStringEntry
+	string_bytes: constructsMapsStringBytesEntry
+	string_float: constructsMapsStringFloatEntry
+	string_double: constructsMapsStringDoubleEntry
+	string_foo: constructsMapsStringFooEntry
+	string_bar: constructsMapsStringBarEntry
+}
+type MapsInput {
+	int32_int32: constructsMapsInt32Int32Entry
+	int64_int64: constructsMapsInt64Int64Entry
+	uint32_uint32: constructsMapsUint32Uint32Entry
+	uint64_uint64: constructsMapsUint64Uint64Entry
+	sint32_sint32: constructsMapsSint32Sint32Entry
+	sint64_sint64: constructsMapsSint64Sint64Entry
+	fixed32_fixed32: constructsMapsFixed32Fixed32Entry
+	fixed64_fixed64: constructsMapsFixed64Fixed64Entry
+	sfixed32_sfixed32: constructsMapsSfixed32Sfixed32Entry
+	sfixed64_sfixed64: constructsMapsSfixed64Sfixed64Entry
+	bool_bool: constructsMapsBoolBoolEntry
+	string_string: constructsMapsStringStringEntry
+	string_bytes: constructsMapsStringBytesEntry
+	string_float: constructsMapsStringFloatEntry
+	string_double: constructsMapsStringDoubleEntry
+	string_foo: constructsMapsStringFooEntry
+	string_bar: constructsMapsStringBarEntry
+}
+type Mutation {
+	Scalars_(input: ScalarsInput): Scalars
+	Repeated_(input: RepeatedInput): Repeated
+	Maps_(input: MapsInput): Maps
+	Any_(input: AnyInput): Any
+	Empty_(input: EmptyInput): Empty
+	Empty2_(input: EmptyRecursiveInput): EmptyNested
+	Empty3_(input: Empty3Input): Empty3
+	Ref_(input: RefInput): Ref
+	Oneof_(input: OneofInput): Oneof
+	CallWithId(input: EmptyInput): Empty
+	Mutate1(input: DataInput): Data
+	Mutate2(input: DataInput): Data
+	Publish(input: DataInput): Data
+	Subscribe(input: DataInput): Data
+	PubSub1(input: DataInput): Data
+	InvalidSubscribe2(input: DataInput): Data
+	PubSub2(input: DataInput): Data
+	Ignore(input: DataInput): Data
+	Name(input: DataInput): Data
+	Name(input: DataInput): Data
+	NewName(input: DataInput): Data
+	Mutate1(input: DataInput): Data
+	Subscribe(input: DataInput): Data
+}
+type Oneof {
+	param1: String
+	param2: String
+	param3: String
+	param4: String
+	param5: String
+	param6: String
+}
+type OneofInput {
+	param1: String
+	param2: String
+	param3: String
+	param4: String
+	param5: String
+	param6: String
+}
+type Query {
+	Query1(input: DataInput): Data
+	InvalidSubscribe1(input: DataInput): Data
+	InvalidSubscribe3(input: DataInput): Data
+	Query1(input: DataInput): Data
+	Query2(input: DataInput): Data
+}
+type Ref {
+	empty: googleprotobufEmpty
+	local_time2: constructsTimestamp
+	external: googleprotobufTimestamp
+	local_time: constructsTimestamp
+	file: constructsBaz
+	file_msg: constructsFoo
+	file_enum: constructsBar
+	local: constructsRefFoo
+	foreign: constructsFooFoo2
+	en1: constructsRefFooEn
+	en2: constructsRefFooBarEn
+	gz: constructsRefFooBazGz
+}
+type RefInput {
+	empty: googleprotobufEmpty
+	local_time2: constructsTimestamp
+	external: googleprotobufTimestamp
+	local_time: constructsTimestamp
+	file: constructsBaz
+	file_msg: constructsFoo
+	file_enum: constructsBar
+	local: constructsRefFoo
+	foreign: constructsFooFoo2
+	en1: constructsRefFooEn
+	en2: constructsRefFooBarEn
+	gz: constructsRefFooBazGz
+}
+type Repeated {
+	double: Float
+	float: Float
+	int32: Int
+	int64: Int
+	uint32: Int
+	uint64: Int
+	sint32: Int
+	sint64: Int
+	fixed32: Int
+	fixed64: Int
+	sfixed32: Int
+	sfixed64: Int
+	bool: Boolean
+	string_x: String
+	bytes: String
+	foo: constructsFoo
+	bar: constructsBar
+}
+type RepeatedInput {
+	double: Float
+	float: Float
+	int32: Int
+	int64: Int
+	uint32: Int
+	uint64: Int
+	sint32: Int
+	sint64: Int
+	fixed32: Int
+	fixed64: Int
+	sfixed32: Int
+	sfixed64: Int
+	bool: Boolean
+	string_x: String
+	bytes: String
+	foo: constructsFoo
+	bar: constructsBar
+}
+type Scalars {
+	double: Float
+	float: Float
+	int32: Int
+	int64: Int
+	uint32: Int
+	uint64: Int
+	sint32: Int
+	sint64: Int
+	fixed32: Int
+	fixed64: Int
+	sfixed32: Int
+	sfixed64: Int
+	bool: Boolean
+	string_x: String
+	bytes: String
+	paths: googleprotobufFieldMask
+}
+type ScalarsInput {
+	double: Float
+	float: Float
+	int32: Int
+	int64: Int
+	uint32: Int
+	uint64: Int
+	sint32: Int
+	sint64: Int
+	fixed32: Int
+	fixed64: Int
+	sfixed32: Int
+	sfixed64: Int
+	bool: Boolean
+	string_x: String
+	bytes: String
+	paths: googleprotobufFieldMask
 }

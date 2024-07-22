@@ -162,15 +162,22 @@ func (s *SchemaDescriptor) AsGraphQL() *ast.Schema {
 	mutationDef := *s.Mutation
 	subscriptionsDef := *s.Subscription
 	schema := &ast.Schema{Types: map[string]*ast.Definition{}, Directives: s.Directives}
-	schema.Query = &queryDef
-	schema.Types["Query"] = &queryDef
-
-	schema.Mutation = &mutationDef
-	schema.Types["Mutation"] = &mutationDef
-	schema.Subscription = &subscriptionsDef
-	schema.Types["Subscription"] = &subscriptionsDef
-
 	schema.Types = s.Types
+
+	if len(queryDef.Fields) > 0 {
+		schema.Query = &queryDef
+		schema.Types["Query"] = &queryDef
+	}
+
+	if len(mutationDef.Fields) > 0 {
+		schema.Mutation = &mutationDef
+		schema.Types["Mutation"] = &mutationDef
+	}
+
+	if len(subscriptionsDef.Fields) > 0 {
+		schema.Subscription = &subscriptionsDef
+		schema.Types["Subscription"] = &subscriptionsDef
+	}
 
 	return schema
 }
