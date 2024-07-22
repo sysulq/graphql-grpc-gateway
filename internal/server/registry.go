@@ -52,15 +52,15 @@ func (v *repository) Init(ctx context.Context) error {
 
 	for _, f := range gqlDesc {
 		v.methodsByName[ast.Mutation] = map[string]*desc.MethodDescriptor{}
-		for _, m := range f.GetMutation().Methods() {
+		for _, m := range f.Methods(ast.Mutation) {
 			v.methodsByName[ast.Mutation][m.Name] = m.MethodDescriptor
 		}
 		v.methodsByName[ast.Query] = map[string]*desc.MethodDescriptor{}
-		for _, m := range f.GetQuery().Methods() {
+		for _, m := range f.Methods(ast.Query) {
 			v.methodsByName[ast.Query][m.Name] = m.MethodDescriptor
 		}
 		v.methodsByName[ast.Subscription] = map[string]*desc.MethodDescriptor{}
-		for _, m := range f.GetSubscription().Methods() {
+		for _, m := range f.Methods(ast.Subscription) {
 			v.methodsByName[ast.Subscription][m.Name] = m.MethodDescriptor
 		}
 	}

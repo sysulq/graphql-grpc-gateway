@@ -91,17 +91,17 @@ func generateFile(generateUnboundMethods bool, file *desc.FileDescriptor, schema
 			}
 
 			if rpc.IsServerStreaming() && rpc.IsClientStreaming() {
-				schema.GetMutation().addMethod(svc, rpc, in, out)
+				schema.mutation.addMethod(svc, rpc, in, out)
 			}
 
 			if rpc.IsServerStreaming() {
-				schema.GetSubscription().addMethod(svc, rpc, in, out)
+				schema.subscription.addMethod(svc, rpc, in, out)
 			} else {
 				switch rpcOpts.GetPattern().(type) {
 				case *gqlpb.Rpc_Query:
-					schema.GetQuery().addMethod(svc, rpc, in, out)
+					schema.query.addMethod(svc, rpc, in, out)
 				default:
-					schema.GetMutation().addMethod(svc, rpc, in, out)
+					schema.mutation.addMethod(svc, rpc, in, out)
 				}
 			}
 		}
@@ -141,6 +141,9 @@ func NewSchemaDescriptor(genServiceDesc bool, goref GoRef) *SchemaDescriptor {
 	for _, name := range graphqlReservedNames {
 		sd.reservedNames[name] = nil
 	}
+	sd.query = NewRootDefinition(Query, sd)
+	sd.mutation = NewRootDefinition(Mutation, sd)
+	sd.subscription = NewRootDefinition(Subscription, sd)
 	return sd
 }
 
@@ -167,10 +170,23 @@ type createdObjectKey struct {
 	input bool
 }
 
+func (s *SchemaDescriptor) Methods(op ast.Operation) []*MethodDescriptor {
+	switch op {
+	case ast.Query:
+		return s.query.methods
+	case ast.Mutation:
+		return s.mutation.methods
+	case ast.Subscription:
+		return s.subscription.methods
+	default:
+		return nil
+	}
+}
+
 func (s *SchemaDescriptor) AsGraphql() *ast.Schema {
-	queryDef := *s.GetQuery().Definition
-	mutationDef := *s.GetMutation().Definition
-	subscriptionsDef := *s.GetSubscription().Definition
+	queryDef := *s.query.Definition
+	mutationDef := *s.mutation.Definition
+	subscriptionsDef := *s.subscription.Definition
 	schema := &ast.Schema{Types: map[string]*ast.Definition{}, Directives: s.Directives}
 	schema.Query = &queryDef
 	schema.Types["Query"] = &queryDef
@@ -198,28 +214,6 @@ func (s *SchemaDescriptor) AsGraphql() *ast.Schema {
 
 func (s *SchemaDescriptor) Objects() []*ObjectDescriptor {
 	return s.objects
-}
-
-func (s *SchemaDescriptor) GetMutation() *RootDefinition {
-	if s.mutation == nil {
-		s.mutation = NewRootDefinition(Mutation, s)
-	}
-	return s.mutation
-}
-
-func (s *SchemaDescriptor) GetSubscription() *RootDefinition {
-	if s.subscription == nil {
-		s.subscription = NewRootDefinition(Subscription, s)
-	}
-	return s.subscription
-}
-
-func (s *SchemaDescriptor) GetQuery() *RootDefinition {
-	if s.query == nil {
-		s.query = NewRootDefinition(Query, s)
-	}
-
-	return s.query
 }
 
 // make name be unique
