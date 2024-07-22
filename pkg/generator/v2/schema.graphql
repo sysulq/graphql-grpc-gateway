@@ -1,0 +1,8 @@
+type Any {
+	type_url: Int!
+	value: String
+}
+input AnyInput {
+	type_url: String!
+	value: String
+}
