@@ -5,8 +5,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/sysulq/graphql-grpc-gateway/api/test"
+	"github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
-	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type (
@@ -18,23 +19,23 @@ const constructsMapsQuery = `
 mutation {
  constructsMaps_(
     in: {
-      int32Int32: { key: 1, value: 1 }
-      int64Int64: { key: 2, value: 2 }
-      uint32Uint32: { key: 3, value: 3 }
-      uint64Uint64: { key: 4, value: 4 }
-      sint32Sint32: { key: 5, value: 5 }
-      sint64Sint64: { key: 6, value: 5 }
-      fixed32Fixed32: { key: 7, value: 7 }
-      fixed64Fixed64: { key: 8, value: 8 }
-      sfixed32Sfixed32: { key: 9, value: 9 }
-      sfixed64Sfixed64: { key: 10, value: 10 }
-      boolBool: { key: true, value: true }
-      stringString: { key: "test1", value: "test1" }
-      stringBytes: { key: "test2", value: "dGVzdA==" }
-      stringFloat: { key: "test1", value: 11.1 }
-      stringDouble: { key: "test1", value: 12.2 }
-      stringFoo: { key: "test1", value: { param1: "param1", param2: "param2" } }
-      stringBar: { key: "test1", value: BAR3 }
+      int32Int32: [{ key: 1, value: 1 }]
+      int64Int64: [{ key: 2, value: 2 }]
+      uint32Uint32: [{ key: 3, value: 3 }]
+      uint64Uint64: [{ key: 4, value: 4 }]
+      sint32Sint32: [{ key: 5, value: 5 }]
+      sint64Sint64: [{ key: 6, value: 5 }]
+      fixed32Fixed32: [{ key: 7, value: 7 }]
+      fixed64Fixed64: [{ key: 8, value: 8 }]
+      sfixed32Sfixed32: [{ key: 9, value: 9 }]
+      sfixed64Sfixed64: [{ key: 10, value: 10 }]
+      boolBool: [{ key: true, value: true }]
+      stringString: [{ key: "test1", value: "test1" }]
+      stringBytes: [{ key: "test2", value: "dGVzdA==" }]
+      stringFloat: [{ key: "test1", value: 11.1 }]
+      stringDouble: [{ key: "test1", value: 12.2 }]
+      stringFoo: [{ key: "test1", value: { param1: "param1", param2: "param2" } }]
+      stringBar: [{ key: "test1", value: BAR3 }]
     }
   ) {
     int32Int32 { key value }
@@ -58,135 +59,74 @@ mutation {
 }
 `
 
-var constructsMapsResponse = j{
-	"constructsMaps_": j{
-		"boolBool":         l{j{"key": true, "value": true}},
-		"stringBar":        l{j{"key": "test1", "value": "BAR3"}},
-		"stringBytes":      l{j{"key": "test2", "value": "dGVzdA=="}},
-		"stringDouble":     l{j{"key": "test1", "value": 12.2}},
-		"stringFloat":      l{j{"key": "test1", "value": 11.1}},
-		"stringFoo":        l{j{"key": "test1", "value": j{"param1": "param1", "param2": "param2"}}},
-		"stringString":     l{j{"key": "test1", "value": "test1"}},
-		"fixed32Fixed32":   l{j{"key": float64(7), "value": float64(7)}},
-		"fixed64Fixed64":   l{j{"key": float64(8), "value": float64(8)}},
-		"int32Int32":       l{j{"key": float64(1), "value": float64(1)}},
-		"int64Int64":       l{j{"key": float64(2), "value": float64(2)}},
-		"sfixed32Sfixed32": l{j{"key": float64(9), "value": float64(9)}},
-		"sfixed64Sfixed64": l{j{"key": float64(10), "value": float64(10)}},
-		"sint32Sint32":     l{j{"key": float64(5), "value": float64(5)}},
-		"sint64Sint64":     l{j{"key": float64(6), "value": float64(5)}},
-		"uint32Uint32":     l{j{"key": float64(3), "value": float64(3)}},
-		"uint64Uint64":     l{j{"key": float64(4), "value": float64(4)}},
+var constructsMaps = &test.Maps{
+	Int32Int32: map[int32]int32{1: 1},
+	Int64Int64: map[int64]int64{2: 2},
+	Uint32Uint32: map[uint32]uint32{
+		3: 3,
+	},
+	Uint64Uint64: map[uint64]uint64{
+		4: 4,
+	},
+	Sint32Sint32: map[int32]int32{
+		5: 5,
+	},
+	Sint64Sint64: map[int64]int64{
+		6: 5,
+	},
+	Fixed32Fixed32: map[uint32]uint32{
+		7: 7,
+	},
+	Fixed64Fixed64: map[uint64]uint64{
+		8: 8,
+	},
+	Sfixed32Sfixed32: map[int32]int32{
+		9: 9,
+	},
+	Sfixed64Sfixed64: map[int64]int64{
+		10: 10,
+	},
+	BoolBool: map[bool]bool{
+		true: true,
+	},
+	StringString: map[string]string{
+		"test1": "test1",
+	},
+	StringBytes: map[string][]byte{
+		"test2": []byte("test"),
+	},
+	StringFloat: map[string]float32{
+		"test1": 11.1,
+	},
+	StringDouble: map[string]float64{
+		"test1": 12.2,
+	},
+	StringFoo: map[string]*test.Foo{
+		"test1": {Param1: "param1", Param2: "param2"},
+	},
+	StringBar: map[string]test.Bar{
+		"test1": test.Bar_BAR3,
 	},
 }
 
 func TestEncodeMaps(t *testing.T) {
-	ins := &Generator{}
-
+	schema, err := gqlparser.LoadSchema(&ast.Source{
+		Input: schemaGraphQL,
+	})
+	require.Nil(t, err)
 	var msg test.Maps
 
-	generated, err := ins.GraphQL2Proto(msg.ProtoReflect().Type().Descriptor(), &ast.Field{
-		Alias: "constructsMaps_",
-		Name:  "constructsMaps_",
-		Arguments: ast.ArgumentList{
-			&ast.Argument{
-				Name: "in",
-				Value: &ast.Value{
-					Children: ast.ChildValueList{
-						&ast.ChildValue{
-							Name: "int32Int32",
-							Value: &ast.Value{
-								Children: ast.ChildValueList{
-									&ast.ChildValue{
-										Name: "",
-										Value: &ast.Value{
-											Children: ast.ChildValueList{
-												&ast.ChildValue{
-													Name: "key",
-													Value: &ast.Value{
-														Raw:  "1",
-														Kind: ast.IntValue,
-													},
-												},
-												&ast.ChildValue{
-													Name: "value",
-													Value: &ast.Value{
-														Raw:  "2",
-														Kind: ast.IntValue,
-													},
-												},
-											},
-											Kind: ast.ObjectValue,
-										},
-									},
-								},
-								Kind: ast.ListValue,
-							},
-						},
-						&ast.ChildValue{
-							Name: "int64Int64",
-							Value: &ast.Value{
-								Children: ast.ChildValueList{
-									&ast.ChildValue{
-										Name: "",
-										Value: &ast.Value{
-											Children: ast.ChildValueList{
-												&ast.ChildValue{
-													Name: "key",
-													Value: &ast.Value{
-														Raw:  "1",
-														Kind: ast.IntValue,
-													},
-												},
-												&ast.ChildValue{
-													Name: "value",
-													Value: &ast.Value{
-														Raw:  "2",
-														Kind: ast.IntValue,
-													},
-												},
-											},
-											Kind: ast.ObjectValue,
-										},
-									},
-									&ast.ChildValue{
-										Name: "",
-										Value: &ast.Value{
-											Children: ast.ChildValueList{
-												&ast.ChildValue{
-													Name: "key",
-													Value: &ast.Value{
-														Raw:  "2",
-														Kind: ast.IntValue,
-													},
-												},
-												&ast.ChildValue{
-													Name: "value",
-													Value: &ast.Value{
-														Raw:  "3",
-														Kind: ast.IntValue,
-													},
-												},
-											},
-											Kind: ast.ObjectValue,
-										},
-									},
-								},
-								Kind: ast.ListValue,
-							},
-						},
-					},
-					Kind: ast.ObjectValue,
-				},
-			},
-		},
-	}, map[string]interface{}{})
+	queryDoc, err := gqlparser.LoadQuery(schema, constructsMapsQuery)
+	require.Nil(t, err)
+
+	ins := &Generator{}
+	generated, err := ins.GraphQL2Proto(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
 
 	require.Nil(t, err)
-	d1, _ := proto.Marshal(generated)
-	d2, _ := proto.Marshal(&test.Maps{
-		Int32Int32: map[int32]int32{1: 2},
-		Int64Int64: map[int64]int64{1: 2, 2: 3},
-	})
-	require.Equal(t, d1, d2)
+
+	data, err := protojson.Marshal(generated)
+	require.Nil(t, err)
+	expected, err := protojson.Marshal(constructsMaps)
+	require.Nil(t, err)
+	require.Equal(t, string(expected), string(data))
 }

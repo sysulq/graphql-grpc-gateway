@@ -1,9 +1,9 @@
 package v2
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/proto"
@@ -76,7 +76,7 @@ func unmarshalMap(msg protoreflect.Message, fd protoreflect.FieldDescriptor, val
 		return fmt.Errorf("expected list value for map field %s", fd.JSONName())
 	}
 
-	mapValue := msg.NewField(fd).Map()
+	mapValue := msg.Mutable(fd).Map()
 	for _, child := range value.Children {
 		if child.Value.Kind != ast.ObjectValue {
 			return fmt.Errorf("expected object value in list for map field %s", fd.JSONName())
@@ -117,7 +117,7 @@ func unmarshalMessage(msg protoreflect.Message, fd protoreflect.FieldDescriptor,
 		return fmt.Errorf("expected object value for message field %s", fd.JSONName())
 	}
 
-	subMsg := dynamicpb.NewMessage(fd.Message())
+	subMsg := newMessage(fd.Message())
 	for _, child := range value.Children {
 		subFd := fd.Message().Fields().ByJSONName(child.Name)
 		if subFd == nil {
@@ -138,9 +138,7 @@ func unmarshalScalar(msg protoreflect.Message, fd protoreflect.FieldDescriptor, 
 	if err != nil {
 		return err
 	}
-	if strings.Contains(string(fd.FullName()), "float") {
-		fmt.Println(msg)
-	}
+
 	msg.Set(fd, val)
 	return nil
 }
@@ -227,11 +225,21 @@ func convertValue(fd protoreflect.FieldDescriptor, gqlValue *ast.Value) (protore
 	case protoreflect.StringKind:
 		return protoreflect.ValueOf(gqlValue.Raw), nil
 	case protoreflect.BytesKind:
-		return protoreflect.ValueOf([]byte(gqlValue.Raw)), nil
-	// case protoreflect.EnumKind:
-	// 	return protoreflect.ValueOf(protoreflect.EnumNumber(gqlValue.IntValue())), nil
+		// base64 decode
+		data, err := base64.StdEncoding.DecodeString(gqlValue.Raw)
+		if err != nil {
+			return protoreflect.Value{}, err
+		}
+
+		return protoreflect.ValueOf(data), nil
+	case protoreflect.EnumKind:
+		enumDesc := fd.Enum().Values().ByName(protoreflect.Name(gqlValue.Raw))
+		if enumDesc == nil {
+			return protoreflect.Value{}, fmt.Errorf("enum type not found")
+		}
+		return protoreflect.ValueOf(enumDesc.Number()), nil
 	case protoreflect.MessageKind, protoreflect.GroupKind:
-		dynamicMessage := dynamicpb.NewMessage(fd.Message())
+		dynamicMessage := newMessage(fd.Message())
 		for _, child := range gqlValue.Children {
 			subFd := fd.Message().Fields().ByJSONName(child.Name)
 			if subFd == nil {

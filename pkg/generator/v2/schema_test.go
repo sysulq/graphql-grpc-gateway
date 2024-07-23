@@ -17,15 +17,17 @@ var schemaGraphQL string
 
 func TestSchema(t *testing.T) {
 	ins := New()
-	ins.GenerateFile(true, test.File_test_constructs_input_proto)
-	ins.GenerateFile(true, test.File_test_options_input_proto)
 	var err error
-	schema := ins.AsGraphQL()
+	err = ins.GenerateFile(true, test.File_test_constructs_input_proto)
+	require.Nil(t, err)
+	err = ins.GenerateFile(true, test.File_test_options_input_proto)
+	require.Nil(t, err)
 
+	schema := ins.AsGraphQL()
 	file, err := os.Create("schema.graphql")
 	require.Nil(t, err)
 	formatter.NewFormatter(file).FormatSchema(schema)
-	// require.Equal(t, string(""), file.String())
+
 	_, err = validator.LoadSchema(validator.Prelude, &ast.Source{Input: schemaGraphQL})
 	require.Nil(t, err)
 }

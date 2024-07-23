@@ -3,6 +3,7 @@ package generator
 import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/vektah/gqlparser/v2/ast"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 type ObjectDescriptor struct {
@@ -64,7 +65,41 @@ func isEmpty(o *desc.MessageDescriptor, callstack Callstack) bool {
 	return true
 }
 
+// same isEmpty but for mortals
+func IsEmptyV2(o protoreflect.MessageDescriptor) bool { return isEmptyV2(o, NewCallstack()) }
+
+// make sure objects are fulled with all objects
+func isEmptyV2(o protoreflect.MessageDescriptor, callstack Callstack) bool {
+	callstack.Push(o)
+	defer callstack.Pop(o)
+
+	if o.Fields().Len() == 0 {
+		return true
+	}
+	for i := 0; i < o.Fields().Len(); i++ {
+		f := o.Fields().Get(i)
+		objType := f.Message()
+		if objType == nil {
+			return false
+		}
+
+		// check if the call stack already contains a reference to this type and prevent it from calling itself again
+		if callstack.Has(objType) {
+			return true
+		}
+		if !isEmptyV2(objType, callstack) {
+			return false
+		}
+	}
+
+	return true
+}
+
 // TODO maybe not compare by strings
 func IsAny(o *desc.MessageDescriptor) bool {
 	return o.GetFullyQualifiedName() == "google.protobuf.Any"
+}
+
+func IsAnyV2(o protoreflect.MessageDescriptor) bool {
+	return o.FullName() == "google.protobuf.Any"
 }
