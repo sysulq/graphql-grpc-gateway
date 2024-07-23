@@ -61,6 +61,8 @@ func (ins *Generator) GraphQL2Proto(desc protoreflect.MessageDescriptor, field *
 // unmarshalValue 根据字段类型分发到具体的解码函数
 func unmarshalValue(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
 	switch {
+	case fd.IsList():
+		return unmarshalList(msg, fd, value)
 	case fd.IsMap():
 		return unmarshalMap(msg, fd, value)
 	case fd.Message() != nil:
@@ -68,6 +70,25 @@ func unmarshalValue(msg protoreflect.Message, fd protoreflect.FieldDescriptor, v
 	default:
 		return unmarshalScalar(msg, fd, value)
 	}
+}
+
+// unmarshalList 解码 List 类型字段
+func unmarshalList(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
+	if value.Kind != ast.ListValue {
+		return fmt.Errorf("expected list value for field %s %+v", fd.Name(), value)
+	}
+
+	list := msg.Mutable(fd).List()
+	for _, v := range value.Children {
+		val, err := convertValue(fd, v.Value)
+		if err != nil {
+			return err
+		}
+
+		list.Append(val)
+	}
+
+	return nil
 }
 
 // unmarshalMap 解码 GraphQL 对象到 Protocol Buffers map

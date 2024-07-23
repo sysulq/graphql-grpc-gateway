@@ -172,75 +172,49 @@ func (s *SchemaDescriptor) createObjectFromChoice(choice protoreflect.FieldDescr
 	}, nil
 }
 
-// createOneOfInput 处理 oneof 字段，创建 GraphQL 输入对象类型
-func (s *SchemaDescriptor) createOneOfInput(oneof protoreflect.OneofDescriptor) (*ast.FieldDefinition, error) {
-	fields := []*ast.FieldDefinition{}
-	for i := 0; i < oneof.Fields().Len(); i++ {
-		choice := oneof.Fields().Get(i)
-		fieldType, err := s.getGraphQLFieldType(choice, true)
-		if err != nil {
-			return nil, err
-		}
-		fieldDef := &ast.FieldDefinition{
-			Name: string(choice.Name()),
-			Type: fieldType,
-		}
-		fields = append(fields, fieldDef)
-	}
-
-	inputName := s.uniqueName(oneof) + "Input"
-	inputDef := &ast.Definition{
-		Kind:   ast.InputObject,
-		Name:   inputName,
-		Fields: fields,
-	}
-
-	s.Types[inputName] = inputDef
-
-	fieldName := strings.ToLower(string(oneof.Name()))
-	return &ast.FieldDefinition{
-		Name: fieldName,
-		Type: &ast.Type{NamedType: inputName},
-	}, nil
-}
-
 // getGraphQLFieldType 将 proto 字段类型转换为 GraphQL 字段类型
 func (s *SchemaDescriptor) getGraphQLFieldType(field protoreflect.FieldDescriptor, isInput bool) (*ast.Type, error) {
+	var astType *ast.Type
+
 	switch field.Kind() {
 	case protoreflect.BoolKind:
-		return &ast.Type{NamedType: "Boolean"}, nil
+		astType = &ast.Type{NamedType: "Boolean"}
 	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Sfixed32Kind:
-		return &ast.Type{NamedType: "Int"}, nil
+		astType = &ast.Type{NamedType: "Int"}
 	case protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Sfixed64Kind:
-		return &ast.Type{NamedType: "Int"}, nil
+		astType = &ast.Type{NamedType: "Int"}
 	case protoreflect.Uint32Kind, protoreflect.Fixed32Kind:
-		return &ast.Type{NamedType: "Int"}, nil
+		astType = &ast.Type{NamedType: "Int"}
 	case protoreflect.Uint64Kind, protoreflect.Fixed64Kind:
-		return &ast.Type{NamedType: "Int"}, nil
+		astType = &ast.Type{NamedType: "Int"}
 	case protoreflect.FloatKind, protoreflect.DoubleKind:
-		return &ast.Type{NamedType: "Float"}, nil
+		astType = &ast.Type{NamedType: "Float"}
 	case protoreflect.StringKind:
-		return &ast.Type{NamedType: "String"}, nil
+		astType = &ast.Type{NamedType: "String"}
 	case protoreflect.BytesKind:
-		return &ast.Type{NamedType: "String"}, nil
+		astType = &ast.Type{NamedType: "String"}
 	case protoreflect.EnumKind:
-		return s.getGraphQLEnumType(field.Enum()), nil
+		astType = s.getGraphQLEnumType(field.Enum())
 	case protoreflect.MessageKind, protoreflect.GroupKind:
 		nestedType, err := s.CreateObjects(field.Message(), isInput)
 		if err != nil {
 			return nil, err
 		}
 
-		typ := &ast.Type{NamedType: nestedType.Name}
-		if field.IsList() || field.IsMap() {
-			typ.NonNull = true
-			typ = ast.ListType(typ, &ast.Position{})
-		}
-
-		return typ, nil
+		astType = &ast.Type{NamedType: nestedType.Name}
 	default:
 		return &ast.Type{NamedType: "String"}, nil
 	}
+
+	if field.IsList() {
+		astType.NonNull = true
+		astType = ast.ListType(astType, &ast.Position{})
+	} else if field.IsMap() {
+		astType.NonNull = true
+		astType = ast.ListType(astType, &ast.Position{})
+	}
+
+	return astType, nil
 }
 
 // getGraphQLEnumType 将 proto 枚举类型转换为 GraphQL 枚举类型
@@ -352,10 +326,6 @@ func (s *SchemaDescriptor) AsGraphQL() *ast.Schema {
 // uniqueName 生成唯一名称
 func (s *SchemaDescriptor) uniqueName(desc protoreflect.Descriptor) string {
 	return strings.ReplaceAll(string(desc.FullName()), ".", "_")
-}
-
-func (s *SchemaDescriptor) fieldFullName(gql string) string {
-	return gql
 }
 
 func (s *SchemaDescriptor) msgFullName(msg protoreflect.MessageDescriptor) string {
