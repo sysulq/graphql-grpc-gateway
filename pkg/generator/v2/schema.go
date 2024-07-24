@@ -90,6 +90,10 @@ func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor,
 			continue
 		}
 
+		if !isInput && field.ContainingOneof() != nil {
+			continue
+		}
+
 		fieldType, err := s.getGraphQLFieldType(field, isInput)
 		if err != nil {
 			return nil, err

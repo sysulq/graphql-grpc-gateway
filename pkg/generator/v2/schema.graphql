@@ -240,11 +240,6 @@ type Mutation {
 }
 type Oneof {
 	param1: String
-	param2: String
-	param3: String
-	param4: String
-	param5: String
-	param6: String
 	Oneof1: constructs_Oneof_Oneof1
 	Oneof2: constructs_Oneof_Oneof2
 	Oneof3: constructs_Oneof_Oneof3
