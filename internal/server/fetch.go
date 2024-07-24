@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-kod/kod"
-	"github.com/jhump/protoreflect/grpcreflect"
+	"github.com/jhump/protoreflect/v2/grpcreflect"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
@@ -44,16 +44,16 @@ func (ins *reflection) ListPackages(ctx context.Context, cc grpc.ClientConnInter
 
 	var fds []protoreflect.FileDescriptor
 	for _, s := range ssvcs {
-		if isReflectionServiceName(s) {
+		if isReflectionServiceName(string(s)) {
 			continue
 		}
-		svc, err := client.ResolveService(s)
+		svc, err := client.AsResolver().FindServiceByName(s)
 		if err != nil {
 			return nil, err
 		}
 
-		fd := svc.GetFile() //.AsFileDescriptorProto()
-		fds = append(fds, fd.UnwrapFile())
+		fd := svc.ParentFile() //.AsFileDescriptorProto()
+		fds = append(fds, fd)
 	}
 	return fds, nil
 }

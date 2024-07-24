@@ -9,7 +9,6 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/grafana/pyroscope-go v1.1.1
 	github.com/hashicorp/golang-lru/v2 v2.0.7
-	github.com/jhump/protoreflect v1.16.0
 	github.com/jhump/protoreflect/v2 v2.0.0-20240207013822-c9ae7caed596
 	github.com/nautilus/gateway v0.3.17
 	github.com/nautilus/graphql v0.0.25
@@ -19,7 +18,6 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
 	go.uber.org/mock v0.4.0
 	golang.org/x/sync v0.7.0
-	golang.org/x/text v0.16.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 )
@@ -29,7 +27,6 @@ require (
 	github.com/99designs/gqlgen v0.17.49 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bufbuild/protocompile v0.10.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
@@ -113,6 +110,7 @@ require (
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240711142825-46eb208f015d // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240711142825-46eb208f015d // indirect

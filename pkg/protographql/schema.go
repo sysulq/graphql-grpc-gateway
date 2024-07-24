@@ -5,9 +5,7 @@ import (
 	"strings"
 
 	graphqlv1 "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/generator"
 	"github.com/vektah/gqlparser/v2/ast"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/dynamicpb"
@@ -52,26 +50,6 @@ func New() *SchemaDescriptor {
 	}
 }
 
-func GraphqlMethodOptions(opts proto.Message) *graphqlv1.Rpc {
-	if opts != nil {
-		v := proto.GetExtension(opts, graphqlv1.E_Rpc)
-		if v != nil {
-			return v.(*graphqlv1.Rpc)
-		}
-	}
-	return nil
-}
-
-func GraphqlFieldOptions(opts proto.Message) *graphqlv1.Field {
-	if opts != nil {
-		v := proto.GetExtension(opts, graphqlv1.E_Field)
-		if v != nil {
-			return v.(*graphqlv1.Field)
-		}
-	}
-	return nil
-}
-
 // CreateObjects 创建 GraphQL 对象类型定义
 func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor, isInput bool) (*ast.Definition, error) {
 	if msgDesc == nil {
@@ -101,7 +79,7 @@ func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor,
 	if isInput {
 		definition.Kind = ast.InputObject
 	}
-	if generator.IsEmptyV2(msgDesc) {
+	if IsEmpty(msgDesc) {
 		return definition, nil
 	}
 
@@ -111,7 +89,7 @@ func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor,
 		field := msgDesc.Fields().Get(i)
 		fieldOpt := GraphqlFieldOptions(field.Options())
 
-		if field.Kind() == protoreflect.MessageKind && generator.IsEmptyV2(field.Message()) {
+		if field.Kind() == protoreflect.MessageKind && IsEmpty(field.Message()) {
 			continue
 		}
 
@@ -284,13 +262,13 @@ func (s *SchemaDescriptor) addMethod(typ ast.Operation, def *ast.Definition, rpc
 	}
 
 	field.Type = ast.NamedType("Boolean", &ast.Position{})
-	if rpc.Output() != nil && !generator.IsEmptyV2(rpc.Output()) {
+	if rpc.Output() != nil && !IsEmpty(rpc.Output()) {
 		field.Type = &ast.Type{
 			NamedType: out.Name,
 		}
 	}
 
-	if rpc.Input() != nil && !generator.IsEmptyV2(rpc.Input()) {
+	if rpc.Input() != nil && !IsEmpty(rpc.Input()) {
 		field.Arguments = []*ast.ArgumentDefinition{
 			{
 				Name: "in",
@@ -334,16 +312,9 @@ func (schema *SchemaDescriptor) RegisterFileDescriptor(generateUnboundMethods bo
 				continue
 			}
 
-			var name string
-			switch rpcOpts.GetPattern().(type) {
-			case *graphqlv1.Rpc_Query:
-				name = rpcOpts.GetQuery()
-			case *graphqlv1.Rpc_Mutation:
-				name = rpcOpts.GetMutation()
-			}
-
+			name := GetRequestOperation(rpcOpts)
 			if len(name) == 0 && generateUnboundMethods {
-				name = generator.ToLowerFirst(string(rpc.Parent().Name() + rpc.Name()))
+				name = ToLowerFirst(string(rpc.Parent().Name() + rpc.Name()))
 			}
 
 			if len(name) == 0 {
