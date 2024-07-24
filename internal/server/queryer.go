@@ -19,8 +19,9 @@ type anyMap = map[string]interface{}
 type queryer struct {
 	kod.Implements[Queryer]
 
-	config kod.Ref[config.Config]
-	caller kod.Ref[Caller]
+	config   kod.Ref[config.Config]
+	caller   kod.Ref[Caller]
+	registry kod.Ref[CallerRegistry]
 }
 
 func (q *queryer) Interceptors() []interceptor.Interceptor {
@@ -165,12 +166,12 @@ func (q *queryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, 
 }
 
 func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.Field, vars map[string]interface{}) (interface{}, error) {
-	method := q.caller.Get().FindMethodByName(op, field.Name)
+	method := q.registry.Get().FindMethodByName(op, field.Name)
 	if method == nil {
 		return nil, errors.New("method not found")
 	}
 
-	inputMsg, err := q.caller.Get().Unmarshal(method.Input(), field, vars)
+	inputMsg, err := q.registry.Get().Unmarshal(method.Input(), field, vars)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +181,7 @@ func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.
 		return nil, err
 	}
 
-	return q.caller.Get().Marshal(msg, field)
+	return q.registry.Get().Marshal(msg, field)
 }
 
 // func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (protoadapt.MessageV1, error) {

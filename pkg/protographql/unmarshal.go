@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/dynamicpb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 func (ins *SchemaDescriptor) newMessage(desc protoreflect.MessageDescriptor) protoreflect.Message {
@@ -54,7 +55,38 @@ func (ins *SchemaDescriptor) Unmarshal(desc protoreflect.MessageDescriptor, fiel
 		return nil, fmt.Errorf("argument 'in' is not an object")
 	}
 
+	// 处理 FieldMask 字段
+	for i := desc.Fields().Len() - 1; i >= 0; i-- {
+		fieldDescriptor := desc.Fields().Get(i)
+		if fieldDescriptor.Message() != nil && fieldDescriptor.Message().FullName() == "google.protobuf.FieldMask" {
+			fieldMask := &fieldmaskpb.FieldMask{Paths: getSelectionSet(field.SelectionSet, "")}
+			dynamicMessage.Set(fieldDescriptor, protoreflect.ValueOfMessage(fieldMask.ProtoReflect()))
+			break
+		}
+	}
+
 	return dynamicMessage.Interface(), nil
+}
+
+func getSelectionSet(selections ast.SelectionSet, prefix string) []string {
+	var fields []string
+	for _, selection := range selections {
+		field, ok := selection.(*ast.Field)
+		if !ok {
+			continue
+		}
+		fullName := field.Name
+		if prefix != "" {
+			fullName = fmt.Sprintf("%s.%s", prefix, field.Name)
+		}
+		if len(field.SelectionSet) > 0 {
+			subFields := getSelectionSet(field.SelectionSet, fullName)
+			fields = append(fields, subFields...)
+		} else {
+			fields = append(fields, fullName)
+		}
+	}
+	return fields
 }
 
 // unmarshalValue 根据字段类型分发到具体的解码函数

@@ -14,6 +14,7 @@ import (
 	http "net/http"
 	reflect "reflect"
 
+	grpcdynamic "github.com/jhump/protoreflect/v2/grpcdynamic"
 	graphql "github.com/nautilus/graphql"
 	ast "github.com/vektah/gqlparser/v2/ast"
 	gomock "go.uber.org/mock/gomock"
@@ -21,6 +22,139 @@ import (
 	proto "google.golang.org/protobuf/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 )
+
+// MockCaller is a mock of Caller interface.
+type MockCaller struct {
+	ctrl     *gomock.Controller
+	recorder *MockCallerMockRecorder
+}
+
+// MockCallerMockRecorder is the mock recorder for MockCaller.
+type MockCallerMockRecorder struct {
+	mock *MockCaller
+}
+
+// NewMockCaller creates a new mock instance.
+func NewMockCaller(ctrl *gomock.Controller) *MockCaller {
+	mock := &MockCaller{ctrl: ctrl}
+	mock.recorder = &MockCallerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCaller) EXPECT() *MockCallerMockRecorder {
+	return m.recorder
+}
+
+// Call mocks base method.
+func (m *MockCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Call", ctx, rpc, message)
+	ret0, _ := ret[0].(proto.Message)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Call indicates an expected call of Call.
+func (mr *MockCallerMockRecorder) Call(ctx, rpc, message any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Call", reflect.TypeOf((*MockCaller)(nil).Call), ctx, rpc, message)
+}
+
+// MockCallerRegistry is a mock of CallerRegistry interface.
+type MockCallerRegistry struct {
+	ctrl     *gomock.Controller
+	recorder *MockCallerRegistryMockRecorder
+}
+
+// MockCallerRegistryMockRecorder is the mock recorder for MockCallerRegistry.
+type MockCallerRegistryMockRecorder struct {
+	mock *MockCallerRegistry
+}
+
+// NewMockCallerRegistry creates a new mock instance.
+func NewMockCallerRegistry(ctrl *gomock.Controller) *MockCallerRegistry {
+	mock := &MockCallerRegistry{ctrl: ctrl}
+	mock.recorder = &MockCallerRegistryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCallerRegistry) EXPECT() *MockCallerRegistryMockRecorder {
+	return m.recorder
+}
+
+// FindMethodByName mocks base method.
+func (m *MockCallerRegistry) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindMethodByName", op, name)
+	ret0, _ := ret[0].(protoreflect.MethodDescriptor)
+	return ret0
+}
+
+// FindMethodByName indicates an expected call of FindMethodByName.
+func (mr *MockCallerRegistryMockRecorder) FindMethodByName(op, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindMethodByName", reflect.TypeOf((*MockCallerRegistry)(nil).FindMethodByName), op, name)
+}
+
+// GetCallerStub mocks base method.
+func (m *MockCallerRegistry) GetCallerStub(service string) *grpcdynamic.Stub {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCallerStub", service)
+	ret0, _ := ret[0].(*grpcdynamic.Stub)
+	return ret0
+}
+
+// GetCallerStub indicates an expected call of GetCallerStub.
+func (mr *MockCallerRegistryMockRecorder) GetCallerStub(service any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCallerStub", reflect.TypeOf((*MockCallerRegistry)(nil).GetCallerStub), service)
+}
+
+// GraphQLSchema mocks base method.
+func (m *MockCallerRegistry) GraphQLSchema() *ast.Schema {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GraphQLSchema")
+	ret0, _ := ret[0].(*ast.Schema)
+	return ret0
+}
+
+// GraphQLSchema indicates an expected call of GraphQLSchema.
+func (mr *MockCallerRegistryMockRecorder) GraphQLSchema() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GraphQLSchema", reflect.TypeOf((*MockCallerRegistry)(nil).GraphQLSchema))
+}
+
+// Marshal mocks base method.
+func (m *MockCallerRegistry) Marshal(proto proto.Message, field *ast.Field) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Marshal", proto, field)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Marshal indicates an expected call of Marshal.
+func (mr *MockCallerRegistryMockRecorder) Marshal(proto, field any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Marshal", reflect.TypeOf((*MockCallerRegistry)(nil).Marshal), proto, field)
+}
+
+// Unmarshal mocks base method.
+func (m *MockCallerRegistry) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]any) (proto.Message, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Unmarshal", desc, field, vars)
+	ret0, _ := ret[0].(proto.Message)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Unmarshal indicates an expected call of Unmarshal.
+func (mr *MockCallerRegistryMockRecorder) Unmarshal(desc, field, vars any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unmarshal", reflect.TypeOf((*MockCallerRegistry)(nil).Unmarshal), desc, field, vars)
+}
 
 // MockReflection is a mock of Reflection interface.
 type MockReflection struct {
@@ -96,102 +230,6 @@ func (m *MockGateway) BuildServer() (http.Handler, error) {
 func (mr *MockGatewayMockRecorder) BuildServer() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildServer", reflect.TypeOf((*MockGateway)(nil).BuildServer))
-}
-
-// MockCaller is a mock of Caller interface.
-type MockCaller struct {
-	ctrl     *gomock.Controller
-	recorder *MockCallerMockRecorder
-}
-
-// MockCallerMockRecorder is the mock recorder for MockCaller.
-type MockCallerMockRecorder struct {
-	mock *MockCaller
-}
-
-// NewMockCaller creates a new mock instance.
-func NewMockCaller(ctrl *gomock.Controller) *MockCaller {
-	mock := &MockCaller{ctrl: ctrl}
-	mock.recorder = &MockCallerMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCaller) EXPECT() *MockCallerMockRecorder {
-	return m.recorder
-}
-
-// Call mocks base method.
-func (m *MockCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Call", ctx, rpc, message)
-	ret0, _ := ret[0].(proto.Message)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Call indicates an expected call of Call.
-func (mr *MockCallerMockRecorder) Call(ctx, rpc, message any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Call", reflect.TypeOf((*MockCaller)(nil).Call), ctx, rpc, message)
-}
-
-// FindMethodByName mocks base method.
-func (m *MockCaller) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindMethodByName", op, name)
-	ret0, _ := ret[0].(protoreflect.MethodDescriptor)
-	return ret0
-}
-
-// FindMethodByName indicates an expected call of FindMethodByName.
-func (mr *MockCallerMockRecorder) FindMethodByName(op, name any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindMethodByName", reflect.TypeOf((*MockCaller)(nil).FindMethodByName), op, name)
-}
-
-// GraphQLSchema mocks base method.
-func (m *MockCaller) GraphQLSchema() *ast.Schema {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GraphQLSchema")
-	ret0, _ := ret[0].(*ast.Schema)
-	return ret0
-}
-
-// GraphQLSchema indicates an expected call of GraphQLSchema.
-func (mr *MockCallerMockRecorder) GraphQLSchema() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GraphQLSchema", reflect.TypeOf((*MockCaller)(nil).GraphQLSchema))
-}
-
-// Marshal mocks base method.
-func (m *MockCaller) Marshal(proto proto.Message, field *ast.Field) (any, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Marshal", proto, field)
-	ret0, _ := ret[0].(any)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Marshal indicates an expected call of Marshal.
-func (mr *MockCallerMockRecorder) Marshal(proto, field any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Marshal", reflect.TypeOf((*MockCaller)(nil).Marshal), proto, field)
-}
-
-// Unmarshal mocks base method.
-func (m *MockCaller) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]any) (proto.Message, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Unmarshal", desc, field, vars)
-	ret0, _ := ret[0].(proto.Message)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Unmarshal indicates an expected call of Unmarshal.
-func (mr *MockCallerMockRecorder) Unmarshal(desc, field, vars any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unmarshal", reflect.TypeOf((*MockCaller)(nil).Unmarshal), desc, field, vars)
 }
 
 // MockQueryer is a mock of Queryer interface.

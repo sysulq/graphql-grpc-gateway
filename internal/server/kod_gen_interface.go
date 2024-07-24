@@ -6,12 +6,27 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/jhump/protoreflect/v2/grpcdynamic"
 	"github.com/nautilus/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
+
+// caller is a component that implements Caller.
+type Caller interface {
+	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
+}
+
+// callerRegistry is a component that implements CallerRegistry.
+type CallerRegistry interface {
+	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
+	GraphQLSchema() *ast.Schema
+	Marshal(proto proto.Message, field *ast.Field) (interface{}, error)
+	Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error)
+	GetCallerStub(service string) *grpcdynamic.Stub
+}
 
 // reflection is a component that implements Reflection.
 type Reflection interface {
@@ -21,15 +36,6 @@ type Reflection interface {
 // server is a component that implements Gateway.
 type Gateway interface {
 	BuildServer() (http.Handler, error)
-}
-
-// caller is a component that implements Caller.
-type Caller interface {
-	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
-	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
-	GraphQLSchema() *ast.Schema
-	Marshal(proto proto.Message, field *ast.Field) (interface{}, error)
-	Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error)
 }
 
 // queryer is a component that implements Queryer.

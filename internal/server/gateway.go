@@ -21,9 +21,10 @@ type server struct {
 
 	profiler *pyroscope.Profiler
 
-	config  kod.Ref[config.Config]
-	queryer kod.Ref[Queryer]
-	caller  kod.Ref[Caller]
+	config   kod.Ref[config.Config]
+	_        kod.Ref[Caller]
+	queryer  kod.Ref[Queryer]
+	registry kod.Ref[CallerRegistry]
 }
 
 func (ins *server) Init(ctx context.Context) error {
@@ -54,7 +55,7 @@ func (s *server) BuildServer() (http.Handler, error) {
 	})
 
 	sources := []*graphql.RemoteSchema{{URL: "url1"}}
-	sources[0].Schema = s.caller.Get().GraphQLSchema()
+	sources[0].Schema = s.registry.Get().GraphQLSchema()
 
 	// formatter.NewFormatter(os.Stdout).FormatSchema(sources[0].Schema)
 
