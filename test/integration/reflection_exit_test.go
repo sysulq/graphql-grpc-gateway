@@ -44,12 +44,12 @@ func TestReflectionExit(t *testing.T) {
 
 			recv := map[string]interface{}{}
 			if err := querier.Query(context.Background(), &graphql.QueryInput{
-				Query: constructsAnyQuery,
+				Query: constructsScalarsQuery,
 			}, &recv); err != nil {
 				t.Fatal(err)
 			}
-			if !reflect.DeepEqual(recv, constructsAnyResponse) {
-				t.Errorf("mutation failed: expected: %s got: %s", constructsAnyResponse, recv)
+			if !reflect.DeepEqual(recv, constructsScalarsResponse) {
+				t.Errorf("mutation failed: expected: %s got: %s", constructsScalarsResponse, recv)
 			}
 		})
 	}, kod.WithFakes(kod.Fake[config.Config](mockConfig)))

@@ -1,4 +1,4 @@
-package v2
+package protographql
 
 type (
 	j  = map[string]interface{}

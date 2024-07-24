@@ -54,7 +54,9 @@ func (s *server) BuildServer() (http.Handler, error) {
 	})
 
 	sources := []*graphql.RemoteSchema{{URL: "url1"}}
-	sources[0].Schema = s.registry.Get().SchemaDescriptorList().AsGraphql()[0]
+	sources[0].Schema = s.registry.Get().SchemaDescriptorList().AsGraphQL()
+
+	// formatter.NewFormatter(os.Stdout).FormatSchema(sources[0].Schema)
 
 	opts := []gateway.Option{
 		gateway.WithLogger(&noopLogger{}),

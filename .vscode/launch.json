@@ -10,7 +10,10 @@
             "request": "launch",
             "mode": "auto",
             "cwd": "${workspaceFolder}",
-            "args":["-config", "example/gateway/config.yaml"],
+            "env": {
+                "KOD_CONFIG": "${workspaceFolder}/example/gateway/config.yaml",
+                "KOD_NAME": "gateway"
+            },
             "program": "./cmd/gateway"
         },
         {
@@ -19,6 +22,9 @@
             "request": "launch",
             "mode": "auto",
             "cwd": "${workspaceFolder}",
+            "env": {
+                "KOD_NAME": "optionsserver"
+            },
             "program": "./example/gateway/optionsserver"
         },
         {
@@ -27,6 +33,9 @@
             "request": "launch",
             "mode": "auto",
             "cwd": "${workspaceFolder}",
+            "env": {
+                "KOD_NAME": "constructsserver"
+            },
             "program": "./example/gateway/constructsserver"
         }
     ],

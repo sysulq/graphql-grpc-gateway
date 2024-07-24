@@ -27,18 +27,14 @@ extend google.protobuf.OneofOptions {
 message Oneof {
     // ignore the oneof
     bool ignore = 1;
-    // name of the oneof
-    string name = 2;
 }
 
 // The options for the field
 message Field {
     // required the field is required
     bool required = 1;
-    // name of the field
-    string name = 2;
     // ignore the field
-    bool ignore = 3;
+    bool ignore = 2;
 }
 
 // The options for the rpc

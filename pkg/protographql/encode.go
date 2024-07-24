@@ -1,4 +1,4 @@
-package v2
+package protographql
 
 import (
 	"encoding/base64"
@@ -8,12 +8,11 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/dynamicpb"
 )
 
-func newMessage(desc protoreflect.MessageDescriptor) protoreflect.Message {
-	msgType, err := protoregistry.GlobalTypes.FindMessageByName(desc.FullName())
+func (ins *SchemaDescriptor) newMessage(desc protoreflect.MessageDescriptor) protoreflect.Message {
+	msgType, err := ins.ProtoTypes.FindMessageByName(desc.FullName())
 	if err != nil {
 		return dynamicpb.NewMessage(desc)
 	}
@@ -22,7 +21,7 @@ func newMessage(desc protoreflect.MessageDescriptor) protoreflect.Message {
 }
 
 // GraphQL2Proto 将 GraphQL 字段转换为 Protocol Buffers 消息
-func (ins *Generator) GraphQL2Proto(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
+func (ins *SchemaDescriptor) GraphQL2Proto(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
 	// 查找名为 "in" 的参数
 	var inArg *ast.Argument
 	for _, arg := range field.Arguments {
@@ -36,7 +35,7 @@ func (ins *Generator) GraphQL2Proto(desc protoreflect.MessageDescriptor, field *
 	}
 
 	// 创建一个动态消息
-	dynamicMessage := newMessage(desc)
+	dynamicMessage := ins.newMessage(desc)
 
 	// 设置字段值
 	if inArg.Value.Kind == ast.ObjectValue {
@@ -46,7 +45,7 @@ func (ins *Generator) GraphQL2Proto(desc protoreflect.MessageDescriptor, field *
 				return nil, fmt.Errorf("field %s not found in message", argField.Name)
 			}
 
-			err := unmarshalValue(dynamicMessage, fieldDescriptor, argField.Value)
+			err := ins.unmarshalValue(dynamicMessage, fieldDescriptor, argField.Value)
 			if err != nil {
 				return nil, err
 			}
@@ -59,28 +58,27 @@ func (ins *Generator) GraphQL2Proto(desc protoreflect.MessageDescriptor, field *
 }
 
 // unmarshalValue 根据字段类型分发到具体的解码函数
-func unmarshalValue(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
-	switch {
-	case fd.IsList():
-		return unmarshalList(msg, fd, value)
-	case fd.IsMap():
-		return unmarshalMap(msg, fd, value)
-	case fd.Message() != nil:
-		return unmarshalMessage(msg, fd, value)
-	default:
-		return unmarshalScalar(msg, fd, value)
+func (ins *SchemaDescriptor) unmarshalValue(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
+	if fd.IsList() {
+		return ins.unmarshalList(msg, fd, value)
+	} else if fd.IsMap() {
+		return ins.unmarshalMap(msg, fd, value)
+	} else if fd.Message() != nil {
+		return ins.unmarshalMessage(msg, fd, value)
+	} else {
+		return ins.unmarshalScalar(msg, fd, value)
 	}
 }
 
 // unmarshalList 解码 List 类型字段
-func unmarshalList(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
+func (ins *SchemaDescriptor) unmarshalList(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
 	if value.Kind != ast.ListValue {
 		return fmt.Errorf("expected list value for field %s %+v", fd.Name(), value)
 	}
 
 	list := msg.Mutable(fd).List()
 	for _, v := range value.Children {
-		val, err := convertValue(fd, v.Value)
+		val, err := ins.convertValue(fd, v.Value)
 		if err != nil {
 			return err
 		}
@@ -92,7 +90,7 @@ func unmarshalList(msg protoreflect.Message, fd protoreflect.FieldDescriptor, va
 }
 
 // unmarshalMap 解码 GraphQL 对象到 Protocol Buffers map
-func unmarshalMap(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
+func (ins *SchemaDescriptor) unmarshalMap(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
 	if value.Kind != ast.ListValue {
 		return fmt.Errorf("expected list value for map field %s", fd.JSONName())
 	}
@@ -122,7 +120,7 @@ func unmarshalMap(msg protoreflect.Message, fd protoreflect.FieldDescriptor, val
 		if err != nil {
 			return err
 		}
-		mapVal, err := convertValue(fd.MapValue(), val)
+		mapVal, err := ins.convertValue(fd.MapValue(), val)
 		if err != nil {
 			return err
 		}
@@ -133,18 +131,18 @@ func unmarshalMap(msg protoreflect.Message, fd protoreflect.FieldDescriptor, val
 }
 
 // unmarshalMessage 解码 GraphQL 对象到 Protocol Buffers message
-func unmarshalMessage(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
+func (ins *SchemaDescriptor) unmarshalMessage(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
 	if value.Kind != ast.ObjectValue {
 		return fmt.Errorf("expected object value for message field %s", fd.JSONName())
 	}
 
-	subMsg := newMessage(fd.Message())
+	subMsg := ins.newMessage(fd.Message())
 	for _, child := range value.Children {
 		subFd := fd.Message().Fields().ByJSONName(child.Name)
 		if subFd == nil {
 			return fmt.Errorf("field %s not found in message %s", child.Name, fd.JSONName())
 		}
-		err := unmarshalValue(subMsg, subFd, child.Value)
+		err := ins.unmarshalValue(subMsg, subFd, child.Value)
 		if err != nil {
 			return err
 		}
@@ -154,8 +152,8 @@ func unmarshalMessage(msg protoreflect.Message, fd protoreflect.FieldDescriptor,
 }
 
 // unmarshalScalar 解码 GraphQL 标量值到 Protocol Buffers 标量字段
-func unmarshalScalar(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
-	val, err := convertValue(fd, value)
+func (ins *SchemaDescriptor) unmarshalScalar(msg protoreflect.Message, fd protoreflect.FieldDescriptor, value *ast.Value) error {
+	val, err := ins.convertValue(fd, value)
 	if err != nil {
 		return err
 	}
@@ -205,7 +203,7 @@ func unmarshalMapKey(fd protoreflect.FieldDescriptor, key string) (protoreflect.
 }
 
 // convertValue 将 GraphQL 值转换为 Protocol Buffers 值
-func convertValue(fd protoreflect.FieldDescriptor, gqlValue *ast.Value) (protoreflect.Value, error) {
+func (ins *SchemaDescriptor) convertValue(fd protoreflect.FieldDescriptor, gqlValue *ast.Value) (protoreflect.Value, error) {
 	switch fd.Kind() {
 	case protoreflect.BoolKind:
 		boolValue, err := strconv.ParseBool(gqlValue.Raw)
@@ -237,7 +235,13 @@ func convertValue(fd protoreflect.FieldDescriptor, gqlValue *ast.Value) (protore
 			return protoreflect.Value{}, err
 		}
 		return protoreflect.ValueOf(uintValue), nil
-	case protoreflect.FloatKind, protoreflect.DoubleKind:
+	case protoreflect.FloatKind:
+		floatValue, err := strconv.ParseFloat(gqlValue.Raw, 32)
+		if err != nil {
+			return protoreflect.Value{}, err
+		}
+		return protoreflect.ValueOf(float32(floatValue)), nil
+	case protoreflect.DoubleKind:
 		floatValue, err := strconv.ParseFloat(gqlValue.Raw, 64)
 		if err != nil {
 			return protoreflect.Value{}, err
@@ -260,13 +264,13 @@ func convertValue(fd protoreflect.FieldDescriptor, gqlValue *ast.Value) (protore
 		}
 		return protoreflect.ValueOf(enumDesc.Number()), nil
 	case protoreflect.MessageKind, protoreflect.GroupKind:
-		dynamicMessage := newMessage(fd.Message())
+		dynamicMessage := ins.newMessage(fd.Message())
 		for _, child := range gqlValue.Children {
 			subFd := fd.Message().Fields().ByJSONName(child.Name)
 			if subFd == nil {
 				return protoreflect.Value{}, fmt.Errorf("field %s not found in message %s", child.Name, fd.JSONName())
 			}
-			err := unmarshalValue(dynamicMessage, subFd, child.Value)
+			err := ins.unmarshalValue(dynamicMessage, subFd, child.Value)
 			if err != nil {
 				return protoreflect.Value{}, err
 			}

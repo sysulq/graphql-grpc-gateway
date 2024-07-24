@@ -7,12 +7,12 @@ import (
 	"strings"
 
 	"github.com/go-kod/kod"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/grpcreflect"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 func isReflectionServiceName(name string) bool {
@@ -26,7 +26,7 @@ type reflection struct {
 	kod.Implements[Reflection]
 }
 
-func (ins *reflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]*desc.FileDescriptor, error) {
+func (ins *reflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error) {
 	client := grpcreflect.NewClientAuto(ctx, cc)
 	ssvcs, err := client.ListServices()
 	if err != nil {
@@ -42,7 +42,7 @@ func (ins *reflection) ListPackages(ctx context.Context, cc grpc.ClientConnInter
 		return nil, fmt.Errorf("failed to list services from reflecton enabled gRPC server: %w", err)
 	}
 
-	var fds []*desc.FileDescriptor
+	var fds []protoreflect.FileDescriptor
 	for _, s := range ssvcs {
 		if isReflectionServiceName(s) {
 			continue
@@ -53,7 +53,7 @@ func (ins *reflection) ListPackages(ctx context.Context, cc grpc.ClientConnInter
 		}
 
 		fd := svc.GetFile() //.AsFileDescriptorProto()
-		fds = append(fds, fd)
+		fds = append(fds, fd.UnwrapFile())
 	}
 	return fds, nil
 }

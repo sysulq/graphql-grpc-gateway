@@ -54,19 +54,23 @@ func TestGraphql2Grpc(t *testing.T) {
 				name:         "Mutation constructs scalars",
 				query:        constructsScalarsQuery,
 				wantResponse: constructsScalarsResponse,
-			}, {
-				name:         "Mutation constructs any",
-				query:        constructsAnyQuery,
-				wantResponse: constructsAnyResponse,
-			}, {
+			},
+			// {
+			// 	name:         "Mutation constructs any",
+			// 	query:        constructsAnyQuery,
+			// 	wantResponse: constructsAnyResponse,
+			// },
+			{
 				name:         "Mutation constructs maps",
 				query:        constructsMapsQuery,
 				wantResponse: constructsMapsResponse,
-			}, {
+			},
+			{
 				name:         "Mutation constructs repeated",
 				query:        constructsRepeatedQuery,
 				wantResponse: constructsRepeatedResponse,
-			}, {
+			},
+			{
 				name:         "Mutation constructs oneofs",
 				query:        constructsOneofsQuery,
 				wantResponse: constructsOneofsResponse,

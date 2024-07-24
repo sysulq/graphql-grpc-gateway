@@ -1,4 +1,4 @@
-package v2
+package protographql
 
 import (
 	"testing"
@@ -21,7 +21,10 @@ func TestEncodeMaps(t *testing.T) {
 	queryDoc, err := gqlparser.LoadQuery(schema, constructsMapsQuery)
 	require.Nil(t, err)
 
-	ins := &Generator{}
+	ins := New()
+	err = ins.GenerateFile(true, test.File_test_constructs_input_proto)
+	require.Nil(t, err)
+
 	generated, err := ins.GraphQL2Proto(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
 
 	require.Nil(t, err)
@@ -42,7 +45,9 @@ func TestEncodeRepeated(t *testing.T) {
 	queryDoc, err := gqlparser.LoadQuery(schema, constructsRepeatedQuery)
 	require.Nil(t, err, err.Error())
 
-	ins := &Generator{}
+	ins := New()
+	err = ins.GenerateFile(true, test.File_test_constructs_input_proto)
+	require.Nil(t, err)
 	generated, err := ins.GraphQL2Proto(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
 
 	require.Nil(t, err)
@@ -96,7 +101,9 @@ func TestEncodeDecode(t *testing.T) {
 			queryDoc, err := gqlparser.LoadQuery(schema, c.query)
 			require.Nil(t, err, err)
 
-			ins := &Generator{}
+			ins := New()
+			err = ins.GenerateFile(true, test.File_test_constructs_input_proto)
+			require.Nil(t, err)
 
 			selection, err := graphql.ApplyFragments(queryDoc.Operations[0].SelectionSet, queryDoc.Fragments)
 			require.Nil(t, err, err)

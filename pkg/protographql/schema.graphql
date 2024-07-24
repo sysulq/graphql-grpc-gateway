@@ -10,9 +10,9 @@ input BazInput {
 	param1: String
 }
 type Data {
-	stringX: String
-	foo: Foo2
-	double: [Float!]
+	stringX: String!
+	foo: Foo2!
+	double: [Float!]!
 	string2: String
 	foo2: Foo2
 	double2: [Float!]
@@ -20,9 +20,9 @@ type Data {
 	string: String
 }
 input DataInput {
-	stringX: String
-	foo: Foo2Input
-	double: [Float!]
+	stringX: String!
+	foo: Foo2Input!
+	double: [Float!]!
 	string2: String
 	foo2: Foo2Input
 	double2: [Float!]
@@ -241,8 +241,7 @@ type Mutation {
 	servicePubSub1(in: DataInput): Data
 	serviceInvalidSubscribe2(in: DataInput): Data
 	servicePubSub2(in: DataInput): Data
-	serviceIgnore(in: DataInput): Data
-	serviceName(in: DataInput): Data
+	newName(in: DataInput): Data
 	testName(in: DataInput): Data
 	testNewName(in: DataInput): Data
 	queryMutate1(in: DataInput): Data
@@ -410,11 +409,6 @@ input ScalarsInput {
 	stringX: String
 	bytes: String
 	paths: googleprotobufFieldMaskInput
-}
-type Subscription {
-	serviceSubscribe(in: DataInput): Data
-	serviceInvalidSubscribe2(in: DataInput): Data
-	querySubscribe(in: DataInput): Data
 }
 type Timestamp {
 	time: String

@@ -1,3 +1,3 @@
-package v2
+package protographql
 
 type Generator struct{}

@@ -1,6 +1,7 @@
-package v2
+package protographql
 
 import (
+	"fmt"
 	"strings"
 
 	graphqlv1 "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1"
@@ -8,6 +9,8 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/types/dynamicpb"
 )
 
 // SchemaDescriptor 存储生成的 GraphQL schema 信息
@@ -19,6 +22,8 @@ type SchemaDescriptor struct {
 	Directives      map[string]*ast.DirectiveDefinition
 	Types           map[string]*ast.Definition
 	ProcessedTypes  map[string]struct{}
+	MethodsByName   map[ast.Operation]map[string]protoreflect.MethodDescriptor
+	ProtoTypes      *protoregistry.Types
 }
 
 func New() *SchemaDescriptor {
@@ -40,6 +45,12 @@ func New() *SchemaDescriptor {
 		},
 		Types:          make(map[string]*ast.Definition),
 		ProcessedTypes: make(map[string]struct{}),
+		MethodsByName: map[ast.Operation]map[string]protoreflect.MethodDescriptor{
+			ast.Mutation:     make(map[string]protoreflect.MethodDescriptor),
+			ast.Query:        make(map[string]protoreflect.MethodDescriptor),
+			ast.Subscription: make(map[string]protoreflect.MethodDescriptor),
+		},
+		ProtoTypes: &protoregistry.Types{},
 	}
 }
 
@@ -48,6 +59,16 @@ func GraphqlMethodOptions(opts proto.Message) *graphqlv1.Rpc {
 		v := proto.GetExtension(opts, graphqlv1.E_Rpc)
 		if v != nil {
 			return v.(*graphqlv1.Rpc)
+		}
+	}
+	return nil
+}
+
+func GraphqlFieldOptions(opts proto.Message) *graphqlv1.Field {
+	if opts != nil {
+		v := proto.GetExtension(opts, graphqlv1.E_Field)
+		if v != nil {
+			return v.(*graphqlv1.Field)
 		}
 	}
 	return nil
@@ -85,8 +106,13 @@ func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor,
 
 	for i := 0; i < msgDesc.Fields().Len(); i++ {
 		field := msgDesc.Fields().Get(i)
+		fieldOpt := GraphqlFieldOptions(field.Options())
 
 		if field.Kind() == protoreflect.MessageKind && generator.IsEmptyV2(field.Message()) {
+			continue
+		}
+
+		if fieldOpt.GetIgnore() {
 			continue
 		}
 
@@ -102,6 +128,11 @@ func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor,
 			Name: field.JSONName(),
 			Type: fieldType,
 		}
+
+		if fieldOpt.GetRequired() {
+			fieldDef.Type.NonNull = true
+		}
+
 		definition.Fields = append(definition.Fields, fieldDef)
 	}
 
@@ -116,7 +147,6 @@ func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor,
 			}
 			definition.Fields = append(definition.Fields, fieldDef)
 		}
-
 	}
 
 	return definition, nil
@@ -245,9 +275,9 @@ func (s *SchemaDescriptor) getGraphQLEnumType(enumDesc protoreflect.EnumDescript
 	return &ast.Type{NamedType: typeName}
 }
 
-func (s *SchemaDescriptor) addMethod(def *ast.Definition, svc protoreflect.ServiceDescriptor, rpc protoreflect.MethodDescriptor, in, out *ast.Definition) {
+func (s *SchemaDescriptor) addMethod(typ ast.Operation, def *ast.Definition, rpc protoreflect.MethodDescriptor, in, out *ast.Definition, name string) {
 	field := &ast.FieldDefinition{
-		Name: generator.ToLowerFirst(string(rpc.Parent().Name() + rpc.Name())),
+		Name: name,
 	}
 
 	field.Type = ast.NamedType("Boolean", &ast.Position{})
@@ -269,9 +299,18 @@ func (s *SchemaDescriptor) addMethod(def *ast.Definition, svc protoreflect.Servi
 	}
 
 	def.Fields = append(def.Fields, field)
+
+	s.MethodsByName[typ][field.Name] = rpc
 }
 
 func (schema *SchemaDescriptor) GenerateFile(generateUnboundMethods bool, file protoreflect.FileDescriptor) error {
+	for i := 0; i < file.Messages().Len(); i++ {
+		msg := file.Messages().Get(i)
+		if err := schema.ProtoTypes.RegisterMessage(dynamicpb.NewMessageType(msg)); err != nil {
+			return fmt.Errorf("register message %q: %w", msg.FullName(), err)
+		}
+	}
+
 	for i := 0; i < file.Services().Len(); i++ {
 		svc := file.Services().Get(i)
 		for j := 0; j < svc.Methods().Len(); j++ {
@@ -288,15 +327,31 @@ func (schema *SchemaDescriptor) GenerateFile(generateUnboundMethods bool, file p
 				return err
 			}
 
-			if !rpc.IsStreamingClient() && rpc.IsStreamingServer() {
-				schema.addMethod(schema.Subscription, svc, rpc, in, out)
+			if rpcOpts.GetIgnore() {
+				continue
+			}
+
+			var name string
+			switch rpcOpts.GetPattern().(type) {
+			case *graphqlv1.Rpc_Query:
+				name = rpcOpts.GetQuery()
+			case *graphqlv1.Rpc_Mutation:
+				name = rpcOpts.GetMutation()
+			}
+
+			if len(name) == 0 && generateUnboundMethods {
+				name = generator.ToLowerFirst(string(rpc.Parent().Name() + rpc.Name()))
+			}
+
+			if len(name) == 0 {
+				continue
 			}
 
 			switch rpcOpts.GetPattern().(type) {
 			case *graphqlv1.Rpc_Query:
-				schema.addMethod(schema.Query, svc, rpc, in, out)
+				schema.addMethod(ast.Query, schema.Query, rpc, in, out, name)
 			default:
-				schema.addMethod(schema.Mutation, svc, rpc, in, out)
+				schema.addMethod(ast.Mutation, schema.Mutation, rpc, in, out, name)
 			}
 		}
 	}

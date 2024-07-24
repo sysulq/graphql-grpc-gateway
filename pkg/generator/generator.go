@@ -561,9 +561,9 @@ func (s *SchemaDescriptor) createField(field *desc.FieldDescriptor, obj *ObjectD
 	}
 	fieldOpts := GraphqlFieldOptions(field.AsFieldDescriptorProto().GetOptions())
 	if fieldOpts != nil {
-		if fieldOpts.Name != "" {
-			fieldAst.Name = fieldOpts.Name
-		}
+		// if fieldOpts.Name != "" {
+		// 	fieldAst.Name = fieldOpts.Name
+		// }
 		directive := &ast.DirectiveDefinition{
 			Name: goFieldDirective,
 			Arguments: []*ast.ArgumentDefinition{{
@@ -707,10 +707,10 @@ func (s *SchemaDescriptor) createUnion(oneof *desc.OneOfDescriptor) (*FieldDescr
 	}
 	s.objects = append(s.objects, obj)
 	name := ToLowerFirst(CamelCase(oneof.GetName()))
-	opts := GraphqlOneofOptions(oneof.AsOneofDescriptorProto().GetOptions())
-	if opts.GetName() != "" {
-		name = opts.GetName()
-	}
+	// opts := GraphqlOneofOptions(oneof.AsOneofDescriptorProto().GetOptions())
+	// if opts.GetName() != "" {
+	// 	name = opts.GetName()
+	// }
 	return &FieldDescriptor{
 		FieldDefinition: &ast.FieldDefinition{
 			Description: getDescription(oneof),

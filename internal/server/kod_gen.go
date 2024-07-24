@@ -7,12 +7,11 @@ import (
 	"context"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
-	"github.com/jhump/protoreflect/desc"
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/generator"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/protographql"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/runtime/protoiface"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"net/http"
 	"reflect"
 )
@@ -144,7 +143,7 @@ type caller_local_stub struct {
 // Check that caller_local_stub implements the Caller interface.
 var _ Caller = (*caller_local_stub)(nil)
 
-func (s caller_local_stub) Call(ctx context.Context, a1 *desc.MethodDescriptor, a2 protoiface.MessageV1) (r0 protoiface.MessageV1, err error) {
+func (s caller_local_stub) Call(ctx context.Context, a1 protoreflect.MethodDescriptor, a2 protoreflect.ProtoMessage) (r0 protoreflect.ProtoMessage, err error) {
 
 	if s.interceptor == nil {
 		r0, err = s.impl.Call(ctx, a1, a2)
@@ -168,7 +167,7 @@ func (s caller_local_stub) Call(ctx context.Context, a1 *desc.MethodDescriptor, 
 	return
 }
 
-func (s caller_local_stub) GetDescs() (r0 []*desc.FileDescriptor) {
+func (s caller_local_stub) GetDescs() (r0 []protoreflect.FileDescriptor) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0 = s.impl.GetDescs()
 	return
@@ -230,7 +229,7 @@ type reflection_local_stub struct {
 // Check that reflection_local_stub implements the Reflection interface.
 var _ Reflection = (*reflection_local_stub)(nil)
 
-func (s reflection_local_stub) ListPackages(ctx context.Context, a1 grpc.ClientConnInterface) (r0 []*desc.FileDescriptor, err error) {
+func (s reflection_local_stub) ListPackages(ctx context.Context, a1 grpc.ClientConnInterface) (r0 []protoreflect.FileDescriptor, err error) {
 
 	if s.interceptor == nil {
 		r0, err = s.impl.ListPackages(ctx, a1)
@@ -263,43 +262,13 @@ type registry_local_stub struct {
 // Check that registry_local_stub implements the Registry interface.
 var _ Registry = (*registry_local_stub)(nil)
 
-func (s registry_local_stub) FindFieldByName(a0 desc.Descriptor, a1 string) (r0 *desc.FieldDescriptor) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.FindFieldByName(a0, a1)
-	return
-}
-
-func (s registry_local_stub) FindGraphqlFieldByProtoField(a0 *ast.Definition, a1 string) (r0 *ast.FieldDefinition) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.FindGraphqlFieldByProtoField(a0, a1)
-	return
-}
-
-func (s registry_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 *desc.MethodDescriptor) {
+func (s registry_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 protoreflect.MethodDescriptor) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0 = s.impl.FindMethodByName(a0, a1)
 	return
 }
 
-func (s registry_local_stub) FindObjectByFullyQualifiedName(a0 string) (r0 *desc.MessageDescriptor, r1 *ast.Definition) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0, r1 = s.impl.FindObjectByFullyQualifiedName(a0)
-	return
-}
-
-func (s registry_local_stub) FindObjectByName(a0 string) (r0 *desc.MessageDescriptor) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.FindObjectByName(a0)
-	return
-}
-
-func (s registry_local_stub) FindUnionFieldByMessageFQNAndName(a0 string, a1 string) (r0 *desc.FieldDescriptor) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.FindUnionFieldByMessageFQNAndName(a0, a1)
-	return
-}
-
-func (s registry_local_stub) SchemaDescriptorList() (r0 generator.SchemaDescriptorList) {
+func (s registry_local_stub) SchemaDescriptorList() (r0 *protographql.SchemaDescriptor) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0 = s.impl.SchemaDescriptorList()
 	return

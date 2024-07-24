@@ -2,24 +2,16 @@ package server
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
-	"fmt"
 	"reflect"
 
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kratelimit"
-	"github.com/jhump/protoreflect/desc"
-	"github.com/jhump/protoreflect/dynamic"
 	"github.com/nautilus/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/protoadapt"
-	"google.golang.org/protobuf/types/known/anypb"
 
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	v2 "github.com/sysulq/graphql-grpc-gateway/pkg/generator/v2"
 )
 
 type anyMap = map[string]interface{}
@@ -104,26 +96,26 @@ func (q *queryer) resolveMutation(ctx context.Context, selection ast.SelectionSe
 	return
 }
 
-func getSelectionSet(selections ast.SelectionSet, prefix string) []string {
-	var fields []string
-	for _, selection := range selections {
-		field, ok := selection.(*ast.Field)
-		if !ok {
-			continue
-		}
-		fullName := field.Name
-		if prefix != "" {
-			fullName = fmt.Sprintf("%s.%s", prefix, field.Name)
-		}
-		if len(field.SelectionSet) > 0 {
-			subFields := getSelectionSet(field.SelectionSet, fullName)
-			fields = append(fields, subFields...)
-		} else {
-			fields = append(fields, fullName)
-		}
-	}
-	return fields
-}
+// func getSelectionSet(selections ast.SelectionSet, prefix string) []string {
+// 	var fields []string
+// 	for _, selection := range selections {
+// 		field, ok := selection.(*ast.Field)
+// 		if !ok {
+// 			continue
+// 		}
+// 		fullName := field.Name
+// 		if prefix != "" {
+// 			fullName = fmt.Sprintf("%s.%s", prefix, field.Name)
+// 		}
+// 		if len(field.SelectionSet) > 0 {
+// 			subFields := getSelectionSet(field.SelectionSet, fullName)
+// 			fields = append(fields, subFields...)
+// 		} else {
+// 			fields = append(fields, fullName)
+// 		}
+// 	}
+// 	return fields
+// }
 
 func (q *queryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, res anyMap, vars map[string]interface{}) (err error) {
 	type mapEntry struct {
@@ -179,20 +171,18 @@ func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.
 		return nil, errors.New("method not found")
 	}
 
-	g := &v2.Generator{}
-	inputMsg, err := g.GraphQL2Proto(method.GetInputType().UnwrapMessage(), field, vars)
-
+	inputMsg, err := q.registry.Get().SchemaDescriptorList().GraphQL2Proto(method.Input(), field, vars)
 	// inputMsg, err := q.pbEncode(method.GetInputType(), field, vars)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	msg, err := q.caller.Get().Call(ctx, method, protoadapt.MessageV1Of(inputMsg))
 	if err != nil {
 		return nil, err
 	}
 
-	return q.pbDecode(field, msg)
+	msg, err := q.caller.Get().Call(ctx, method, inputMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	return q.registry.Get().SchemaDescriptorList().MarshalProto2GraphQL(msg, field)
 }
 
 // func (q *queryer) pbEncode(in *desc.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (protoadapt.MessageV1, error) {
@@ -383,225 +373,225 @@ func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.
 // 	return val, nil
 // }
 
-func (q *queryer) pbDecodeOneofField(desc *desc.MessageDescriptor, dynamicMsg *dynamic.Message, selection ast.SelectionSet) (oneof anyMap, err error) {
-	oneof = anyMap{}
-	for _, f := range selection {
-		out, ok := f.(*ast.Field)
-		if !ok {
-			continue
-		}
-		if out.Name == "__typename" {
-			oneof[nameOrAlias(out)] = out.ObjectDefinition.Name
-			continue
-		}
+// func (q *queryer) pbDecodeOneofField(desc *desc.MessageDescriptor, dynamicMsg *dynamic.Message, selection ast.SelectionSet) (oneof anyMap, err error) {
+// 	oneof = anyMap{}
+// 	for _, f := range selection {
+// 		out, ok := f.(*ast.Field)
+// 		if !ok {
+// 			continue
+// 		}
+// 		if out.Name == "__typename" {
+// 			oneof[nameOrAlias(out)] = out.ObjectDefinition.Name
+// 			continue
+// 		}
 
-		fieldDesc := q.registry.Get().FindUnionFieldByMessageFQNAndName(desc.GetFullyQualifiedName(), out.Name)
-		protoVal := dynamicMsg.GetField(fieldDesc)
-		oneof[nameOrAlias(out)], err = q.gqlValue(protoVal, fieldDesc.GetMessageType(), fieldDesc.GetEnumType(), out)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return oneof, nil
-}
+// 		fieldDesc := q.registry.Get().FindUnionFieldByMessageFQNAndName(desc.GetFullyQualifiedName(), out.Name)
+// 		protoVal := dynamicMsg.GetField(fieldDesc)
+// 		oneof[nameOrAlias(out)], err = q.gqlValue(protoVal, fieldDesc.GetMessageType(), fieldDesc.GetEnumType(), out)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	}
+// 	return oneof, nil
+// }
 
-func (q *queryer) pbDecode(field *ast.Field, msg protoadapt.MessageV1) (res interface{}, err error) {
-	switch dynamicMsg := msg.(type) {
-	case *dynamic.Message:
-		return q.gqlValue(dynamicMsg, dynamicMsg.GetMessageDescriptor(), nil, field)
-	case *anypb.Any:
-		return q.gqlValue(dynamicMsg, nil, nil, field)
-	default:
-		return nil, fmt.Errorf("expected proto message of type *dynamic.Message or *anypb.Any but received: %T", msg)
-	}
-}
+// func (q *queryer) pbDecode(field *ast.Field, msg protoadapt.MessageV1) (res interface{}, err error) {
+// 	switch dynamicMsg := msg.(type) {
+// 	case *dynamic.Message:
+// 		return q.gqlValue(dynamicMsg, dynamicMsg.GetMessageDescriptor(), nil, field)
+// 	case *anypb.Any:
+// 		return q.gqlValue(dynamicMsg, nil, nil, field)
+// 	default:
+// 		return nil, fmt.Errorf("expected proto message of type *dynamic.Message or *anypb.Any but received: %T", msg)
+// 	}
+// }
 
-// FIXME take care of recursive calls
-func (q *queryer) gqlValue(val interface{}, msgDesc *desc.MessageDescriptor, enumDesc *desc.EnumDescriptor, field *ast.Field) (_ interface{}, err error) {
-	switch v := val.(type) {
-	case int32:
-		// int32 enum
-		if enumDesc != nil {
-			values := map[int32]string{}
-			for _, v := range enumDesc.GetValues() {
-				values[v.GetNumber()] = v.GetName()
-			}
+// // FIXME take care of recursive calls
+// func (q *queryer) gqlValue(val interface{}, msgDesc *desc.MessageDescriptor, enumDesc *desc.EnumDescriptor, field *ast.Field) (_ interface{}, err error) {
+// 	switch v := val.(type) {
+// 	case int32:
+// 		// int32 enum
+// 		if enumDesc != nil {
+// 			values := map[int32]string{}
+// 			for _, v := range enumDesc.GetValues() {
+// 				values[v.GetNumber()] = v.GetName()
+// 			}
 
-			return values[v], nil
-		}
+// 			return values[v], nil
+// 		}
 
-	case map[interface{}]interface{}:
-		res := make([]interface{}, len(v))
-		i := 0
-		for kk, vv := range v {
-			vals := anyMap{}
-			for _, f := range field.SelectionSet {
-				out, ok := f.(*ast.Field)
-				if !ok {
-					continue
-				}
-				switch out.Name {
-				case "value":
-					valueField := msgDesc.FindFieldByName("value")
-					if vals[nameOrAlias(out)], err = q.gqlValue(vv, valueField.GetMessageType(), valueField.GetEnumType(), out); err != nil {
-						return nil, err
-					}
-				case "key":
-					vals[nameOrAlias(out)] = kk
-				case "__typename":
-					vals[nameOrAlias(out)] = out.ObjectDefinition.Name
-				}
-			}
+// 	case map[interface{}]interface{}:
+// 		res := make([]interface{}, len(v))
+// 		i := 0
+// 		for kk, vv := range v {
+// 			vals := anyMap{}
+// 			for _, f := range field.SelectionSet {
+// 				out, ok := f.(*ast.Field)
+// 				if !ok {
+// 					continue
+// 				}
+// 				switch out.Name {
+// 				case "value":
+// 					valueField := msgDesc.FindFieldByName("value")
+// 					if vals[nameOrAlias(out)], err = q.gqlValue(vv, valueField.GetMessageType(), valueField.GetEnumType(), out); err != nil {
+// 						return nil, err
+// 					}
+// 				case "key":
+// 					vals[nameOrAlias(out)] = kk
+// 				case "__typename":
+// 					vals[nameOrAlias(out)] = out.ObjectDefinition.Name
+// 				}
+// 			}
 
-			res[i] = vals
-			i++
-		}
-		return res, nil
+// 			res[i] = vals
+// 			i++
+// 		}
+// 		return res, nil
 
-	case []interface{}:
-		v2 := make([]interface{}, len(v))
-		for i, vv := range v {
-			v2[i], err = q.gqlValue(vv, msgDesc, enumDesc, field)
-			if err != nil {
-				return nil, err
-			}
-		}
-		return v2, nil
+// 	case []interface{}:
+// 		v2 := make([]interface{}, len(v))
+// 		for i, vv := range v {
+// 			v2[i], err = q.gqlValue(vv, msgDesc, enumDesc, field)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 		}
+// 		return v2, nil
 
-	case *dynamic.Message:
-		if v == nil {
-			return nil, nil
-		}
-		fields := v.GetKnownFields()
-		vals := make(map[string]interface{}, len(fields))
-		// gqlFields := map[string]string{}
-		for _, s := range field.SelectionSet {
-			out, ok := s.(*ast.Field)
-			if !ok {
-				continue
-			}
+// 	case *dynamic.Message:
+// 		if v == nil {
+// 			return nil, nil
+// 		}
+// 		fields := v.GetKnownFields()
+// 		vals := make(map[string]interface{}, len(fields))
+// 		// gqlFields := map[string]string{}
+// 		for _, s := range field.SelectionSet {
+// 			out, ok := s.(*ast.Field)
+// 			if !ok {
+// 				continue
+// 			}
 
-			if out.Name == "__typename" {
-				vals[nameOrAlias(out)] = out.ObjectDefinition.Name
-				continue
-			}
+// 			if out.Name == "__typename" {
+// 				vals[nameOrAlias(out)] = out.ObjectDefinition.Name
+// 				continue
+// 			}
 
-			descMsg := v.GetMessageDescriptor()
-			fieldDesc := q.registry.Get().FindFieldByName(descMsg, out.Name)
-			if fieldDesc == nil {
-				vals[nameOrAlias(out)], err = q.pbDecodeOneofField(descMsg, v, out.SelectionSet)
-				if err != nil {
-					return nil, err
-				}
-				continue
-			}
+// 			descMsg := v.GetMessageDescriptor()
+// 			fieldDesc := q.registry.Get().FindFieldByName(descMsg, out.Name)
+// 			if fieldDesc == nil {
+// 				vals[nameOrAlias(out)], err = q.pbDecodeOneofField(descMsg, v, out.SelectionSet)
+// 				if err != nil {
+// 					return nil, err
+// 				}
+// 				continue
+// 			}
 
-			vals[nameOrAlias(out)], err = q.gqlValue(v.GetField(fieldDesc), fieldDesc.GetMessageType(), fieldDesc.GetEnumType(), out)
-			if err != nil {
-				return nil, err
-			}
-		}
-		return vals, nil
-	case *anypb.Any:
-		vals, err := q.anyMessageToMap(v)
-		if err != nil {
-			return nil, err
-		}
-		return vals, nil
+// 			vals[nameOrAlias(out)], err = q.gqlValue(v.GetField(fieldDesc), fieldDesc.GetMessageType(), fieldDesc.GetEnumType(), out)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 		}
+// 		return vals, nil
+// 	case *anypb.Any:
+// 		vals, err := q.anyMessageToMap(v)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		return vals, nil
 
-	case []byte:
-		return base64.StdEncoding.EncodeToString(v), nil
-	}
+// 	case []byte:
+// 		return base64.StdEncoding.EncodeToString(v), nil
+// 	}
 
-	return val, nil
-}
+// 	return val, nil
+// }
 
-func (q *queryer) anyMessageToMap(v *anypb.Any) (map[string]interface{}, error) {
-	fqn := string(v.MessageName())
+// func (q *queryer) anyMessageToMap(v *anypb.Any) (map[string]interface{}, error) {
+// 	fqn := string(v.MessageName())
 
-	grpcType, definition := q.registry.Get().FindObjectByFullyQualifiedName(fqn)
-	outputMsg := dynamic.NewMessage(grpcType)
-	if err := outputMsg.Unmarshal(v.Value); err != nil {
-		return nil, err
-	}
-	return q.protoMessageToMap(outputMsg, definition)
-}
+// 	grpcType, definition := q.registry.Get().FindObjectByFullyQualifiedName(fqn)
+// 	outputMsg := dynamic.NewMessage(grpcType)
+// 	if err := outputMsg.Unmarshal(v.Value); err != nil {
+// 		return nil, err
+// 	}
+// 	return q.protoMessageToMap(outputMsg, definition)
+// }
 
-func (q *queryer) protoMessageToMap(outputMsg *dynamic.Message, definition *ast.Definition) (map[string]interface{}, error) {
-	fields := outputMsg.GetKnownFields()
-	vals := make(map[string]interface{}, len(fields))
-	vals["__typename"] = definition.Name
-	for _, field := range fields {
-		fieldDef := q.registry.Get().FindGraphqlFieldByProtoField(definition, field.GetName())
-		// the field is probably invalid or ignored
-		if fieldDef == nil {
-			continue
-			// return nil, fmt.Errorf("proto field %q doesn't have a graphql counterpart on type %q", field.GetName(), definition.Name)
-		}
-		val := outputMsg.GetField(field)
-		switch vv := val.(type) {
-		case int32:
-			if field.GetEnumType() != nil {
-				values := map[int32]string{}
-				for _, v := range field.GetEnumType().GetValues() {
-					values[v.GetNumber()] = v.GetName()
-				}
+// func (q *queryer) protoMessageToMap(outputMsg *dynamic.Message, definition *ast.Definition) (map[string]interface{}, error) {
+// 	fields := outputMsg.GetKnownFields()
+// 	vals := make(map[string]interface{}, len(fields))
+// 	vals["__typename"] = definition.Name
+// 	for _, field := range fields {
+// 		fieldDef := q.registry.Get().FindGraphqlFieldByProtoField(definition, field.GetName())
+// 		// the field is probably invalid or ignored
+// 		if fieldDef == nil {
+// 			continue
+// 			// return nil, fmt.Errorf("proto field %q doesn't have a graphql counterpart on type %q", field.GetName(), definition.Name)
+// 		}
+// 		val := outputMsg.GetField(field)
+// 		switch vv := val.(type) {
+// 		case int32:
+// 			if field.GetEnumType() != nil {
+// 				values := map[int32]string{}
+// 				for _, v := range field.GetEnumType().GetValues() {
+// 					values[v.GetNumber()] = v.GetName()
+// 				}
 
-				vals[fieldDef.Name] = values[vv]
-			}
+// 				vals[fieldDef.Name] = values[vv]
+// 			}
 
-		case *dynamic.Message:
-			_, definition := q.registry.Get().FindObjectByFullyQualifiedName(vv.GetMessageDescriptor().GetFullyQualifiedName())
-			val, err := q.protoMessageToMap(vv, definition)
-			if err != nil {
-				return nil, err
-			}
-			vals[fieldDef.Name] = val
-		case *anypb.Any:
-			val, err := q.anyMessageToMap(vv)
-			if err != nil {
-				return nil, err
-			}
-			vals[fieldDef.Name] = val
-		case []interface{}:
-			var arrayVals []interface{}
-			for _, val := range vv {
-				switch vv := val.(type) {
-				case int32:
-					if field.GetEnumType() != nil {
-						values := map[int32]string{}
-						for _, v := range field.GetEnumType().GetValues() {
-							values[v.GetNumber()] = v.GetName()
-						}
+// 		case *dynamic.Message:
+// 			_, definition := q.registry.Get().FindObjectByFullyQualifiedName(vv.GetMessageDescriptor().GetFullyQualifiedName())
+// 			val, err := q.protoMessageToMap(vv, definition)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 			vals[fieldDef.Name] = val
+// 		case *anypb.Any:
+// 			val, err := q.anyMessageToMap(vv)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 			vals[fieldDef.Name] = val
+// 		case []interface{}:
+// 			var arrayVals []interface{}
+// 			for _, val := range vv {
+// 				switch vv := val.(type) {
+// 				case int32:
+// 					if field.GetEnumType() != nil {
+// 						values := map[int32]string{}
+// 						for _, v := range field.GetEnumType().GetValues() {
+// 							values[v.GetNumber()] = v.GetName()
+// 						}
 
-						arrayVals = append(arrayVals, values[vv])
-					}
+// 						arrayVals = append(arrayVals, values[vv])
+// 					}
 
-				case *dynamic.Message:
-					_, definition := q.registry.Get().FindObjectByFullyQualifiedName(vv.GetMessageDescriptor().GetFullyQualifiedName())
-					val, err := q.protoMessageToMap(vv, definition)
-					if err != nil {
-						return nil, err
-					}
-					arrayVals = append(arrayVals, val)
-				case *anypb.Any:
-					val, err := q.anyMessageToMap(vv)
-					if err != nil {
-						return nil, err
-					}
-					arrayVals = append(arrayVals, val)
-				default:
-					arrayVals = append(arrayVals, vv)
-				}
-			}
+// 				case *dynamic.Message:
+// 					_, definition := q.registry.Get().FindObjectByFullyQualifiedName(vv.GetMessageDescriptor().GetFullyQualifiedName())
+// 					val, err := q.protoMessageToMap(vv, definition)
+// 					if err != nil {
+// 						return nil, err
+// 					}
+// 					arrayVals = append(arrayVals, val)
+// 				case *anypb.Any:
+// 					val, err := q.anyMessageToMap(vv)
+// 					if err != nil {
+// 						return nil, err
+// 					}
+// 					arrayVals = append(arrayVals, val)
+// 				default:
+// 					arrayVals = append(arrayVals, vv)
+// 				}
+// 			}
 
-			vals[fieldDef.Name] = arrayVals
-		default:
-			vals[fieldDef.Name] = vv
-		}
-	}
-	return vals, nil
-}
+// 			vals[fieldDef.Name] = arrayVals
+// 		default:
+// 			vals[fieldDef.Name] = vv
+// 		}
+// 	}
+// 	return vals, nil
+// }
 
 func nameOrAlias(field *ast.Field) string {
 	if field.Alias != "" {
@@ -611,11 +601,11 @@ func nameOrAlias(field *ast.Field) string {
 	return field.Name
 }
 
-func marshalAny(inputMsg *dynamic.Message) (*anypb.Any, error) {
-	b, err := proto.Marshal(protoadapt.MessageV2Of(inputMsg))
-	if err != nil {
-		return nil, err
-	}
+// func marshalAny(inputMsg *dynamic.Message) (*anypb.Any, error) {
+// 	b, err := proto.Marshal(protoadapt.MessageV2Of(inputMsg))
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &anypb.Any{TypeUrl: "type.googleapis.com/" + string(inputMsg.GetMessageDescriptor().Unwrap().FullName()), Value: b}, nil
-}
+// 	return &anypb.Any{TypeUrl: "type.googleapis.com/" + string(inputMsg.GetMessageDescriptor().Unwrap().FullName()), Value: b}, nil
+// }

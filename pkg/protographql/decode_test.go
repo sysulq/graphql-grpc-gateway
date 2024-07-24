@@ -1,4 +1,4 @@
-package v2
+package protographql
 
 import (
 	"testing"
@@ -9,7 +9,10 @@ import (
 )
 
 func TestDecodeMaps(t *testing.T) {
-	ins := &Generator{}
+	ins := New()
+	err := ins.GenerateFile(true, test.File_test_constructs_input_proto)
+	require.Nil(t, err)
+
 	msg := &test.Maps{}
 
 	generated, err := ins.MarshalProto2GraphQL(msg, &ast.Field{

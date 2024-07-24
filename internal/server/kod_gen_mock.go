@@ -14,13 +14,13 @@ import (
 	http "net/http"
 	reflect "reflect"
 
-	desc "github.com/jhump/protoreflect/desc"
 	graphql "github.com/nautilus/graphql"
-	generator "github.com/sysulq/graphql-grpc-gateway/pkg/generator"
+	protographql "github.com/sysulq/graphql-grpc-gateway/pkg/protographql"
 	ast "github.com/vektah/gqlparser/v2/ast"
 	gomock "go.uber.org/mock/gomock"
 	grpc "google.golang.org/grpc"
-	protoadapt "google.golang.org/protobuf/protoadapt"
+	proto "google.golang.org/protobuf/proto"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // MockReflection is a mock of Reflection interface.
@@ -47,10 +47,10 @@ func (m *MockReflection) EXPECT() *MockReflectionMockRecorder {
 }
 
 // ListPackages mocks base method.
-func (m *MockReflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]*desc.FileDescriptor, error) {
+func (m *MockReflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListPackages", ctx, cc)
-	ret0, _ := ret[0].([]*desc.FileDescriptor)
+	ret0, _ := ret[0].([]protoreflect.FileDescriptor)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -123,10 +123,10 @@ func (m *MockCaller) EXPECT() *MockCallerMockRecorder {
 }
 
 // Call mocks base method.
-func (m *MockCaller) Call(ctx context.Context, rpc *desc.MethodDescriptor, message protoadapt.MessageV1) (protoadapt.MessageV1, error) {
+func (m *MockCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Call", ctx, rpc, message)
-	ret0, _ := ret[0].(protoadapt.MessageV1)
+	ret0, _ := ret[0].(proto.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -138,10 +138,10 @@ func (mr *MockCallerMockRecorder) Call(ctx, rpc, message any) *gomock.Call {
 }
 
 // GetDescs mocks base method.
-func (m *MockCaller) GetDescs() []*desc.FileDescriptor {
+func (m *MockCaller) GetDescs() []protoreflect.FileDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDescs")
-	ret0, _ := ret[0].([]*desc.FileDescriptor)
+	ret0, _ := ret[0].([]protoreflect.FileDescriptor)
 	return ret0
 }
 
@@ -211,39 +211,11 @@ func (m *MockRegistry) EXPECT() *MockRegistryMockRecorder {
 	return m.recorder
 }
 
-// FindFieldByName mocks base method.
-func (m *MockRegistry) FindFieldByName(msg desc.Descriptor, name string) *desc.FieldDescriptor {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindFieldByName", msg, name)
-	ret0, _ := ret[0].(*desc.FieldDescriptor)
-	return ret0
-}
-
-// FindFieldByName indicates an expected call of FindFieldByName.
-func (mr *MockRegistryMockRecorder) FindFieldByName(msg, name any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindFieldByName", reflect.TypeOf((*MockRegistry)(nil).FindFieldByName), msg, name)
-}
-
-// FindGraphqlFieldByProtoField mocks base method.
-func (m *MockRegistry) FindGraphqlFieldByProtoField(msg *ast.Definition, name string) *ast.FieldDefinition {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindGraphqlFieldByProtoField", msg, name)
-	ret0, _ := ret[0].(*ast.FieldDefinition)
-	return ret0
-}
-
-// FindGraphqlFieldByProtoField indicates an expected call of FindGraphqlFieldByProtoField.
-func (mr *MockRegistryMockRecorder) FindGraphqlFieldByProtoField(msg, name any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindGraphqlFieldByProtoField", reflect.TypeOf((*MockRegistry)(nil).FindGraphqlFieldByProtoField), msg, name)
-}
-
 // FindMethodByName mocks base method.
-func (m *MockRegistry) FindMethodByName(op ast.Operation, name string) *desc.MethodDescriptor {
+func (m *MockRegistry) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindMethodByName", op, name)
-	ret0, _ := ret[0].(*desc.MethodDescriptor)
+	ret0, _ := ret[0].(protoreflect.MethodDescriptor)
 	return ret0
 }
 
@@ -253,54 +225,11 @@ func (mr *MockRegistryMockRecorder) FindMethodByName(op, name any) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindMethodByName", reflect.TypeOf((*MockRegistry)(nil).FindMethodByName), op, name)
 }
 
-// FindObjectByFullyQualifiedName mocks base method.
-func (m *MockRegistry) FindObjectByFullyQualifiedName(fqn string) (*desc.MessageDescriptor, *ast.Definition) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindObjectByFullyQualifiedName", fqn)
-	ret0, _ := ret[0].(*desc.MessageDescriptor)
-	ret1, _ := ret[1].(*ast.Definition)
-	return ret0, ret1
-}
-
-// FindObjectByFullyQualifiedName indicates an expected call of FindObjectByFullyQualifiedName.
-func (mr *MockRegistryMockRecorder) FindObjectByFullyQualifiedName(fqn any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindObjectByFullyQualifiedName", reflect.TypeOf((*MockRegistry)(nil).FindObjectByFullyQualifiedName), fqn)
-}
-
-// FindObjectByName mocks base method.
-func (m *MockRegistry) FindObjectByName(name string) *desc.MessageDescriptor {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindObjectByName", name)
-	ret0, _ := ret[0].(*desc.MessageDescriptor)
-	return ret0
-}
-
-// FindObjectByName indicates an expected call of FindObjectByName.
-func (mr *MockRegistryMockRecorder) FindObjectByName(name any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindObjectByName", reflect.TypeOf((*MockRegistry)(nil).FindObjectByName), name)
-}
-
-// FindUnionFieldByMessageFQNAndName mocks base method.
-func (m *MockRegistry) FindUnionFieldByMessageFQNAndName(fqn, name string) *desc.FieldDescriptor {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindUnionFieldByMessageFQNAndName", fqn, name)
-	ret0, _ := ret[0].(*desc.FieldDescriptor)
-	return ret0
-}
-
-// FindUnionFieldByMessageFQNAndName indicates an expected call of FindUnionFieldByMessageFQNAndName.
-func (mr *MockRegistryMockRecorder) FindUnionFieldByMessageFQNAndName(fqn, name any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUnionFieldByMessageFQNAndName", reflect.TypeOf((*MockRegistry)(nil).FindUnionFieldByMessageFQNAndName), fqn, name)
-}
-
 // SchemaDescriptorList mocks base method.
-func (m *MockRegistry) SchemaDescriptorList() generator.SchemaDescriptorList {
+func (m *MockRegistry) SchemaDescriptorList() *protographql.SchemaDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SchemaDescriptorList")
-	ret0, _ := ret[0].(generator.SchemaDescriptorList)
+	ret0, _ := ret[0].(*protographql.SchemaDescriptor)
 	return ret0
 }
 
