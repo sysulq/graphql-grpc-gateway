@@ -237,6 +237,16 @@ type Mutation {
 	serviceMutate1(in: DataInput): Data
 	serviceMutate2(in: DataInput): Data
 	servicePublish(in: DataInput): Data
+	serviceSubscribe(in: DataInput): Data
+	servicePubSub1(in: DataInput): Data
+	serviceInvalidSubscribe2(in: DataInput): Data
+	servicePubSub2(in: DataInput): Data
+	serviceIgnore(in: DataInput): Data
+	serviceName(in: DataInput): Data
+	testName(in: DataInput): Data
+	testNewName(in: DataInput): Data
+	queryMutate1(in: DataInput): Data
+	querySubscribe(in: DataInput): Data
 }
 type Oneof {
 	param1: String
@@ -254,6 +264,10 @@ input OneofInput {
 }
 type Query {
 	serviceQuery1(in: DataInput): Data
+	serviceInvalidSubscribe1(in: DataInput): Data
+	serviceInvalidSubscribe3(in: DataInput): Data
+	queryQuery1(in: DataInput): Data
+	queryQuery2(in: DataInput): Data
 }
 type Ref {
 	localTime2: Timestamp
@@ -399,6 +413,8 @@ input ScalarsInput {
 }
 type Subscription {
 	serviceSubscribe(in: DataInput): Data
+	serviceInvalidSubscribe2(in: DataInput): Data
+	querySubscribe(in: DataInput): Data
 }
 type Timestamp {
 	time: String

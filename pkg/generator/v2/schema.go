@@ -290,7 +290,6 @@ func (schema *SchemaDescriptor) GenerateFile(generateUnboundMethods bool, file p
 
 			if !rpc.IsStreamingClient() && rpc.IsStreamingServer() {
 				schema.addMethod(schema.Subscription, svc, rpc, in, out)
-				return nil
 			}
 
 			switch rpcOpts.GetPattern().(type) {
