@@ -6,6 +6,12 @@ directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_
 The @specifiedBy built-in directive is used within the type system definition language to provide a scalar specification URL for specifying the behavior of custom scalar types.
 """
 directive @specifiedBy(url: String!) on SCALAR
+input AnyInput {
+	param1: String
+}
+type AnyInputOutput {
+	any: googleprotobufAny
+}
 enum Bar {
 	BAR1
 	BAR2
@@ -242,6 +248,7 @@ type Mutation {
 	constructsRef_(in: RefInput): Ref
 	constructsOneof_(in: OneofInput): Oneof
 	constructsCallWithId: Boolean
+	constructsAnyway_(in: AnyInput): AnyInputOutput
 	serviceMutate1(in: DataInput): Data
 	serviceMutate2(in: DataInput): Data
 	servicePublish(in: DataInput): Data

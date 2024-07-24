@@ -21,7 +21,6 @@ type SchemaDescriptor struct {
 	Subscription    *ast.Definition
 	Directives      map[string]*ast.DirectiveDefinition
 	Types           map[string]*ast.Definition
-	ProcessedTypes  map[string]struct{}
 	MethodsByName   map[ast.Operation]map[string]protoreflect.MethodDescriptor
 	ProtoTypes      *protoregistry.Types
 }
@@ -43,8 +42,7 @@ func New() *SchemaDescriptor {
 			Name:   "Subscription",
 			Fields: []*ast.FieldDefinition{},
 		},
-		Types:          make(map[string]*ast.Definition),
-		ProcessedTypes: make(map[string]struct{}),
+		Types: make(map[string]*ast.Definition),
 		MethodsByName: map[ast.Operation]map[string]protoreflect.MethodDescriptor{
 			ast.Mutation:     make(map[string]protoreflect.MethodDescriptor),
 			ast.Query:        make(map[string]protoreflect.MethodDescriptor),
@@ -86,7 +84,12 @@ func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor,
 	}
 
 	if def, exists := s.Types[typeName]; exists {
-		return def, nil
+		// if the type already exists, but it's an output type, we need to rename it
+		if !isInput && strings.HasSuffix(s.msgFullName(msgDesc), "Input") {
+			typeName += "Output"
+		} else {
+			return def, nil
+		}
 	}
 
 	definition := &ast.Definition{

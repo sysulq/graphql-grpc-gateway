@@ -30,7 +30,6 @@ type caller struct {
 
 	serviceStub  map[string]*grpcdynamic.Stub
 	singleflight singleflight.Group
-	descs        []protoreflect.FileDescriptor
 
 	schema *protographql.SchemaDescriptor
 }
@@ -77,7 +76,6 @@ func (c *caller) Init(ctx context.Context) (err error) {
 		return string(item.FullName())
 	})
 
-	c.descs = descs
 	c.serviceStub = serviceStub
 
 	c.schema = protographql.New()
