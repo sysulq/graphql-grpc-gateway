@@ -245,9 +245,9 @@ type Oneof {
 	param4: String
 	param5: String
 	param6: String
-	oneof1: constructs_Oneof_Oneof1
-	oneof2: constructs_Oneof_Oneof2
-	oneof3: constructs_Oneof_Oneof3
+	Oneof1: constructs_Oneof_Oneof1
+	Oneof2: constructs_Oneof_Oneof2
+	Oneof3: constructs_Oneof_Oneof3
 }
 input OneofInput {
 	param1: String

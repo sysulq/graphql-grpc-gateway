@@ -3,6 +3,7 @@ package v2
 import (
 	"encoding/base64"
 	"fmt"
+	"maps"
 
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/proto"
@@ -17,9 +18,20 @@ func (ins *Generator) MarshalProto2GraphQL(msg proto.Message, field *ast.Field) 
 	for _, selection := range field.SelectionSet {
 		if f, ok := selection.(*ast.Field); ok {
 			fieldName := f.Name
+			if fieldName == "__typename" {
+				result["__typename"] = string(message.Descriptor().Name())
+				continue
+			}
+
 			fieldDesc := message.Descriptor().Fields().ByJSONName(fieldName)
 			if fieldDesc == nil {
-				return nil, fmt.Errorf("field %s not found in message", fieldName)
+				oneofMap, err := marshalOneof(message, f)
+				if err != nil {
+					return nil, err
+				}
+
+				result[fieldName] = oneofMap
+				continue
 			}
 			value := message.Get(fieldDesc)
 			marshaldValue, err := marshalValue(value, fieldDesc, f)
@@ -35,14 +47,50 @@ func (ins *Generator) MarshalProto2GraphQL(msg proto.Message, field *ast.Field) 
 
 // marshalValue 将 protoreflect.Value 转换为适合 GraphQL 的值
 func marshalValue(value protoreflect.Value, fieldDesc protoreflect.FieldDescriptor, field *ast.Field) (interface{}, error) {
-	switch {
-	case fieldDesc.IsList():
+	if fieldDesc.IsList() {
 		return marshalList(value.List(), fieldDesc, field)
-	case fieldDesc.IsMap():
+	} else if fieldDesc.IsMap() {
 		return marshalMap(value.Map(), fieldDesc, field)
 	}
 
 	return marshalScalar(value, fieldDesc, field)
+}
+
+// marshalOneof 将 oneof 类型字段转换为 map[string]interface{}
+func marshalOneof(message protoreflect.Message, field *ast.Field) (map[string]interface{}, error) {
+	result := make(map[string]interface{})
+	oneofDesc := message.Descriptor().Oneofs().ByName(protoreflect.Name(field.Name))
+	if oneofDesc == nil {
+		return result, nil
+	}
+
+	fieldDesc := message.WhichOneof(oneofDesc)
+	if fieldDesc == nil {
+		return result, nil
+	}
+
+	value := message.Get(fieldDesc)
+
+	for _, selects := range field.SelectionSet {
+		if f, ok := selects.(*ast.Field); ok {
+			if f.Name == "__typename" {
+				result["__typename"] = field.Definition.Type.NamedType
+				continue
+			}
+
+			if string(fieldDesc.Name()) != f.Name {
+				continue
+			}
+
+			marshaldValue, err := marshalValue(value, fieldDesc, f)
+			if err != nil {
+				return nil, err
+			}
+			result[f.Name] = marshaldValue
+		}
+	}
+
+	return result, nil
 }
 
 func marshalScalar(value protoreflect.Value, fieldDesc protoreflect.FieldDescriptor, field *ast.Field) (interface{}, error) {
@@ -86,11 +134,22 @@ func marshalMessage(message protoreflect.Message, field *ast.Field) (interface{}
 			if fieldName == "" {
 				fieldName = f.Name
 			}
+			if fieldName == "__typename" {
+				result[fieldName] = message.Descriptor().Name()
+				continue
+			}
 
 			fieldDesc := message.Descriptor().Fields().ByJSONName(fieldName)
 			if fieldDesc == nil {
+				oneofField, err := marshalOneof(message, f)
+				if err != nil {
+					return nil, err
+				}
+
+				maps.Copy(result, oneofField)
 				continue
 			}
+
 			value := message.Get(fieldDesc)
 			marshaldValue, err := marshalValue(value, fieldDesc, f)
 			if err != nil {

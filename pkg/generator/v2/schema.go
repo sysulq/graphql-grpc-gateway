@@ -143,7 +143,7 @@ func (s *SchemaDescriptor) createUnion(oneof protoreflect.OneofDescriptor) (*ast
 
 	s.Types[unionName] = unionDef
 
-	fieldName := strings.ToLower(string(oneof.Name()))
+	fieldName := string(oneof.Name())
 	return &ast.FieldDefinition{
 			Name: fieldName,
 			Type: &ast.Type{NamedType: unionName},

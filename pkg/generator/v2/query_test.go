@@ -6,6 +6,53 @@ type (
 	l  = []interface{}
 )
 
+const constructsScalarsQuery = `
+mutation {
+  constructsScalars_(in: {
+    double: 1.1, float: 2.2, int32: 3, int64: -4, 
+    uint32: 5, uint64: 6, sint32: 7, sint64: 8, 
+    fixed32: 9, fixed64: 10, sfixed32: 11, sfixed64: 12,
+    bool: true, stringX: "test", bytes: "dGVzdA=="
+  }) {
+    double
+    float
+    int32
+    int64
+    uint32
+    uint64
+    sint32
+    sint64
+    fixed32
+    fixed64
+    sfixed32
+    sfixed64
+    bool
+    stringX
+    bytes
+    __typename
+  }
+}
+`
+
+var constructsScalarsResponse = j{
+	"__typename": "Scalars",
+	"bool":       true,
+	"bytes":      "dGVzdA==",
+	"stringX":    "test",
+	"double":     1.1,
+	"fixed32":    uint32(9),
+	"fixed64":    uint64(10),
+	"float":      float32(2.2),
+	"int32":      int32(3),
+	"int64":      int64(-4),
+	"sfixed32":   int32(11),
+	"sfixed64":   int64(12),
+	"sint32":     int32(7),
+	"sint64":     int64(8),
+	"uint32":     uint32(5),
+	"uint64":     uint64(6),
+}
+
 const constructsMapsQuery = `
 mutation {
  constructsMaps_(
@@ -133,3 +180,53 @@ var constructsRepeatedResponse = j{
 	"uint32":   l{uint32(7)},
 	"uint64":   l{uint64(8)},
 }
+
+var constructsOneofsResponse = j{
+	"Oneof1": j{
+		"__typename": "constructs_Oneof_Oneof1",
+		"param3":     "3",
+	},
+	"Oneof2": j{
+		"__typename": "constructs_Oneof_Oneof2",
+		"param5":     "5",
+	},
+	"Oneof3": j{
+		"__typename": "constructs_Oneof_Oneof3",
+		"param6":     "6",
+	},
+	"param1": "2",
+}
+
+const constructsOneofsQuery = `
+mutation {
+  constructsOneof_(
+    in: {param1: "2", param3:"3", param5: "5", param6: "6"}
+  ){ 
+    param1
+    Oneof1 {
+      __typename
+      ... on constructs_Oneof_param2 {
+        param2
+      }
+      ... on constructs_Oneof_param3 {
+        param3
+      }
+    }
+    Oneof2 {
+      __typename
+      ... on constructs_Oneof_param4 {
+        param4
+      }
+      ... on constructs_Oneof_param5 {
+        param5
+      }
+    }
+    Oneof3 {
+      __typename
+      ... on constructs_Oneof_param6 {
+        param6
+      }
+    }
+  }
+}
+`
