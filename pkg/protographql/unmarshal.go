@@ -20,8 +20,8 @@ func (ins *SchemaDescriptor) newMessage(desc protoreflect.MessageDescriptor) pro
 	return msgType.New()
 }
 
-// GraphQL2Proto 将 GraphQL 字段转换为 Protocol Buffers 消息
-func (ins *SchemaDescriptor) GraphQL2Proto(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
+// Unmarshal 将 GraphQL 字段转换为 Protocol Buffers 消息
+func (ins *SchemaDescriptor) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
 	// 查找名为 "in" 的参数
 	var inArg *ast.Argument
 	for _, arg := range field.Arguments {

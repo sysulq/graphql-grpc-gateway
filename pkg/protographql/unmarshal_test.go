@@ -25,11 +25,11 @@ func TestEncodeMaps(t *testing.T) {
 	err = ins.RegisterFileDescriptor(true, test.File_test_constructs_input_proto)
 	require.Nil(t, err)
 
-	generated, err := ins.GraphQL2Proto(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
+	generated, err := ins.Unmarshal(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
 
 	require.Nil(t, err)
 
-	data, err := ins.MarshalProto2GraphQL(generated, queryDoc.Operations[0].SelectionSet[0].(*ast.Field))
+	data, err := ins.Marshal(generated, queryDoc.Operations[0].SelectionSet[0].(*ast.Field))
 	require.Nil(t, err)
 
 	require.Equal(t, constructsMapsResponse, data)
@@ -48,11 +48,11 @@ func TestEncodeRepeated(t *testing.T) {
 	ins := New()
 	err = ins.RegisterFileDescriptor(true, test.File_test_constructs_input_proto)
 	require.Nil(t, err)
-	generated, err := ins.GraphQL2Proto(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
+	generated, err := ins.Unmarshal(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
 
 	require.Nil(t, err)
 
-	data, err := ins.MarshalProto2GraphQL(generated, queryDoc.Operations[0].SelectionSet[0].(*ast.Field))
+	data, err := ins.Marshal(generated, queryDoc.Operations[0].SelectionSet[0].(*ast.Field))
 	require.Nil(t, err)
 
 	require.Equal(t, constructsRepeatedResponse, data)
@@ -108,11 +108,11 @@ func TestEncodeDecode(t *testing.T) {
 			selection, err := graphql.ApplyFragments(queryDoc.Operations[0].SelectionSet, queryDoc.Fragments)
 			require.Nil(t, err, err)
 
-			generated, err := ins.GraphQL2Proto(c.msg.ProtoReflect().Descriptor(), selection[0].(*ast.Field), nil)
+			generated, err := ins.Unmarshal(c.msg.ProtoReflect().Descriptor(), selection[0].(*ast.Field), nil)
 
 			require.Nil(t, err)
 
-			data, err := ins.MarshalProto2GraphQL(generated, selection[0].(*ast.Field))
+			data, err := ins.Marshal(generated, selection[0].(*ast.Field))
 			require.Nil(t, err)
 
 			require.Equal(t, c.wantResponse, data)

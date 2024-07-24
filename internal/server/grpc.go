@@ -169,9 +169,9 @@ func (r *caller) GraphQLSchema() *ast.Schema {
 }
 
 func (r *caller) Marshal(proto proto.Message, field *ast.Field) (interface{}, error) {
-	return r.schema.MarshalProto2GraphQL(proto, field)
+	return r.schema.Marshal(proto, field)
 }
 
 func (r *caller) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
-	return r.schema.GraphQL2Proto(desc, field, vars)
+	return r.schema.Unmarshal(desc, field, vars)
 }

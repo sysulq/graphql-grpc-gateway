@@ -15,7 +15,7 @@ func TestDecodeMaps(t *testing.T) {
 
 	msg := &test.Maps{}
 
-	generated, err := ins.MarshalProto2GraphQL(msg, &ast.Field{
+	generated, err := ins.Marshal(msg, &ast.Field{
 		Alias:        "constructsMaps_",
 		Name:         "constructsMaps_",
 		SelectionSet: ast.SelectionSet{},

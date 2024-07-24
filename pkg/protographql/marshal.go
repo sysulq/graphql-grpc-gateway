@@ -10,8 +10,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-// MarshalProto2GraphQL 将 gRPC 返回的 proto.Message 转换为 GraphQL 数据
-func (ins *SchemaDescriptor) MarshalProto2GraphQL(msg proto.Message, field *ast.Field) (interface{}, error) {
+// Marshal 将 gRPC 返回的 proto.Message 转换为 GraphQL 数据
+func (ins *SchemaDescriptor) Marshal(msg proto.Message, field *ast.Field) (interface{}, error) {
 	message := msg.ProtoReflect()
 	result := make(map[string]interface{})
 
