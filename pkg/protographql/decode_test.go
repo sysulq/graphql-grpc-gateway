@@ -10,7 +10,7 @@ import (
 
 func TestDecodeMaps(t *testing.T) {
 	ins := New()
-	err := ins.GenerateFile(true, test.File_test_constructs_input_proto)
+	err := ins.RegisterFileDescriptor(true, test.File_test_constructs_input_proto)
 	require.Nil(t, err)
 
 	msg := &test.Maps{}

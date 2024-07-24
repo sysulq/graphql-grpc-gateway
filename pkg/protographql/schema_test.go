@@ -18,9 +18,9 @@ var schemaGraphQL string
 func TestSchema(t *testing.T) {
 	ins := New()
 	var err error
-	err = ins.GenerateFile(true, test.File_test_constructs_input_proto)
+	err = ins.RegisterFileDescriptor(true, test.File_test_constructs_input_proto)
 	require.Nil(t, err)
-	err = ins.GenerateFile(true, test.File_test_options_input_proto)
+	err = ins.RegisterFileDescriptor(true, test.File_test_options_input_proto)
 	require.Nil(t, err)
 
 	schema := ins.AsGraphQL()

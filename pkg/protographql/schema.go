@@ -303,7 +303,7 @@ func (s *SchemaDescriptor) addMethod(typ ast.Operation, def *ast.Definition, rpc
 	s.MethodsByName[typ][field.Name] = rpc
 }
 
-func (schema *SchemaDescriptor) GenerateFile(generateUnboundMethods bool, file protoreflect.FileDescriptor) error {
+func (schema *SchemaDescriptor) RegisterFileDescriptor(generateUnboundMethods bool, file protoreflect.FileDescriptor) error {
 	for i := 0; i < file.Messages().Len(); i++ {
 		msg := file.Messages().Get(i)
 		if err := schema.ProtoTypes.RegisterMessage(dynamicpb.NewMessageType(msg)); err != nil {

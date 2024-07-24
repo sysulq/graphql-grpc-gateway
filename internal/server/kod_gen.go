@@ -8,7 +8,6 @@ import (
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/protographql"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -44,7 +43,7 @@ func init() {
 		Impl:      reflect.TypeOf(server{}),
 		Refs: `⟦88a4dee9:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
 ⟦b39287d6:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer⟧,
-⟦93c735b8:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Registry⟧`,
+⟦f59f8a3c:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
 			if h, ok := info.Impl.(interface {
@@ -65,7 +64,6 @@ func init() {
 		Interface: reflect.TypeOf((*Queryer)(nil)).Elem(),
 		Impl:      reflect.TypeOf(queryer{}),
 		Refs: `⟦20a41d92:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦c2374838:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer→github.com/sysulq/graphql-grpc-gateway/internal/server/Registry⟧,
 ⟦8d32f9dd:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			interceptors := info.Interceptors
@@ -102,27 +100,6 @@ func init() {
 			}
 		},
 	})
-	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Registry",
-		Interface: reflect.TypeOf((*Registry)(nil)).Elem(),
-		Impl:      reflect.TypeOf(repository{}),
-		Refs: `⟦09a889ca:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧,
-⟦4607e1cb:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Registry→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧`,
-		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			interceptors := info.Interceptors
-			if h, ok := info.Impl.(interface {
-				Interceptors() []interceptor.Interceptor
-			}); ok {
-				interceptors = append(interceptors, h.Interceptors()...)
-			}
-
-			return registry_local_stub{
-				impl:        info.Impl.(Registry),
-				interceptor: interceptor.Chain(interceptors),
-				name:        info.Name,
-			}
-		},
-	})
 }
 
 // kod.InstanceOf checks.
@@ -130,7 +107,6 @@ var _ kod.InstanceOf[Caller] = (*caller)(nil)
 var _ kod.InstanceOf[Gateway] = (*server)(nil)
 var _ kod.InstanceOf[Queryer] = (*queryer)(nil)
 var _ kod.InstanceOf[Reflection] = (*reflection)(nil)
-var _ kod.InstanceOf[Registry] = (*repository)(nil)
 
 // Local stub implementations.
 
@@ -167,9 +143,27 @@ func (s caller_local_stub) Call(ctx context.Context, a1 protoreflect.MethodDescr
 	return
 }
 
-func (s caller_local_stub) GetDescs() (r0 []protoreflect.FileDescriptor) {
+func (s caller_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 protoreflect.MethodDescriptor) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.GetDescs()
+	r0 = s.impl.FindMethodByName(a0, a1)
+	return
+}
+
+func (s caller_local_stub) GraphQLSchema() (r0 *ast.Schema) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.GraphQLSchema()
+	return
+}
+
+func (s caller_local_stub) Marshal(a0 protoreflect.ProtoMessage, a1 *ast.Field) (r0 interface{}, err error) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0, err = s.impl.Marshal(a0, a1)
+	return
+}
+
+func (s caller_local_stub) Unmarshal(a0 protoreflect.MessageDescriptor, a1 *ast.Field, a2 map[string]interface{}) (r0 protoreflect.ProtoMessage, err error) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0, err = s.impl.Unmarshal(a0, a1, a2)
 	return
 }
 
@@ -250,26 +244,5 @@ func (s reflection_local_stub) ListPackages(ctx context.Context, a1 grpc.ClientC
 	}
 
 	err = s.interceptor(ctx, info, []any{a1}, []any{r0}, call)
-	return
-}
-
-type registry_local_stub struct {
-	impl        Registry
-	name        string
-	interceptor interceptor.Interceptor
-}
-
-// Check that registry_local_stub implements the Registry interface.
-var _ Registry = (*registry_local_stub)(nil)
-
-func (s registry_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 protoreflect.MethodDescriptor) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.FindMethodByName(a0, a1)
-	return
-}
-
-func (s registry_local_stub) SchemaDescriptorList() (r0 *protographql.SchemaDescriptor) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.SchemaDescriptorList()
 	return
 }

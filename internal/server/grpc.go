@@ -13,6 +13,8 @@ import (
 	"github.com/jhump/protoreflect/v2/grpcdynamic"
 	"github.com/samber/lo"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/protographql"
+	"github.com/vektah/gqlparser/v2/ast"
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -29,6 +31,8 @@ type caller struct {
 	serviceStub  map[string]*grpcdynamic.Stub
 	singleflight singleflight.Group
 	descs        []protoreflect.FileDescriptor
+
+	schema *protographql.SchemaDescriptor
 }
 
 func (c *caller) Init(ctx context.Context) (err error) {
@@ -76,11 +80,16 @@ func (c *caller) Init(ctx context.Context) (err error) {
 	c.descs = descs
 	c.serviceStub = serviceStub
 
-	return nil
-}
+	c.schema = protographql.New()
 
-func (c *caller) GetDescs() []protoreflect.FileDescriptor {
-	return c.descs
+	for _, desc := range descs {
+		err := c.schema.RegisterFileDescriptor(c.config.Get().Config().GraphQL.GenerateUnboundMethods, desc)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (c *caller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
@@ -150,3 +159,19 @@ func (c *caller) Interceptors() []interceptor.Interceptor {
 }
 
 var allowSingleFlightKey struct{}
+
+func (r *caller) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
+	return r.schema.MethodsByName[op][name]
+}
+
+func (r *caller) GraphQLSchema() *ast.Schema {
+	return r.schema.AsGraphQL()
+}
+
+func (r *caller) Marshal(proto proto.Message, field *ast.Field) (interface{}, error) {
+	return r.schema.MarshalProto2GraphQL(proto, field)
+}
+
+func (r *caller) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
+	return r.schema.GraphQL2Proto(desc, field, vars)
+}

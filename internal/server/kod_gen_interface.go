@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/protographql"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
@@ -26,17 +25,14 @@ type Gateway interface {
 
 // caller is a component that implements Caller.
 type Caller interface {
-	GetDescs() []protoreflect.FileDescriptor
 	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
+	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
+	GraphQLSchema() *ast.Schema
+	Marshal(proto proto.Message, field *ast.Field) (interface{}, error)
+	Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error)
 }
 
 // queryer is a component that implements Queryer.
 type Queryer interface {
 	Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error
-}
-
-// repository is a component that implements Registry.
-type Registry interface {
-	SchemaDescriptorList() *protographql.SchemaDescriptor
-	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
 }

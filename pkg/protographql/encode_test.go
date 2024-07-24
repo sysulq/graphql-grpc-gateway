@@ -22,7 +22,7 @@ func TestEncodeMaps(t *testing.T) {
 	require.Nil(t, err)
 
 	ins := New()
-	err = ins.GenerateFile(true, test.File_test_constructs_input_proto)
+	err = ins.RegisterFileDescriptor(true, test.File_test_constructs_input_proto)
 	require.Nil(t, err)
 
 	generated, err := ins.GraphQL2Proto(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
@@ -46,7 +46,7 @@ func TestEncodeRepeated(t *testing.T) {
 	require.Nil(t, err, err.Error())
 
 	ins := New()
-	err = ins.GenerateFile(true, test.File_test_constructs_input_proto)
+	err = ins.RegisterFileDescriptor(true, test.File_test_constructs_input_proto)
 	require.Nil(t, err)
 	generated, err := ins.GraphQL2Proto(msg.ProtoReflect().Descriptor(), queryDoc.Operations[0].SelectionSet[0].(*ast.Field), nil)
 
@@ -102,7 +102,7 @@ func TestEncodeDecode(t *testing.T) {
 			require.Nil(t, err, err)
 
 			ins := New()
-			err = ins.GenerateFile(true, test.File_test_constructs_input_proto)
+			err = ins.RegisterFileDescriptor(true, test.File_test_constructs_input_proto)
 			require.Nil(t, err)
 
 			selection, err := graphql.ApplyFragments(queryDoc.Operations[0].SelectionSet, queryDoc.Fragments)
