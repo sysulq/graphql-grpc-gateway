@@ -1,23 +1,18 @@
-directive @Constructs on FIELD_DEFINITION
-directive @Oneof_Oneof1 on INPUT_FIELD_DEFINITION
-directive @Oneof_Oneof2 on INPUT_FIELD_DEFINITION
-directive @Oneof_Oneof3 on INPUT_FIELD_DEFINITION
-directive @Query on FIELD_DEFINITION
-directive @Service on FIELD_DEFINITION
-directive @Test on FIELD_DEFINITION
 """
 The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer.
 """
 directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 """
 The @specifiedBy built-in directive is used within the type system definition language to provide a scalar specification URL for specifying the behavior of custom scalar types.
 """
 directive @specifiedBy(url: String!) on SCALAR
-"""
-Any is any json type
-"""
 scalar Any
+input AnyInput {
+	param1: String
+}
+type AnyInputOutput {
+	any: Any
+}
 enum Bar {
 	BAR1
 	BAR2
@@ -29,7 +24,6 @@ type Baz {
 input BazInput {
 	param1: String
 }
-scalar Bytes
 type Data {
 	stringX: String!
 	foo: Foo2!
@@ -37,8 +31,8 @@ type Data {
 	string2: String
 	foo2: Foo2
 	double2: [Float!]
-	bars: String
-	str: String
+	bar: String
+	string: String
 }
 input DataInput {
 	stringX: String!
@@ -47,8 +41,8 @@ input DataInput {
 	string2: String
 	foo2: Foo2Input
 	double2: [Float!]
-	bars: String
-	str: String
+	bar: String
+	string: String
 }
 type Foo {
 	param1: String
@@ -60,195 +54,187 @@ type Foo2 {
 input Foo2Input {
 	param1: String
 }
+type FooFoo2 {
+	param1: String
+}
+input FooFoo2Input {
+	param1: String
+}
 input FooInput {
 	param1: String
 	param2: String
 }
-type Foo_Foo2 {
-	param1: String
-}
-input Foo_Foo2Input {
-	param1: String
-}
-type GoogleProtobuf_Timestamp {
-	seconds: Int
-	nanos: Int
-}
-input GoogleProtobuf_TimestampInput {
-	seconds: Int
-	nanos: Int
-}
 type Maps {
-	int32Int32: [Maps_Int32Int32Entry!]
-	int64Int64: [Maps_Int64Int64Entry!]
-	uint32Uint32: [Maps_Uint32Uint32Entry!]
-	uint64Uint64: [Maps_Uint64Uint64Entry!]
-	sint32Sint32: [Maps_Sint32Sint32Entry!]
-	sint64Sint64: [Maps_Sint64Sint64Entry!]
-	fixed32Fixed32: [Maps_Fixed32Fixed32Entry!]
-	fixed64Fixed64: [Maps_Fixed64Fixed64Entry!]
-	sfixed32Sfixed32: [Maps_Sfixed32Sfixed32Entry!]
-	sfixed64Sfixed64: [Maps_Sfixed64Sfixed64Entry!]
-	boolBool: [Maps_BoolBoolEntry!]
-	stringString: [Maps_StringStringEntry!]
-	stringBytes: [Maps_StringBytesEntry!]
-	stringFloat: [Maps_StringFloatEntry!]
-	stringDouble: [Maps_StringDoubleEntry!]
-	stringFoo: [Maps_StringFooEntry!]
-	stringBar: [Maps_StringBarEntry!]
+	int32Int32: [MapsInt32Int32Entry!]
+	int64Int64: [MapsInt64Int64Entry!]
+	uint32Uint32: [MapsUint32Uint32Entry!]
+	uint64Uint64: [MapsUint64Uint64Entry!]
+	sint32Sint32: [MapsSint32Sint32Entry!]
+	sint64Sint64: [MapsSint64Sint64Entry!]
+	fixed32Fixed32: [MapsFixed32Fixed32Entry!]
+	fixed64Fixed64: [MapsFixed64Fixed64Entry!]
+	sfixed32Sfixed32: [MapsSfixed32Sfixed32Entry!]
+	sfixed64Sfixed64: [MapsSfixed64Sfixed64Entry!]
+	boolBool: [MapsBoolBoolEntry!]
+	stringString: [MapsStringStringEntry!]
+	stringBytes: [MapsStringBytesEntry!]
+	stringFloat: [MapsStringFloatEntry!]
+	stringDouble: [MapsStringDoubleEntry!]
+	stringFoo: [MapsStringFooEntry!]
+	stringBar: [MapsStringBarEntry!]
+}
+type MapsBoolBoolEntry {
+	key: Boolean
+	value: Boolean
+}
+input MapsBoolBoolEntryInput {
+	key: Boolean
+	value: Boolean
+}
+type MapsFixed32Fixed32Entry {
+	key: Int
+	value: Int
+}
+input MapsFixed32Fixed32EntryInput {
+	key: Int
+	value: Int
+}
+type MapsFixed64Fixed64Entry {
+	key: Int
+	value: Int
+}
+input MapsFixed64Fixed64EntryInput {
+	key: Int
+	value: Int
 }
 input MapsInput {
-	int32Int32: [Maps_Int32Int32EntryInput!]
-	int64Int64: [Maps_Int64Int64EntryInput!]
-	uint32Uint32: [Maps_Uint32Uint32EntryInput!]
-	uint64Uint64: [Maps_Uint64Uint64EntryInput!]
-	sint32Sint32: [Maps_Sint32Sint32EntryInput!]
-	sint64Sint64: [Maps_Sint64Sint64EntryInput!]
-	fixed32Fixed32: [Maps_Fixed32Fixed32EntryInput!]
-	fixed64Fixed64: [Maps_Fixed64Fixed64EntryInput!]
-	sfixed32Sfixed32: [Maps_Sfixed32Sfixed32EntryInput!]
-	sfixed64Sfixed64: [Maps_Sfixed64Sfixed64EntryInput!]
-	boolBool: [Maps_BoolBoolEntryInput!]
-	stringString: [Maps_StringStringEntryInput!]
-	stringBytes: [Maps_StringBytesEntryInput!]
-	stringFloat: [Maps_StringFloatEntryInput!]
-	stringDouble: [Maps_StringDoubleEntryInput!]
-	stringFoo: [Maps_StringFooEntryInput!]
-	stringBar: [Maps_StringBarEntryInput!]
+	int32Int32: [MapsInt32Int32EntryInput!]
+	int64Int64: [MapsInt64Int64EntryInput!]
+	uint32Uint32: [MapsUint32Uint32EntryInput!]
+	uint64Uint64: [MapsUint64Uint64EntryInput!]
+	sint32Sint32: [MapsSint32Sint32EntryInput!]
+	sint64Sint64: [MapsSint64Sint64EntryInput!]
+	fixed32Fixed32: [MapsFixed32Fixed32EntryInput!]
+	fixed64Fixed64: [MapsFixed64Fixed64EntryInput!]
+	sfixed32Sfixed32: [MapsSfixed32Sfixed32EntryInput!]
+	sfixed64Sfixed64: [MapsSfixed64Sfixed64EntryInput!]
+	boolBool: [MapsBoolBoolEntryInput!]
+	stringString: [MapsStringStringEntryInput!]
+	stringBytes: [MapsStringBytesEntryInput!]
+	stringFloat: [MapsStringFloatEntryInput!]
+	stringDouble: [MapsStringDoubleEntryInput!]
+	stringFoo: [MapsStringFooEntryInput!]
+	stringBar: [MapsStringBarEntryInput!]
 }
-type Maps_BoolBoolEntry {
-	key: Boolean
-	value: Boolean
-}
-input Maps_BoolBoolEntryInput {
-	key: Boolean
-	value: Boolean
-}
-type Maps_Fixed32Fixed32Entry {
+type MapsInt32Int32Entry {
 	key: Int
 	value: Int
 }
-input Maps_Fixed32Fixed32EntryInput {
+input MapsInt32Int32EntryInput {
 	key: Int
 	value: Int
 }
-type Maps_Fixed64Fixed64Entry {
+type MapsInt64Int64Entry {
 	key: Int
 	value: Int
 }
-input Maps_Fixed64Fixed64EntryInput {
+input MapsInt64Int64EntryInput {
 	key: Int
 	value: Int
 }
-type Maps_Int32Int32Entry {
+type MapsSfixed32Sfixed32Entry {
 	key: Int
 	value: Int
 }
-input Maps_Int32Int32EntryInput {
+input MapsSfixed32Sfixed32EntryInput {
 	key: Int
 	value: Int
 }
-type Maps_Int64Int64Entry {
+type MapsSfixed64Sfixed64Entry {
 	key: Int
 	value: Int
 }
-input Maps_Int64Int64EntryInput {
+input MapsSfixed64Sfixed64EntryInput {
 	key: Int
 	value: Int
 }
-type Maps_Sfixed32Sfixed32Entry {
+type MapsSint32Sint32Entry {
 	key: Int
 	value: Int
 }
-input Maps_Sfixed32Sfixed32EntryInput {
+input MapsSint32Sint32EntryInput {
 	key: Int
 	value: Int
 }
-type Maps_Sfixed64Sfixed64Entry {
+type MapsSint64Sint64Entry {
 	key: Int
 	value: Int
 }
-input Maps_Sfixed64Sfixed64EntryInput {
+input MapsSint64Sint64EntryInput {
 	key: Int
 	value: Int
 }
-type Maps_Sint32Sint32Entry {
-	key: Int
-	value: Int
-}
-input Maps_Sint32Sint32EntryInput {
-	key: Int
-	value: Int
-}
-type Maps_Sint64Sint64Entry {
-	key: Int
-	value: Int
-}
-input Maps_Sint64Sint64EntryInput {
-	key: Int
-	value: Int
-}
-type Maps_StringBarEntry {
+type MapsStringBarEntry {
 	key: String
 	value: Bar
 }
-input Maps_StringBarEntryInput {
+input MapsStringBarEntryInput {
 	key: String
 	value: Bar
 }
-type Maps_StringBytesEntry {
+type MapsStringBytesEntry {
 	key: String
-	value: Bytes
+	value: String
 }
-input Maps_StringBytesEntryInput {
+input MapsStringBytesEntryInput {
 	key: String
-	value: Bytes
+	value: String
 }
-type Maps_StringDoubleEntry {
-	key: String
-	value: Float
-}
-input Maps_StringDoubleEntryInput {
+type MapsStringDoubleEntry {
 	key: String
 	value: Float
 }
-type Maps_StringFloatEntry {
+input MapsStringDoubleEntryInput {
 	key: String
 	value: Float
 }
-input Maps_StringFloatEntryInput {
+type MapsStringFloatEntry {
 	key: String
 	value: Float
 }
-type Maps_StringFooEntry {
+input MapsStringFloatEntryInput {
+	key: String
+	value: Float
+}
+type MapsStringFooEntry {
 	key: String
 	value: Foo
 }
-input Maps_StringFooEntryInput {
+input MapsStringFooEntryInput {
 	key: String
 	value: FooInput
 }
-type Maps_StringStringEntry {
+type MapsStringStringEntry {
 	key: String
 	value: String
 }
-input Maps_StringStringEntryInput {
+input MapsStringStringEntryInput {
 	key: String
 	value: String
 }
-type Maps_Uint32Uint32Entry {
+type MapsUint32Uint32Entry {
 	key: Int
 	value: Int
 }
-input Maps_Uint32Uint32EntryInput {
+input MapsUint32Uint32EntryInput {
 	key: Int
 	value: Int
 }
-type Maps_Uint64Uint64Entry {
+type MapsUint64Uint64Entry {
 	key: Int
 	value: Int
 }
-input Maps_Uint64Uint64EntryInput {
+input MapsUint64Uint64EntryInput {
 	key: Int
 	value: Int
 }
@@ -263,25 +249,28 @@ type Mutation {
 	constructsRef_(in: RefInput): Ref
 	constructsOneof_(in: OneofInput): Oneof
 	constructsCallWithId: Boolean
+	constructsAnyway_(in: AnyInput): AnyInputOutput
 	serviceMutate1(in: DataInput): Data
 	serviceMutate2(in: DataInput): Data
 	servicePublish(in: DataInput): Data
+	serviceSubscribe(in: DataInput): Data
 	servicePubSub1(in: DataInput): Data
-	serviceInvalidSubscribe3(in: DataInput): Data
+	serviceInvalidSubscribe2(in: DataInput): Data
 	servicePubSub2(in: DataInput): Data
 	newName(in: DataInput): Data
 	testName(in: DataInput): Data
 	testNewName(in: DataInput): Data
 	queryMutate1(in: DataInput): Data
+	querySubscribe(in: DataInput): Data
 }
 interface Node {
 	id: ID!
 }
 type Oneof {
 	param1: String
-	oneof1: Oneof_Oneof1
-	oneof2: Oneof_Oneof2
-	oneof3: Oneof_Oneof3
+	Oneof1: constructs_Oneof_Oneof1
+	Oneof2: constructs_Oneof_Oneof2
+	Oneof3: constructs_Oneof_Oneof3
 }
 input OneofInput {
 	param1: String
@@ -291,94 +280,77 @@ input OneofInput {
 	param5: String
 	param6: String
 }
-union Oneof_Oneof1 = Oneof_Param2 | Oneof_Param3
-union Oneof_Oneof2 = Oneof_Param4 | Oneof_Param5
-union Oneof_Oneof3 = Oneof_Param6
-type Oneof_Param2 {
-	param2: String
-}
-type Oneof_Param3 {
-	param3: String
-}
-type Oneof_Param4 {
-	param4: String
-}
-type Oneof_Param5 {
-	param5: String
-}
-type Oneof_Param6 {
-	param6: String
-}
 type Query {
 	serviceQuery1(in: DataInput): Data
 	serviceInvalidSubscribe1(in: DataInput): Data
+	serviceInvalidSubscribe3(in: DataInput): Data
 	queryQuery1(in: DataInput): Data
 	queryQuery2(in: DataInput): Data
 	node(id: ID!): Node
 }
 type Ref {
 	localTime2: Timestamp
-	external: GoogleProtobuf_Timestamp
+	external: googleprotobufTimestamp
 	localTime: Timestamp
 	file: Baz
 	fileMsg: Foo
 	fileEnum: Bar
-	local: Ref_Foo
-	foreign: Foo_Foo2
+	local: RefFoo
+	foreign: FooFoo2
 	en1: Ref_Foo_En
 	en2: Ref_Foo_Bar_En
-	gz: Ref_Foo_Baz_Gz
+	gz: RefFooBazGz
+}
+type RefBar {
+	param1: String
+}
+input RefBarInput {
+	param1: String
+}
+type RefFoo {
+	bar1: RefFooBar
+	localTime2: Timestamp
+	externalTime1: googleprotobufTimestamp
+	bar2: RefBar
+	en1: Ref_Foo_En
+	en2: Ref_Foo_Bar_En
+}
+type RefFooBar {
+	param1: String
+}
+input RefFooBarInput {
+	param1: String
+}
+type RefFooBazGz {
+	param1: String
+}
+input RefFooBazGzInput {
+	param1: String
+}
+input RefFooInput {
+	bar1: RefFooBarInput
+	localTime2: TimestampInput
+	externalTime1: googleprotobufTimestampInput
+	bar2: RefBarInput
+	en1: Ref_Foo_En
+	en2: Ref_Foo_Bar_En
 }
 input RefInput {
 	localTime2: TimestampInput
-	external: GoogleProtobuf_TimestampInput
+	external: googleprotobufTimestampInput
 	localTime: TimestampInput
 	file: BazInput
 	fileMsg: FooInput
 	fileEnum: Bar
-	local: Ref_FooInput
-	foreign: Foo_Foo2Input
+	local: RefFooInput
+	foreign: FooFoo2Input
 	en1: Ref_Foo_En
 	en2: Ref_Foo_Bar_En
-	gz: Ref_Foo_Baz_GzInput
-}
-type Ref_Bar {
-	param1: String
-}
-input Ref_BarInput {
-	param1: String
-}
-type Ref_Foo {
-	bar1: Ref_Foo_Bar
-	localTime2: Timestamp
-	externalTime1: GoogleProtobuf_Timestamp
-	bar2: Ref_Bar
-	en1: Ref_Foo_En
-	en2: Ref_Foo_Bar_En
-}
-input Ref_FooInput {
-	bar1: Ref_Foo_BarInput
-	localTime2: TimestampInput
-	externalTime1: GoogleProtobuf_TimestampInput
-	bar2: Ref_BarInput
-	en1: Ref_Foo_En
-	en2: Ref_Foo_Bar_En
-}
-type Ref_Foo_Bar {
-	param1: String
-}
-input Ref_Foo_BarInput {
-	param1: String
+	gz: RefFooBazGzInput
 }
 enum Ref_Foo_Bar_En {
 	A0
 	A1
-}
-type Ref_Foo_Baz_Gz {
-	param1: String
-}
-input Ref_Foo_Baz_GzInput {
-	param1: String
 }
 enum Ref_Foo_En {
 	A0
@@ -399,7 +371,7 @@ type Repeated {
 	sfixed64: [Int!]
 	bool: [Boolean!]
 	stringX: [String!]
-	bytes: [Bytes!]
+	bytes: [String!]
 	foo: [Foo!]
 	bar: [Bar!]
 }
@@ -418,7 +390,7 @@ input RepeatedInput {
 	sfixed64: [Int!]
 	bool: [Boolean!]
 	stringX: [String!]
-	bytes: [Bytes!]
+	bytes: [String!]
 	foo: [FooInput!]
 	bar: [Bar!]
 }
@@ -437,7 +409,8 @@ type Scalars {
 	sfixed64: Int
 	bool: Boolean
 	stringX: String
-	bytes: Bytes
+	bytes: String
+	paths: googleprotobufFieldMask
 }
 input ScalarsInput {
 	double: Float
@@ -454,19 +427,44 @@ input ScalarsInput {
 	sfixed64: Int
 	bool: Boolean
 	stringX: String
-	bytes: Bytes
-}
-type Subscription {
-	serviceSubscribe(in: DataInput): Data
-	servicePubSub1(in: DataInput): Data
-	serviceInvalidSubscribe2(in: DataInput): Data
-	serviceInvalidSubscribe3(in: DataInput): Data
-	servicePubSub2(in: DataInput): Data
-	querySubscribe(in: DataInput): Data
+	bytes: String
+	paths: googleprotobufFieldMaskInput
 }
 type Timestamp {
 	time: String
 }
 input TimestampInput {
 	time: String
+}
+union constructs_Oneof_Oneof1 = constructs_Oneof_param2 | constructs_Oneof_param3
+union constructs_Oneof_Oneof2 = constructs_Oneof_param4 | constructs_Oneof_param5
+union constructs_Oneof_Oneof3 = constructs_Oneof_param6
+type constructs_Oneof_param2 {
+	param2: String
+}
+type constructs_Oneof_param3 {
+	param3: String
+}
+type constructs_Oneof_param4 {
+	param4: String
+}
+type constructs_Oneof_param5 {
+	param5: String
+}
+type constructs_Oneof_param6 {
+	param6: String
+}
+type googleprotobufFieldMask {
+	paths: [String!]
+}
+input googleprotobufFieldMaskInput {
+	paths: [String!]
+}
+type googleprotobufTimestamp {
+	seconds: Int
+	nanos: Int
+}
+input googleprotobufTimestampInput {
+	seconds: Int
+	nanos: Int
 }

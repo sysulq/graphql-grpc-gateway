@@ -1,14 +1,29 @@
-directive @Query on FIELD_DEFINITION
-directive @Service on FIELD_DEFINITION
 """
 The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer.
 """
 directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 """
 The @specifiedBy built-in directive is used within the type system definition language to provide a scalar specification URL for specifying the behavior of custom scalar types.
 """
 directive @specifiedBy(url: String!) on SCALAR
+scalar Any
+input AnyInput {
+	param1: String
+}
+type AnyInputOutput {
+	any: Any
+}
+enum Bar {
+	BAR1
+	BAR2
+	BAR3
+}
+type Baz {
+	param1: String
+}
+input BazInput {
+	param1: String
+}
 type Data {
 	stringX: String!
 	foo: Foo2!
@@ -16,8 +31,8 @@ type Data {
 	string2: String
 	foo2: Foo2
 	double2: [Float!]
-	bars: String
-	str: String
+	bar: String
+	string: String
 }
 input DataInput {
 	stringX: String!
@@ -26,8 +41,12 @@ input DataInput {
 	string2: String
 	foo2: Foo2Input
 	double2: [Float!]
-	bars: String
-	str: String
+	bar: String
+	string: String
+}
+type Foo {
+	param1: String
+	param2: String
 }
 type Foo2 {
 	param1: String
@@ -35,24 +54,392 @@ type Foo2 {
 input Foo2Input {
 	param1: String
 }
+type FooFoo2 {
+	param1: String
+}
+input FooFoo2Input {
+	param1: String
+}
+input FooInput {
+	param1: String
+	param2: String
+}
+type Maps {
+	int32Int32: [MapsInt32Int32Entry!]
+	int64Int64: [MapsInt64Int64Entry!]
+	uint32Uint32: [MapsUint32Uint32Entry!]
+	uint64Uint64: [MapsUint64Uint64Entry!]
+	sint32Sint32: [MapsSint32Sint32Entry!]
+	sint64Sint64: [MapsSint64Sint64Entry!]
+	fixed32Fixed32: [MapsFixed32Fixed32Entry!]
+	fixed64Fixed64: [MapsFixed64Fixed64Entry!]
+	sfixed32Sfixed32: [MapsSfixed32Sfixed32Entry!]
+	sfixed64Sfixed64: [MapsSfixed64Sfixed64Entry!]
+	boolBool: [MapsBoolBoolEntry!]
+	stringString: [MapsStringStringEntry!]
+	stringBytes: [MapsStringBytesEntry!]
+	stringFloat: [MapsStringFloatEntry!]
+	stringDouble: [MapsStringDoubleEntry!]
+	stringFoo: [MapsStringFooEntry!]
+	stringBar: [MapsStringBarEntry!]
+}
+type MapsBoolBoolEntry {
+	key: Boolean
+	value: Boolean
+}
+input MapsBoolBoolEntryInput {
+	key: Boolean
+	value: Boolean
+}
+type MapsFixed32Fixed32Entry {
+	key: Int
+	value: Int
+}
+input MapsFixed32Fixed32EntryInput {
+	key: Int
+	value: Int
+}
+type MapsFixed64Fixed64Entry {
+	key: Int
+	value: Int
+}
+input MapsFixed64Fixed64EntryInput {
+	key: Int
+	value: Int
+}
+input MapsInput {
+	int32Int32: [MapsInt32Int32EntryInput!]
+	int64Int64: [MapsInt64Int64EntryInput!]
+	uint32Uint32: [MapsUint32Uint32EntryInput!]
+	uint64Uint64: [MapsUint64Uint64EntryInput!]
+	sint32Sint32: [MapsSint32Sint32EntryInput!]
+	sint64Sint64: [MapsSint64Sint64EntryInput!]
+	fixed32Fixed32: [MapsFixed32Fixed32EntryInput!]
+	fixed64Fixed64: [MapsFixed64Fixed64EntryInput!]
+	sfixed32Sfixed32: [MapsSfixed32Sfixed32EntryInput!]
+	sfixed64Sfixed64: [MapsSfixed64Sfixed64EntryInput!]
+	boolBool: [MapsBoolBoolEntryInput!]
+	stringString: [MapsStringStringEntryInput!]
+	stringBytes: [MapsStringBytesEntryInput!]
+	stringFloat: [MapsStringFloatEntryInput!]
+	stringDouble: [MapsStringDoubleEntryInput!]
+	stringFoo: [MapsStringFooEntryInput!]
+	stringBar: [MapsStringBarEntryInput!]
+}
+type MapsInt32Int32Entry {
+	key: Int
+	value: Int
+}
+input MapsInt32Int32EntryInput {
+	key: Int
+	value: Int
+}
+type MapsInt64Int64Entry {
+	key: Int
+	value: Int
+}
+input MapsInt64Int64EntryInput {
+	key: Int
+	value: Int
+}
+type MapsSfixed32Sfixed32Entry {
+	key: Int
+	value: Int
+}
+input MapsSfixed32Sfixed32EntryInput {
+	key: Int
+	value: Int
+}
+type MapsSfixed64Sfixed64Entry {
+	key: Int
+	value: Int
+}
+input MapsSfixed64Sfixed64EntryInput {
+	key: Int
+	value: Int
+}
+type MapsSint32Sint32Entry {
+	key: Int
+	value: Int
+}
+input MapsSint32Sint32EntryInput {
+	key: Int
+	value: Int
+}
+type MapsSint64Sint64Entry {
+	key: Int
+	value: Int
+}
+input MapsSint64Sint64EntryInput {
+	key: Int
+	value: Int
+}
+type MapsStringBarEntry {
+	key: String
+	value: Bar
+}
+input MapsStringBarEntryInput {
+	key: String
+	value: Bar
+}
+type MapsStringBytesEntry {
+	key: String
+	value: String
+}
+input MapsStringBytesEntryInput {
+	key: String
+	value: String
+}
+type MapsStringDoubleEntry {
+	key: String
+	value: Float
+}
+input MapsStringDoubleEntryInput {
+	key: String
+	value: Float
+}
+type MapsStringFloatEntry {
+	key: String
+	value: Float
+}
+input MapsStringFloatEntryInput {
+	key: String
+	value: Float
+}
+type MapsStringFooEntry {
+	key: String
+	value: Foo
+}
+input MapsStringFooEntryInput {
+	key: String
+	value: FooInput
+}
+type MapsStringStringEntry {
+	key: String
+	value: String
+}
+input MapsStringStringEntryInput {
+	key: String
+	value: String
+}
+type MapsUint32Uint32Entry {
+	key: Int
+	value: Int
+}
+input MapsUint32Uint32EntryInput {
+	key: Int
+	value: Int
+}
+type MapsUint64Uint64Entry {
+	key: Int
+	value: Int
+}
+input MapsUint64Uint64EntryInput {
+	key: Int
+	value: Int
+}
 type Mutation {
-	serviceInvalidSubscribe3(in: DataInput): Data
-	servicePubSub2(in: DataInput): Data
 	newName(in: DataInput): Data
-	queryMutate1(in: DataInput): Data
 }
 interface Node {
 	id: ID!
 }
+type Oneof {
+	param1: String
+	Oneof1: constructs_Oneof_Oneof1
+	Oneof2: constructs_Oneof_Oneof2
+	Oneof3: constructs_Oneof_Oneof3
+}
+input OneofInput {
+	param1: String
+	param2: String
+	param3: String
+	param4: String
+	param5: String
+	param6: String
+}
 type Query {
-	serviceQuery1(in: DataInput): Data
-	serviceInvalidSubscribe1(in: DataInput): Data
 	queryQuery1(in: DataInput): Data
 	queryQuery2(in: DataInput): Data
 	node(id: ID!): Node
 }
-type Subscription {
-	serviceInvalidSubscribe2(in: DataInput): Data
-	serviceInvalidSubscribe3(in: DataInput): Data
-	servicePubSub2(in: DataInput): Data
+type Ref {
+	localTime2: Timestamp
+	external: googleprotobufTimestamp
+	localTime: Timestamp
+	file: Baz
+	fileMsg: Foo
+	fileEnum: Bar
+	local: RefFoo
+	foreign: FooFoo2
+	en1: Ref_Foo_En
+	en2: Ref_Foo_Bar_En
+	gz: RefFooBazGz
+}
+type RefBar {
+	param1: String
+}
+input RefBarInput {
+	param1: String
+}
+type RefFoo {
+	bar1: RefFooBar
+	localTime2: Timestamp
+	externalTime1: googleprotobufTimestamp
+	bar2: RefBar
+	en1: Ref_Foo_En
+	en2: Ref_Foo_Bar_En
+}
+type RefFooBar {
+	param1: String
+}
+input RefFooBarInput {
+	param1: String
+}
+type RefFooBazGz {
+	param1: String
+}
+input RefFooBazGzInput {
+	param1: String
+}
+input RefFooInput {
+	bar1: RefFooBarInput
+	localTime2: TimestampInput
+	externalTime1: googleprotobufTimestampInput
+	bar2: RefBarInput
+	en1: Ref_Foo_En
+	en2: Ref_Foo_Bar_En
+}
+input RefInput {
+	localTime2: TimestampInput
+	external: googleprotobufTimestampInput
+	localTime: TimestampInput
+	file: BazInput
+	fileMsg: FooInput
+	fileEnum: Bar
+	local: RefFooInput
+	foreign: FooFoo2Input
+	en1: Ref_Foo_En
+	en2: Ref_Foo_Bar_En
+	gz: RefFooBazGzInput
+}
+enum Ref_Foo_Bar_En {
+	A0
+	A1
+}
+enum Ref_Foo_En {
+	A0
+	A1
+}
+type Repeated {
+	double: [Float!]
+	float: [Float!]
+	int32: [Int!]
+	int64: [Int!]
+	uint32: [Int!]
+	uint64: [Int!]
+	sint32: [Int!]
+	sint64: [Int!]
+	fixed32: [Int!]
+	fixed64: [Int!]
+	sfixed32: [Int!]
+	sfixed64: [Int!]
+	bool: [Boolean!]
+	stringX: [String!]
+	bytes: [String!]
+	foo: [Foo!]
+	bar: [Bar!]
+}
+input RepeatedInput {
+	double: [Float!]
+	float: [Float!]
+	int32: [Int!]
+	int64: [Int!]
+	uint32: [Int!]
+	uint64: [Int!]
+	sint32: [Int!]
+	sint64: [Int!]
+	fixed32: [Int!]
+	fixed64: [Int!]
+	sfixed32: [Int!]
+	sfixed64: [Int!]
+	bool: [Boolean!]
+	stringX: [String!]
+	bytes: [String!]
+	foo: [FooInput!]
+	bar: [Bar!]
+}
+type Scalars {
+	double: Float
+	float: Float
+	int32: Int
+	int64: Int
+	uint32: Int
+	uint64: Int
+	sint32: Int
+	sint64: Int
+	fixed32: Int
+	fixed64: Int
+	sfixed32: Int
+	sfixed64: Int
+	bool: Boolean
+	stringX: String
+	bytes: String
+	paths: googleprotobufFieldMask
+}
+input ScalarsInput {
+	double: Float
+	float: Float
+	int32: Int
+	int64: Int
+	uint32: Int
+	uint64: Int
+	sint32: Int
+	sint64: Int
+	fixed32: Int
+	fixed64: Int
+	sfixed32: Int
+	sfixed64: Int
+	bool: Boolean
+	stringX: String
+	bytes: String
+	paths: googleprotobufFieldMaskInput
+}
+type Timestamp {
+	time: String
+}
+input TimestampInput {
+	time: String
+}
+union constructs_Oneof_Oneof1 = constructs_Oneof_param2 | constructs_Oneof_param3
+union constructs_Oneof_Oneof2 = constructs_Oneof_param4 | constructs_Oneof_param5
+union constructs_Oneof_Oneof3 = constructs_Oneof_param6
+type constructs_Oneof_param2 {
+	param2: String
+}
+type constructs_Oneof_param3 {
+	param3: String
+}
+type constructs_Oneof_param4 {
+	param4: String
+}
+type constructs_Oneof_param5 {
+	param5: String
+}
+type constructs_Oneof_param6 {
+	param6: String
+}
+type googleprotobufFieldMask {
+	paths: [String!]
+}
+input googleprotobufFieldMaskInput {
+	paths: [String!]
+}
+type googleprotobufTimestamp {
+	seconds: Int
+	nanos: Int
+}
+input googleprotobufTimestampInput {
+	seconds: Int
+	nanos: Int
 }

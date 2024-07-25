@@ -18,8 +18,8 @@ const contructsMultipleQuery = `
       param1: "Foo2 Parameter Value"
     },
     double2: [7.89],                  
-    bars: "BAR2",                    
-    str: "Yet another string"      
+    bar: "BAR2",                    
+    string: "Yet another string"      
   }) {
    stringX
   },
@@ -34,8 +34,8 @@ const contructsMultipleQuery = `
       param1: "Foo2 Parameter Value"
     },
     double2: [7.89],                  
-    bars: "BAR2",                    
-    str: "Yet another string"        
+    bar: "BAR2",                    
+    string: "Yet another string"        
   }) {
    stringX
   }
@@ -64,8 +64,8 @@ const contructsMultipleSameQuery = `
       param1: "Foo2 Parameter Value"
     },
     double2: [7.89],                  
-    bars: "BAR2",                    
-    str: "Yet another string"      
+    bar: "BAR2",                    
+    string: "Yet another string"      
   }) {
    stringX
   },
@@ -80,8 +80,8 @@ const contructsMultipleSameQuery = `
       param1: "Foo2 Parameter Value"
     },
     double2: [7.89],                  
-    bars: "BAR2",                    
-    str: "Yet another string"      
+    bar: "BAR2",                    
+    string: "Yet another string"      
   }) {
    stringX
   },
@@ -156,28 +156,55 @@ var constructsAnyResponse = j{
 		"__typename": "Ref",
 		"en1":        "A0",
 		"en2":        "A0",
-		"external":   nil,
-		"file":       nil,
-		"fileEnum":   "BAR2",
-		"fileMsg":    nil,
-		"foreign":    nil,
-		"gz":         nil,
+		"external": j{
+			"__typename": "Timestamp",
+			"nanos":      float64(0),
+			"seconds":    float64(0),
+		},
+		"file": j{
+			"__typename": "Baz",
+			"param1":     "",
+		},
+		"fileEnum": "BAR2",
+		"fileMsg": j{
+			"__typename": "Foo",
+			"param1":     "",
+			"param2":     "",
+		},
+		"foreign": j{
+			"__typename": "Foo2",
+			"param1":     "",
+		},
+		"gz": j{
+			"__typename": "Gz",
+			"param1":     "",
+		},
 		"local": j{
-			"__typename": "Ref_Foo",
+			"__typename": "Foo",
 			"bar1": j{
-				"__typename": "Ref_Foo_Bar",
+				"__typename": "Bar",
 				"param1":     "param1",
 			},
-			"bar2": nil,
-			"en1":  "A1",
-			"en2":  "A0",
-			"externalTime1": j{
-				"seconds": float64(1123),
-				"nanos":   float64(123),
+			"bar2": j{
+				"__typename": "Bar",
+				"param1":     "",
 			},
-			"localTime2": nil,
+			"en1": "A1",
+			"en2": "A0",
+			"externalTime1": j{
+				"__typename": "Timestamp",
+				"nanos":      float64(123),
+				"seconds":    float64(1123),
+			},
+			"localTime2": j{
+				"__typename": "Timestamp",
+				"time":       "",
+			},
 		},
-		"localTime": nil,
+		"localTime": j{
+			"__typename": "Timestamp",
+			"time":       "",
+		},
 		"localTime2": j{
 			"__typename": "Timestamp",
 			"time":       "1234",
@@ -189,23 +216,23 @@ const constructsMapsQuery = `
 mutation {
  constructsMaps_(
     in: {
-      int32Int32: { key: 1, value: 1 }
-      int64Int64: { key: 2, value: 2 }
-      uint32Uint32: { key: 3, value: 3 }
-      uint64Uint64: { key: 4, value: 4 }
-      sint32Sint32: { key: 5, value: 5 }
-      sint64Sint64: { key: 6, value: 5 }
-      fixed32Fixed32: { key: 7, value: 7 }
-      fixed64Fixed64: { key: 8, value: 8 }
-      sfixed32Sfixed32: { key: 9, value: 9 }
-      sfixed64Sfixed64: { key: 10, value: 10 }
-      boolBool: { key: true, value: true }
-      stringString: { key: "test1", value: "test1" }
-      stringBytes: { key: "test2", value: "dGVzdA==" }
-      stringFloat: { key: "test1", value: 11.1 }
-      stringDouble: { key: "test1", value: 12.2 }
-      stringFoo: { key: "test1", value: { param1: "param1", param2: "param2" } }
-      stringBar: { key: "test1", value: BAR3 }
+      int32Int32: [{ key: 1, value: 1 }]
+      int64Int64: [{ key: 2, value: 2 }]
+      uint32Uint32: [{ key: 3, value: 3 }]
+      uint64Uint64: [{ key: 4, value: 4 }]
+      sint32Sint32: [{ key: 5, value: 5 }]
+      sint64Sint64: [{ key: 6, value: 5 }]
+      fixed32Fixed32: [{ key: 7, value: 7 }]
+      fixed64Fixed64: [{ key: 8, value: 8 }]
+      sfixed32Sfixed32: [{ key: 9, value: 9 }]
+      sfixed64Sfixed64: [{ key: 10, value: 10 }]
+      boolBool: [{ key: true, value: true }]
+      stringString: [{ key: "test1", value: "test1" }]
+      stringBytes: [{ key: "test2", value: "dGVzdA==" }]
+      stringFloat: [{ key: "test1", value: 11.1 }]
+      stringDouble: [{ key: "test1", value: 12.2 }]
+      stringFoo: [{ key: "test1", value: { param1: "param1", param2: "param2" } }]
+      stringBar: [{ key: "test1", value: BAR3 }]
     }
   ) {
     int32Int32 { key value }
@@ -270,8 +297,8 @@ mutation {
       bool: [true]
       stringX: ["test"]
       bytes: ["dGVzdA=="]
-      foo: { param1: "param1", param2: "param2" }
-      bar: BAR3
+      foo: [{ param1: "param1", param2: "param2" }]
+      bar: [BAR3]
     }
   ) {
     double
@@ -319,18 +346,16 @@ var constructsRepeatedResponse = j{
 
 var constructsOneofsResponse = j{
 	"constructsOneof_": j{
-		"oneof1": j{
-			"__typename": "Oneof_Oneof1",
-			"param2":     "", // FIXME remove unrequested field
+		"Oneof1": j{
+			"__typename": "constructs_Oneof_Oneof1",
 			"param3":     "3",
 		},
-		"oneof2": j{
-			"__typename": "Oneof_Oneof2",
-			"param4":     "", // FIXME remove unrequested field
+		"Oneof2": j{
+			"__typename": "constructs_Oneof_Oneof2",
 			"param5":     "5",
 		},
-		"oneof3": j{
-			"__typename": "Oneof_Oneof3",
+		"Oneof3": j{
+			"__typename": "constructs_Oneof_Oneof3",
 			"param6":     "6",
 		},
 		"param1": "2",
@@ -343,27 +368,27 @@ mutation {
     in: {param1: "2", param3:"3", param5: "5", param6: "6"}
   ){ 
     param1
-    oneof1 {
+    Oneof1 {
       __typename
-      ... on Oneof_Param2 {
+      ... on constructs_Oneof_param2 {
         param2
       }
-      ... on Oneof_Param3 {
+      ... on constructs_Oneof_param3 {
         param3
       }
     }
-    oneof2 {
+    Oneof2 {
       __typename
-      ... on Oneof_Param4 {
+      ... on constructs_Oneof_param4 {
         param4
       }
-      ... on Oneof_Param5 {
+      ... on constructs_Oneof_param5 {
         param5
       }
     }
-    oneof3 {
+    Oneof3 {
       __typename
-      ... on Oneof_Param6 {
+      ... on constructs_Oneof_param6 {
         param6
       }
     }

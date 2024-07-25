@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"bytes"
 	"context"
 	_ "embed"
 	"os"
@@ -13,7 +14,9 @@ import (
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 	"github.com/sysulq/graphql-grpc-gateway/test"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/formatter"
+	"github.com/vektah/gqlparser/v2/validator"
 	"go.uber.org/mock/gomock"
 )
 
@@ -86,8 +89,8 @@ func TestGraphqlSchemaWithoutUnboundMethod(t *testing.T) {
 	}).AnyTimes()
 
 	kod.RunTest(t, func(ctx context.Context, s server.Gateway) {
-		gatewayUrl := test.SetupGateway(t, s)
 		t.Run("schema is correct", func(t *testing.T) {
+			gatewayUrl := test.SetupGateway(t, s)
 			schema, err := graphql.IntrospectRemoteSchema(gatewayUrl)
 			if err != nil {
 				t.Fatal(err)
@@ -101,6 +104,19 @@ func TestGraphqlSchemaWithoutUnboundMethod(t *testing.T) {
 			require.Nil(t, err)
 
 			require.Equal(t, string(testGatewayExpectedSchemaWithoutUnboundMethod), string(generated))
+		})
+
+		t.Run("schema request", func(t *testing.T) {
+			gatewayUrl := test.SetupGateway(t, s)
+			schema, err := graphql.IntrospectRemoteSchema(gatewayUrl)
+			require.Nil(t, err)
+
+			schemaDefine := new(bytes.Buffer)
+			formatter.NewFormatter(schemaDefine).FormatSchema(schema.Schema)
+			_, err = validator.LoadSchema(validator.Prelude, &ast.Source{
+				Input: schemaDefine.String(),
+			})
+			require.Nil(t, err)
 		})
 	}, kod.WithFakes(kod.Fake[config.Config](mockConfig)))
 }

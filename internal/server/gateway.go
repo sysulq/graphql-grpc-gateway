@@ -22,8 +22,9 @@ type server struct {
 	profiler *pyroscope.Profiler
 
 	config   kod.Ref[config.Config]
+	_        kod.Ref[Caller]
 	queryer  kod.Ref[Queryer]
-	registry kod.Ref[Registry]
+	registry kod.Ref[CallerRegistry]
 }
 
 func (ins *server) Init(ctx context.Context) error {
@@ -54,7 +55,9 @@ func (s *server) BuildServer() (http.Handler, error) {
 	})
 
 	sources := []*graphql.RemoteSchema{{URL: "url1"}}
-	sources[0].Schema = s.registry.Get().SchemaDescriptorList().AsGraphql()[0]
+	sources[0].Schema = s.registry.Get().GraphQLSchema()
+
+	// formatter.NewFormatter(os.Stdout).FormatSchema(sources[0].Schema)
 
 	opts := []gateway.Option{
 		gateway.WithLogger(&noopLogger{}),

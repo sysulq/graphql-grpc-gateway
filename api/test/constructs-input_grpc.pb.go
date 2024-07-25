@@ -31,6 +31,7 @@ const (
 	Constructs_Ref__FullMethodName       = "/constructs.Constructs/Ref_"
 	Constructs_Oneof__FullMethodName     = "/constructs.Constructs/Oneof_"
 	Constructs_CallWithId_FullMethodName = "/constructs.Constructs/CallWithId"
+	Constructs_Anyway__FullMethodName    = "/constructs.Constructs/Anyway_"
 )
 
 // ConstructsClient is the client API for Constructs service.
@@ -47,6 +48,7 @@ type ConstructsClient interface {
 	Ref_(ctx context.Context, in *Ref, opts ...grpc.CallOption) (*Ref, error)
 	Oneof_(ctx context.Context, in *Oneof, opts ...grpc.CallOption) (*Oneof, error)
 	CallWithId(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
+	Anyway_(ctx context.Context, in *Any, opts ...grpc.CallOption) (*AnyInput, error)
 }
 
 type constructsClient struct {
@@ -147,6 +149,15 @@ func (c *constructsClient) CallWithId(ctx context.Context, in *Empty, opts ...gr
 	return out, nil
 }
 
+func (c *constructsClient) Anyway_(ctx context.Context, in *Any, opts ...grpc.CallOption) (*AnyInput, error) {
+	out := new(AnyInput)
+	err := c.cc.Invoke(ctx, Constructs_Anyway__FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConstructsServer is the server API for Constructs service.
 // All implementations should embed UnimplementedConstructsServer
 // for forward compatibility
@@ -161,6 +172,7 @@ type ConstructsServer interface {
 	Ref_(context.Context, *Ref) (*Ref, error)
 	Oneof_(context.Context, *Oneof) (*Oneof, error)
 	CallWithId(context.Context, *Empty) (*Empty, error)
+	Anyway_(context.Context, *Any) (*AnyInput, error)
 }
 
 // UnimplementedConstructsServer should be embedded to have forward compatible implementations.
@@ -196,6 +208,9 @@ func (UnimplementedConstructsServer) Oneof_(context.Context, *Oneof) (*Oneof, er
 }
 func (UnimplementedConstructsServer) CallWithId(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CallWithId not implemented")
+}
+func (UnimplementedConstructsServer) Anyway_(context.Context, *Any) (*AnyInput, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Anyway_ not implemented")
 }
 
 // UnsafeConstructsServer may be embedded to opt out of forward compatibility for this service.
@@ -389,6 +404,24 @@ func _Constructs_CallWithId_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Constructs_Anyway__Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Any)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConstructsServer).Anyway_(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Constructs_Anyway__FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConstructsServer).Anyway_(ctx, req.(*Any))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Constructs_ServiceDesc is the grpc.ServiceDesc for Constructs service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -435,6 +468,10 @@ var Constructs_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CallWithId",
 			Handler:    _Constructs_CallWithId_Handler,
+		},
+		{
+			MethodName: "Anyway_",
+			Handler:    _Constructs_Anyway__Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

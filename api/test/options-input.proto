@@ -62,8 +62,8 @@ message Data {
     string string2 = 4; // simple
     Foo2 foo2 = 5; // simple
     repeated double double2 = 6; // simple
-    string bar = 7 [(graphql.v1.field) = {name: "bars"}];
-    string string = 8 [(graphql.v1.field) = {name: "str"}];
+    string bar = 7 [(graphql.v1.field) = {ignore: false}];
+    string string = 8 [(graphql.v1.field) = {ignore: false}];
 }
 
 message Foo2 {

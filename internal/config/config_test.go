@@ -28,7 +28,7 @@ func TestConfig(t *testing.T) {
 				Address:                ":8080",
 				Disable:                false,
 				Playground:             true,
-				GenerateUnboundMethods: false,
+				GenerateUnboundMethods: true,
 				QueryCache:             true,
 				SingleFlight:           true,
 			},

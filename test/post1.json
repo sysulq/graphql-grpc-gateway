@@ -1,4 +1,4 @@
 {
-  "query": "{\n  serviceQuery1(in: {\n    string: \"sdfs\",\n    foo: {\n      param1: \"para\"\n    },\n    string2: \"ssdfsd\",\n    float: 111\n  }) {\n string,string2,float ,   foo {\n      param1\n   }\n  }\n}"
+  "query": "{\n  serviceQuery1(in: {\n    string: \"sdfs\",\n    foo: {\n      param1: \"para\"\n    },\n    string2: \"ssdfsd\",\n    float: [111]\n  }) {\n string,string2,float ,   foo {\n      param1\n   }\n  }\n}"
 }
 

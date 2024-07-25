@@ -6,17 +6,31 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/v2/grpcdynamic"
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/generator"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/protoadapt"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
+
+// caller is a component that implements Caller.
+type Caller interface {
+	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
+}
+
+// callerRegistry is a component that implements CallerRegistry.
+type CallerRegistry interface {
+	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
+	GraphQLSchema() *ast.Schema
+	Marshal(proto proto.Message, field *ast.Field) (interface{}, error)
+	Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error)
+	GetCallerStub(service string) *grpcdynamic.Stub
+}
 
 // reflection is a component that implements Reflection.
 type Reflection interface {
-	ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]*desc.FileDescriptor, error)
+	ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error)
 }
 
 // server is a component that implements Gateway.
@@ -24,24 +38,7 @@ type Gateway interface {
 	BuildServer() (http.Handler, error)
 }
 
-// caller is a component that implements Caller.
-type Caller interface {
-	GetDescs() []*desc.FileDescriptor
-	Call(ctx context.Context, rpc *desc.MethodDescriptor, message protoadapt.MessageV1) (protoadapt.MessageV1, error)
-}
-
 // queryer is a component that implements Queryer.
 type Queryer interface {
 	Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error
-}
-
-// repository is a component that implements Registry.
-type Registry interface {
-	SchemaDescriptorList() generator.SchemaDescriptorList
-	FindMethodByName(op ast.Operation, name string) *desc.MethodDescriptor
-	FindObjectByName(name string) *desc.MessageDescriptor
-	FindObjectByFullyQualifiedName(fqn string) (*desc.MessageDescriptor, *ast.Definition)
-	FindFieldByName(msg desc.Descriptor, name string) *desc.FieldDescriptor
-	FindUnionFieldByMessageFQNAndName(fqn, name string) *desc.FieldDescriptor
-	FindGraphqlFieldByProtoField(msg *ast.Definition, name string) *ast.FieldDefinition
 }

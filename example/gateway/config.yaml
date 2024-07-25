@@ -2,7 +2,7 @@ graphql:
   address: ":8080"
   disable: false
   playground: true
-  generateUnboundMethod: false
+  generateUnboundMethods: true
   queryCache: true
   singleFlight: true
 

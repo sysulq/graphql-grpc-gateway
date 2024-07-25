@@ -18,6 +18,11 @@ service Constructs {
   rpc Ref_ (Ref) returns (Ref);
   rpc Oneof_ (Oneof) returns (Oneof);
   rpc CallWithId (Empty) returns (Empty);
+  rpc Anyway_ (Any) returns (AnyInput); // some fake any types
+}
+
+message AnyInput {
+  google.protobuf.Any any = 1;
 }
 
 message Empty3 {

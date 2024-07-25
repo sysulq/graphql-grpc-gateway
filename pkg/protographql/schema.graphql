@@ -1,11 +1,3 @@
-"""
-The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer.
-"""
-directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-"""
-The @specifiedBy built-in directive is used within the type system definition language to provide a scalar specification URL for specifying the behavior of custom scalar types.
-"""
-directive @specifiedBy(url: String!) on SCALAR
 scalar Any
 input AnyInput {
 	param1: String
@@ -263,9 +255,6 @@ type Mutation {
 	queryMutate1(in: DataInput): Data
 	querySubscribe(in: DataInput): Data
 }
-interface Node {
-	id: ID!
-}
 type Oneof {
 	param1: String
 	Oneof1: constructs_Oneof_Oneof1
@@ -286,7 +275,6 @@ type Query {
 	serviceInvalidSubscribe3(in: DataInput): Data
 	queryQuery1(in: DataInput): Data
 	queryQuery2(in: DataInput): Data
-	node(id: ID!): Node
 }
 type Ref {
 	localTime2: Timestamp
