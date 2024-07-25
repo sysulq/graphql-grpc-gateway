@@ -1,7 +1,7 @@
 version: '3'
 env:
   GOBIN: { sh: pwd }
-  OTEL_SDK_DISABLED: true
+  # OTEL_SDK_DISABLED: true
   # OTEL_TRACES_EXPORTER: console
   OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:14318
   OTEL_EXPORTER_OTLP_HEADERS: "uptrace-dsn=http://project2_secret_token@localhost:14318?grpc=14317"
