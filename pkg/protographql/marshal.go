@@ -14,7 +14,7 @@ import (
 // Marshal 将 gRPC 返回的 proto.Message 转换为 GraphQL 数据
 func (ins *SchemaDescriptor) Marshal(msg proto.Message, field *ast.Field) (interface{}, error) {
 	message := msg.ProtoReflect()
-	result := make(map[string]interface{})
+	result := make(map[string]interface{}, message.Descriptor().Fields().Len()+1)
 
 	if IsAny(msg.ProtoReflect().Descriptor()) {
 		anyMsg, ok := msg.(*anypb.Any)
@@ -27,8 +27,8 @@ func (ins *SchemaDescriptor) Marshal(msg proto.Message, field *ast.Field) (inter
 			return nil, err
 		}
 
-		msgObj := msgDesc.New().Interface()
-		err = proto.Unmarshal(anyMsg.Value, msgObj)
+		msgObj := ins.newMessage(msgDesc.Descriptor()).Interface()
+		err = proto.UnmarshalOptions{}.Unmarshal(anyMsg.Value, msgObj)
 		if err != nil {
 			return nil, err
 		}
@@ -79,7 +79,7 @@ func (ins *SchemaDescriptor) marshalValue(value protoreflect.Value, fieldDesc pr
 
 // marshalOneof 将 oneof 类型字段转换为 map[string]interface{}
 func (ins *SchemaDescriptor) marshalOneof(message protoreflect.Message, field *ast.Field, allField bool) (map[string]interface{}, error) {
-	result := make(map[string]interface{})
+	result := make(map[string]interface{}, message.Descriptor().Oneofs().Len()+1)
 	oneofDesc := message.Descriptor().Oneofs().ByName(protoreflect.Name(field.Name))
 	if oneofDesc == nil {
 		return result, nil
@@ -148,7 +148,7 @@ func (ins *SchemaDescriptor) marshalScalar(value protoreflect.Value, fieldDesc p
 }
 
 func (ins *SchemaDescriptor) getSelectionSetFromMessage(message protoreflect.Message) ast.SelectionSet {
-	selectionSet := make(ast.SelectionSet, 0)
+	selectionSet := make(ast.SelectionSet, 0, message.Descriptor().Fields().Len()+1)
 
 	for i := 0; i < message.Descriptor().Fields().Len(); i++ {
 		field := message.Descriptor().Fields().Get(i)
@@ -175,7 +175,7 @@ func (ins *SchemaDescriptor) marshalMessage(message protoreflect.Message, field 
 		field.SelectionSet = ins.getSelectionSetFromMessage(message)
 	}
 
-	result := make(map[string]interface{})
+	result := make(map[string]interface{}, message.Descriptor().Fields().Len()+1)
 	for _, selection := range field.SelectionSet {
 		if f, ok := selection.(*ast.Field); ok {
 			fieldName := f.Alias
