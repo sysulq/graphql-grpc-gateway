@@ -55,11 +55,11 @@ func TestGraphql2Grpc(t *testing.T) {
 				query:        constructsScalarsQuery,
 				wantResponse: constructsScalarsResponse,
 			},
-			// {
-			// 	name:         "Mutation constructs any",
-			// 	query:        constructsAnyQuery,
-			// 	wantResponse: constructsAnyResponse,
-			// },
+			{
+				name:         "Mutation constructs any",
+				query:        constructsAnyQuery,
+				wantResponse: constructsAnyResponse,
+			},
 			{
 				name:         "Mutation constructs maps",
 				query:        constructsMapsQuery,

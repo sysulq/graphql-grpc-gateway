@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	graphqlv1 "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1"
 )
@@ -117,4 +118,17 @@ func (c *callstack) Push(entry interface{}) {
 func (c *callstack) Has(entry interface{}) bool {
 	_, ok := c.stack[entry]
 	return ok
+}
+
+func IsAny(o protoreflect.MessageDescriptor) bool {
+	return o.FullName() == "google.protobuf.Any"
+}
+
+func marshalAny(inputMsg proto.Message) (*anypb.Any, error) {
+	b, err := proto.Marshal(inputMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &anypb.Any{TypeUrl: "type.googleapis.com/" + string(inputMsg.ProtoReflect().Descriptor().FullName()), Value: b}, nil
 }

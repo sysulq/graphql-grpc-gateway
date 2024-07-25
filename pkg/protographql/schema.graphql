@@ -1,8 +1,9 @@
+scalar Any
 input AnyInput {
 	param1: String
 }
 type AnyInputOutput {
-	any: googleprotobufAny
+	any: Any
 }
 enum Bar {
 	BAR1
@@ -233,7 +234,7 @@ type Mutation {
 	constructsScalars_(in: ScalarsInput): Scalars
 	constructsRepeated_(in: RepeatedInput): Repeated
 	constructsMaps_(in: MapsInput): Maps
-	constructsAny_(in: googleprotobufAnyInput): googleprotobufAny
+	constructsAny_(in: Any): Any
 	constructsEmpty_: Boolean
 	constructsEmpty2_: Boolean
 	constructsEmpty3_: Boolean
@@ -440,14 +441,6 @@ type constructs_Oneof_param5 {
 }
 type constructs_Oneof_param6 {
 	param6: String
-}
-type googleprotobufAny {
-	typeUrl: String
-	value: String
-}
-input googleprotobufAnyInput {
-	typeUrl: String
-	value: String
 }
 type googleprotobufFieldMask {
 	paths: [String!]

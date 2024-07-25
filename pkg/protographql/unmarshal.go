@@ -2,6 +2,7 @@ package protographql
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -38,12 +39,51 @@ func (ins *SchemaDescriptor) Unmarshal(desc protoreflect.MessageDescriptor, fiel
 	// 创建一个动态消息
 	dynamicMessage := ins.newMessage(desc)
 
+	var anyObj protoreflect.MessageDescriptor
+
+	if IsAny(desc) {
+		if len(inArg.Value.Children) == 0 {
+			return nil, errors.New("no '__typename' provided")
+		}
+		typename := inArg.Value.Children.ForName("__typename")
+		if typename == nil {
+			return nil, errors.New("no '__typename' provided")
+		}
+
+		vv, err := typename.Value(vars)
+		if err != nil {
+			return nil, errors.New("no '__typename' provided")
+		}
+		vvv, ok := vv.(string)
+		if !ok {
+			return nil, errors.New("no '__typename' provided")
+		}
+
+		anyObj, ok = ins.Types2MessageDesc[vvv]
+		if !ok {
+			return nil, errors.New("__typename should be a valid typename")
+		}
+		dynamicMessage = ins.newMessage(anyObj)
+	}
+
 	// 设置字段值
 	if inArg.Value.Kind == ast.ObjectValue {
 		for _, argField := range inArg.Value.Children {
-			fieldDescriptor := desc.Fields().ByJSONName(argField.Name)
-			if fieldDescriptor == nil {
-				return nil, fmt.Errorf("field %s not found in message", argField.Name)
+			if argField.Name == "__typename" {
+				continue
+			}
+
+			var fieldDescriptor protoreflect.FieldDescriptor
+			if anyObj == nil {
+				fieldDescriptor = desc.Fields().ByJSONName(argField.Name)
+				if fieldDescriptor == nil {
+					return nil, fmt.Errorf("field %s not found in message", argField.Name)
+				}
+			} else {
+				fieldDescriptor = anyObj.Fields().ByJSONName(argField.Name)
+				if fieldDescriptor == nil {
+					return nil, fmt.Errorf("field %s not found in message", argField.Name)
+				}
 			}
 
 			err := ins.unmarshalValue(dynamicMessage, fieldDescriptor, argField.Value)
@@ -63,6 +103,10 @@ func (ins *SchemaDescriptor) Unmarshal(desc protoreflect.MessageDescriptor, fiel
 			dynamicMessage.Set(fieldDescriptor, protoreflect.ValueOfMessage(fieldMask.ProtoReflect()))
 			break
 		}
+	}
+
+	if anyObj != nil {
+		return marshalAny(dynamicMessage.Interface())
 	}
 
 	return dynamicMessage.Interface(), nil

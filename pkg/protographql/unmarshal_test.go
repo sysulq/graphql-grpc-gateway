@@ -9,6 +9,7 @@ import (
 	"github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 func TestEncodeMaps(t *testing.T) {
@@ -59,12 +60,19 @@ func TestEncodeRepeated(t *testing.T) {
 }
 
 func TestEncodeDecode(t *testing.T) {
+	_ = test.Ref{}
 	cases := []struct {
 		name         string
 		query        string
 		wantResponse interface{}
 		msg          proto.Message
 	}{
+		{
+			name:         "encode decode any",
+			query:        constructsAnyQuery,
+			wantResponse: constructsAnyResponse,
+			msg:          &anypb.Any{},
+		},
 		{
 			name:         "encode decode scalar",
 			query:        constructsScalarsQuery,

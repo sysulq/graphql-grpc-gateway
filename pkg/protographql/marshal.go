@@ -8,12 +8,33 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // Marshal 将 gRPC 返回的 proto.Message 转换为 GraphQL 数据
 func (ins *SchemaDescriptor) Marshal(msg proto.Message, field *ast.Field) (interface{}, error) {
 	message := msg.ProtoReflect()
 	result := make(map[string]interface{})
+
+	if IsAny(msg.ProtoReflect().Descriptor()) {
+		anyMsg, ok := msg.(*anypb.Any)
+		if !ok {
+			return nil, fmt.Errorf("failed to cast to Any type")
+		}
+
+		msgDesc, err := ins.ProtoTypes.FindMessageByURL(anyMsg.GetTypeUrl())
+		if err != nil {
+			return nil, err
+		}
+
+		msgObj := msgDesc.New().Interface()
+		err = proto.Unmarshal(anyMsg.Value, msgObj)
+		if err != nil {
+			return nil, err
+		}
+
+		return ins.marshalMessage(msgObj.ProtoReflect(), field, true)
+	}
 
 	for _, selection := range field.SelectionSet {
 		if f, ok := selection.(*ast.Field); ok {
@@ -25,7 +46,7 @@ func (ins *SchemaDescriptor) Marshal(msg proto.Message, field *ast.Field) (inter
 
 			fieldDesc := message.Descriptor().Fields().ByJSONName(fieldName)
 			if fieldDesc == nil {
-				oneofMap, err := ins.marshalOneof(message, f)
+				oneofMap, err := ins.marshalOneof(message, f, false)
 				if err != nil {
 					return nil, err
 				}
@@ -34,7 +55,7 @@ func (ins *SchemaDescriptor) Marshal(msg proto.Message, field *ast.Field) (inter
 				continue
 			}
 			value := message.Get(fieldDesc)
-			marshaldValue, err := ins.marshalValue(value, fieldDesc, f)
+			marshaldValue, err := ins.marshalValue(value, fieldDesc, f, false)
 			if err != nil {
 				return nil, err
 			}
@@ -46,18 +67,18 @@ func (ins *SchemaDescriptor) Marshal(msg proto.Message, field *ast.Field) (inter
 }
 
 // marshalValue 将 protoreflect.Value 转换为适合 GraphQL 的值
-func (ins *SchemaDescriptor) marshalValue(value protoreflect.Value, fieldDesc protoreflect.FieldDescriptor, field *ast.Field) (interface{}, error) {
+func (ins *SchemaDescriptor) marshalValue(value protoreflect.Value, fieldDesc protoreflect.FieldDescriptor, field *ast.Field, allField bool) (interface{}, error) {
 	if fieldDesc.IsList() {
-		return ins.marshalList(value.List(), fieldDesc, field)
+		return ins.marshalList(value.List(), fieldDesc, field, allField)
 	} else if fieldDesc.IsMap() {
-		return ins.marshalMap(value.Map(), fieldDesc, field)
+		return ins.marshalMap(value.Map(), fieldDesc, field, allField)
 	}
 
-	return ins.marshalScalar(value, fieldDesc, field)
+	return ins.marshalScalar(value, fieldDesc, field, allField)
 }
 
 // marshalOneof 将 oneof 类型字段转换为 map[string]interface{}
-func (ins *SchemaDescriptor) marshalOneof(message protoreflect.Message, field *ast.Field) (map[string]interface{}, error) {
+func (ins *SchemaDescriptor) marshalOneof(message protoreflect.Message, field *ast.Field, allField bool) (map[string]interface{}, error) {
 	result := make(map[string]interface{})
 	oneofDesc := message.Descriptor().Oneofs().ByName(protoreflect.Name(field.Name))
 	if oneofDesc == nil {
@@ -82,7 +103,7 @@ func (ins *SchemaDescriptor) marshalOneof(message protoreflect.Message, field *a
 				continue
 			}
 
-			marshaldValue, err := ins.marshalValue(value, fieldDesc, f)
+			marshaldValue, err := ins.marshalValue(value, fieldDesc, f, allField)
 			if err != nil {
 				return nil, err
 			}
@@ -93,7 +114,7 @@ func (ins *SchemaDescriptor) marshalOneof(message protoreflect.Message, field *a
 	return result, nil
 }
 
-func (ins *SchemaDescriptor) marshalScalar(value protoreflect.Value, fieldDesc protoreflect.FieldDescriptor, field *ast.Field) (interface{}, error) {
+func (ins *SchemaDescriptor) marshalScalar(value protoreflect.Value, fieldDesc protoreflect.FieldDescriptor, field *ast.Field, allField bool) (interface{}, error) {
 	switch fieldDesc.Kind() {
 	case protoreflect.BoolKind:
 		return value.Bool(), nil
@@ -117,16 +138,43 @@ func (ins *SchemaDescriptor) marshalScalar(value protoreflect.Value, fieldDesc p
 		return string(fieldDesc.Enum().Values().ByNumber(value.Enum()).Name()), nil
 	case protoreflect.MessageKind, protoreflect.GroupKind:
 		if fieldDesc.IsMap() {
-			return ins.marshalMap(value.Map(), fieldDesc, field)
+			return ins.marshalMap(value.Map(), fieldDesc, field, allField)
 		}
 
-		return ins.marshalMessage(value.Message(), field)
+		return ins.marshalMessage(value.Message(), field, allField)
 	default:
 		return nil, fmt.Errorf("unsupported field type: %v", fieldDesc.Kind())
 	}
 }
 
-func (ins *SchemaDescriptor) marshalMessage(message protoreflect.Message, field *ast.Field) (interface{}, error) {
+func (ins *SchemaDescriptor) getSelectionSetFromMessage(message protoreflect.Message) ast.SelectionSet {
+	selectionSet := make(ast.SelectionSet, 0)
+
+	for i := 0; i < message.Descriptor().Fields().Len(); i++ {
+		field := message.Descriptor().Fields().Get(i)
+		if field.Kind() == protoreflect.MessageKind && IsEmpty(field.Message()) {
+			continue
+		}
+
+		selectionSet = append(selectionSet, &ast.Field{
+			Name: field.JSONName(),
+		})
+	}
+
+	if len(selectionSet) > 0 {
+		selectionSet = append(selectionSet, &ast.Field{
+			Name: "__typename",
+		})
+	}
+
+	return selectionSet
+}
+
+func (ins *SchemaDescriptor) marshalMessage(message protoreflect.Message, field *ast.Field, allField bool) (interface{}, error) {
+	if allField {
+		field.SelectionSet = ins.getSelectionSetFromMessage(message)
+	}
+
 	result := make(map[string]interface{})
 	for _, selection := range field.SelectionSet {
 		if f, ok := selection.(*ast.Field); ok {
@@ -135,13 +183,13 @@ func (ins *SchemaDescriptor) marshalMessage(message protoreflect.Message, field 
 				fieldName = f.Name
 			}
 			if fieldName == "__typename" {
-				result[fieldName] = message.Descriptor().Name()
+				result[fieldName] = string(message.Descriptor().Name())
 				continue
 			}
 
 			fieldDesc := message.Descriptor().Fields().ByJSONName(fieldName)
 			if fieldDesc == nil {
-				oneofField, err := ins.marshalOneof(message, f)
+				oneofField, err := ins.marshalOneof(message, f, allField)
 				if err != nil {
 					return nil, err
 				}
@@ -151,7 +199,7 @@ func (ins *SchemaDescriptor) marshalMessage(message protoreflect.Message, field 
 			}
 
 			value := message.Get(fieldDesc)
-			marshaldValue, err := ins.marshalValue(value, fieldDesc, f)
+			marshaldValue, err := ins.marshalValue(value, fieldDesc, f, allField)
 			if err != nil {
 				return nil, err
 			}
@@ -162,7 +210,7 @@ func (ins *SchemaDescriptor) marshalMessage(message protoreflect.Message, field 
 }
 
 // marshalList 将 protoreflect.List 转换为 []interface{}
-func (ins *SchemaDescriptor) marshalList(list protoreflect.List, fieldDesc protoreflect.FieldDescriptor, field *ast.Field) (interface{}, error) {
+func (ins *SchemaDescriptor) marshalList(list protoreflect.List, fieldDesc protoreflect.FieldDescriptor, field *ast.Field, allField bool) (interface{}, error) {
 	result := make([]interface{}, list.Len())
 	for i := 0; i < list.Len(); i++ {
 		value := list.Get(i)
@@ -170,9 +218,9 @@ func (ins *SchemaDescriptor) marshalList(list protoreflect.List, fieldDesc proto
 		var err error
 
 		if fieldDesc.Message() != nil {
-			marshaldValue, err = ins.marshalMessage(value.Message(), field)
+			marshaldValue, err = ins.marshalMessage(value.Message(), field, allField)
 		} else {
-			marshaldValue, err = ins.marshalScalar(value, fieldDesc, field)
+			marshaldValue, err = ins.marshalScalar(value, fieldDesc, field, allField)
 		}
 
 		if err != nil {
@@ -183,7 +231,7 @@ func (ins *SchemaDescriptor) marshalList(list protoreflect.List, fieldDesc proto
 	return result, nil
 }
 
-func (ins *SchemaDescriptor) marshalMap(m protoreflect.Map, fieldDesc protoreflect.FieldDescriptor, field *ast.Field) (interface{}, error) {
+func (ins *SchemaDescriptor) marshalMap(m protoreflect.Map, fieldDesc protoreflect.FieldDescriptor, field *ast.Field, allField bool) (interface{}, error) {
 	result := make([]map[string]interface{}, 0)
 	m.Range(func(mapKey protoreflect.MapKey, mapValue protoreflect.Value) bool {
 		var valueField *ast.Field
@@ -195,7 +243,7 @@ func (ins *SchemaDescriptor) marshalMap(m protoreflect.Map, fieldDesc protorefle
 			}
 		}
 
-		marshaldValue, err := ins.marshalValue(mapValue, fieldDesc.MapValue(), valueField)
+		marshaldValue, err := ins.marshalValue(mapValue, fieldDesc.MapValue(), valueField, allField)
 		if err != nil {
 			return false
 		}

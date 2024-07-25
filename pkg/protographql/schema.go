@@ -13,14 +13,15 @@ import (
 
 // SchemaDescriptor 存储生成的 GraphQL schema 信息
 type SchemaDescriptor struct {
-	FileDescriptors []protoreflect.FileDescriptor
-	Query           *ast.Definition
-	Mutation        *ast.Definition
-	Subscription    *ast.Definition
-	Directives      map[string]*ast.DirectiveDefinition
-	Types           map[string]*ast.Definition
-	MethodsByName   map[ast.Operation]map[string]protoreflect.MethodDescriptor
-	ProtoTypes      *protoregistry.Types
+	FileDescriptors   []protoreflect.FileDescriptor
+	Query             *ast.Definition
+	Mutation          *ast.Definition
+	Subscription      *ast.Definition
+	Directives        map[string]*ast.DirectiveDefinition
+	Types             map[string]*ast.Definition
+	Types2MessageDesc map[string]protoreflect.MessageDescriptor
+	MethodsByName     map[ast.Operation]map[string]protoreflect.MethodDescriptor
+	ProtoTypes        *protoregistry.Types
 }
 
 func New() *SchemaDescriptor {
@@ -40,7 +41,8 @@ func New() *SchemaDescriptor {
 			Name:   "Subscription",
 			Fields: []*ast.FieldDefinition{},
 		},
-		Types: make(map[string]*ast.Definition),
+		Types:             make(map[string]*ast.Definition),
+		Types2MessageDesc: make(map[string]protoreflect.MessageDescriptor),
 		MethodsByName: map[ast.Operation]map[string]protoreflect.MethodDescriptor{
 			ast.Mutation:     make(map[string]protoreflect.MethodDescriptor),
 			ast.Query:        make(map[string]protoreflect.MethodDescriptor),
@@ -83,7 +85,12 @@ func (s *SchemaDescriptor) CreateObjects(msgDesc protoreflect.MessageDescriptor,
 		return definition, nil
 	}
 
+	if IsAny(msgDesc) {
+		return s.createScalar("Any", msgDesc), nil
+	}
+
 	s.Types[typeName] = definition
+	s.Types2MessageDesc[typeName] = msgDesc
 
 	for i := 0; i < msgDesc.Fields().Len(); i++ {
 		field := msgDesc.Fields().Get(i)
@@ -166,6 +173,18 @@ func (s *SchemaDescriptor) createUnion(oneof protoreflect.OneofDescriptor) (*ast
 		nil
 }
 
+func (s *SchemaDescriptor) createScalar(name string, desc protoreflect.MessageDescriptor) *ast.Definition {
+	obj := &ast.Definition{
+		Kind:        ast.Scalar,
+		Description: "",
+		Name:        name,
+		Position:    &ast.Position{},
+	}
+	s.Types[name] = obj
+	s.Types2MessageDesc[name] = desc
+	return obj
+}
+
 // createObjectFromChoice 生成 oneof 中的选择项对象
 func (s *SchemaDescriptor) createObjectFromChoice(choice protoreflect.FieldDescriptor) (*ast.Definition, error) {
 	fieldType, err := s.getGraphQLFieldType(choice, false)
@@ -211,12 +230,15 @@ func (s *SchemaDescriptor) getGraphQLFieldType(field protoreflect.FieldDescripto
 	case protoreflect.EnumKind:
 		astType = s.getGraphQLEnumType(field.Enum())
 	case protoreflect.MessageKind, protoreflect.GroupKind:
-		nestedType, err := s.CreateObjects(field.Message(), isInput)
-		if err != nil {
-			return nil, err
+		if field.Message().FullName() == "google.protobuf.Any" {
+			astType = &ast.Type{NamedType: "Any"}
+		} else {
+			nestedType, err := s.CreateObjects(field.Message(), isInput)
+			if err != nil {
+				return nil, err
+			}
+			astType = &ast.Type{NamedType: nestedType.Name}
 		}
-
-		astType = &ast.Type{NamedType: nestedType.Name}
 	default:
 		return &ast.Type{NamedType: "String"}, nil
 	}

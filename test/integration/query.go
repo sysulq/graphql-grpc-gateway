@@ -143,47 +143,74 @@ var constructsScalarsResponse = j{
 	},
 }
 
-// const constructsAnyQuery = `
-// mutation {
-//   constructsAny_(in: {__typename: "Ref", localTime2: {time: "1234"}, fileEnum: BAR2, local: {
-//     bar1: {param1: "param1"}, en1: A1, externalTime1: {seconds:1123, nanos: 123}
-//   }})
-// }
-// `
+const constructsAnyQuery = `
+mutation {
+  constructsAny_(in: {__typename: "Ref", localTime2: {time: "1234"}, fileEnum: BAR2, local: {
+    bar1: {param1: "param1"}, en1: A1, externalTime1: {seconds:1123, nanos: 123}
+  }})
+}
+`
 
-// var constructsAnyResponse = j{
-// 	"constructsAny_": j{
-// 		"__typename": "Ref",
-// 		"en1":        "A0",
-// 		"en2":        "A0",
-// 		"external":   nil,
-// 		"file":       nil,
-// 		"fileEnum":   "BAR2",
-// 		"fileMsg":    nil,
-// 		"foreign":    nil,
-// 		"gz":         nil,
-// 		"local": j{
-// 			"__typename": "Ref_Foo",
-// 			"bar1": j{
-// 				"__typename": "Ref_Foo_Bar",
-// 				"param1":     "param1",
-// 			},
-// 			"bar2": nil,
-// 			"en1":  "A1",
-// 			"en2":  "A0",
-// 			"externalTime1": j{
-// 				"seconds": float64(1123),
-// 				"nanos":   float64(123),
-// 			},
-// 			"localTime2": nil,
-// 		},
-// 		"localTime": nil,
-// 		"localTime2": j{
-// 			"__typename": "Timestamp",
-// 			"time":       "1234",
-// 		},
-// 	},
-// }
+var constructsAnyResponse = j{
+	"constructsAny_": j{
+		"__typename": "Ref",
+		"en1":        "A0",
+		"en2":        "A0",
+		"external": j{
+			"__typename": "Timestamp",
+			"nanos":      float64(0),
+			"seconds":    float64(0),
+		},
+		"file": j{
+			"__typename": "Baz",
+			"param1":     "",
+		},
+		"fileEnum": "BAR2",
+		"fileMsg": j{
+			"__typename": "Foo",
+			"param1":     "",
+			"param2":     "",
+		},
+		"foreign": j{
+			"__typename": "Foo2",
+			"param1":     "",
+		},
+		"gz": j{
+			"__typename": "Gz",
+			"param1":     "",
+		},
+		"local": j{
+			"__typename": "Foo",
+			"bar1": j{
+				"__typename": "Bar",
+				"param1":     "param1",
+			},
+			"bar2": j{
+				"__typename": "Bar",
+				"param1":     "",
+			},
+			"en1": "A1",
+			"en2": "A0",
+			"externalTime1": j{
+				"__typename": "Timestamp",
+				"nanos":      float64(123),
+				"seconds":    float64(1123),
+			},
+			"localTime2": j{
+				"__typename": "Timestamp",
+				"time":       "",
+			},
+		},
+		"localTime": j{
+			"__typename": "Timestamp",
+			"time":       "",
+		},
+		"localTime2": j{
+			"__typename": "Timestamp",
+			"time":       "1234",
+		},
+	},
+}
 
 const constructsMapsQuery = `
 mutation {
