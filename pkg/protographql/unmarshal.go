@@ -95,13 +95,15 @@ func (ins *SchemaDescriptor) Unmarshal(desc protoreflect.MessageDescriptor, fiel
 		return nil, fmt.Errorf("argument 'in' is not an object")
 	}
 
-	// 处理 FieldMask 字段
-	for i := desc.Fields().Len() - 1; i >= 0; i-- {
-		fieldDescriptor := desc.Fields().Get(i)
-		if fieldDescriptor.Message() != nil && fieldDescriptor.Message().FullName() == "google.protobuf.FieldMask" {
-			fieldMask := &fieldmaskpb.FieldMask{Paths: getSelectionSet(field.SelectionSet, "")}
-			dynamicMessage.Set(fieldDescriptor, protoreflect.ValueOfMessage(fieldMask.ProtoReflect()))
-			break
+	if _, ok := ins.HaveFieldMask[desc]; ok {
+		// 处理 FieldMask 字段
+		for i := desc.Fields().Len() - 1; i >= 0; i-- {
+			fieldDescriptor := desc.Fields().Get(i)
+			if fieldDescriptor.Message() != nil && fieldDescriptor.Message().FullName() == "google.protobuf.FieldMask" {
+				fieldMask := &fieldmaskpb.FieldMask{Paths: getSelectionSet(field.SelectionSet, "")}
+				dynamicMessage.Set(fieldDescriptor, protoreflect.ValueOfMessage(fieldMask.ProtoReflect()))
+				break
+			}
 		}
 	}
 

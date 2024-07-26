@@ -22,6 +22,7 @@ type SchemaDescriptor struct {
 	Types2MessageDesc map[string]protoreflect.MessageDescriptor
 	MethodsByName     map[ast.Operation]map[string]protoreflect.MethodDescriptor
 	ProtoTypes        *protoregistry.Types
+	HaveFieldMask     map[protoreflect.MessageDescriptor]struct{}
 }
 
 func New() *SchemaDescriptor {
@@ -43,6 +44,7 @@ func New() *SchemaDescriptor {
 		},
 		Types:             make(map[string]*ast.Definition),
 		Types2MessageDesc: make(map[string]protoreflect.MessageDescriptor),
+		HaveFieldMask:     make(map[protoreflect.MessageDescriptor]struct{}),
 		MethodsByName: map[ast.Operation]map[string]protoreflect.MethodDescriptor{
 			ast.Mutation:     make(map[string]protoreflect.MethodDescriptor),
 			ast.Query:        make(map[string]protoreflect.MethodDescriptor),
@@ -311,6 +313,14 @@ func (schema *SchemaDescriptor) RegisterFileDescriptor(generateUnboundMethods bo
 		msg := file.Messages().Get(i)
 		if err := schema.ProtoTypes.RegisterMessage(dynamicpb.NewMessageType(msg)); err != nil {
 			return fmt.Errorf("register message %q: %w", msg.FullName(), err)
+		}
+
+		for j := 0; j < msg.Fields().Len(); j++ {
+			field := msg.Fields().Get(j)
+			if field.Message() != nil && field.Message().FullName() == "google.protobuf.FieldMask" {
+				schema.HaveFieldMask[msg] = struct{}{}
+				break
+			}
 		}
 	}
 
