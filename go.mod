@@ -17,7 +17,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.16
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
 	go.uber.org/mock v0.4.0
-	golang.org/x/sync v0.7.0
+	golang.org/x/sync v0.8.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 )
