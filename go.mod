@@ -10,7 +10,7 @@ require (
 	github.com/grafana/pyroscope-go v1.1.1
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jhump/protoreflect/v2 v2.0.0-20240207013822-c9ae7caed596
-	github.com/nautilus/gateway v0.3.17
+	github.com/nautilus/gateway v0.3.18
 	github.com/nautilus/graphql v0.0.25
 	github.com/samber/lo v1.46.0
 	github.com/stretchr/testify v1.9.0
@@ -64,7 +64,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/shirou/gopsutil/v4 v4.24.6 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
-	github.com/sirupsen/logrus v1.7.0 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sony/gobreaker v1.0.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
