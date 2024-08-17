@@ -5,7 +5,6 @@
 //
 //	mockgen -source internal/config/kod_gen_interface.go -destination internal/config/kod_gen_mock.go -package config
 //
-
 // Package config is a generated GoMock package.
 package config
 

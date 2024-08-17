@@ -95,4 +95,6 @@ func (c *caller) Interceptors() []interceptor.Interceptor {
 	return nil
 }
 
-var allowSingleFlightKey struct{}
+type allowSingleFlightType struct{}
+
+var allowSingleFlightKey allowSingleFlightType

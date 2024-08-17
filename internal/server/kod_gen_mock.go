@@ -5,7 +5,6 @@
 //
 //	mockgen -source internal/server/kod_gen_interface.go -destination internal/server/kod_gen_mock.go -package server
 //
-
 // Package server is a generated GoMock package.
 package server
 
