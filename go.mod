@@ -10,7 +10,7 @@ require (
 	github.com/grafana/pyroscope-go v1.1.2
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jhump/protoreflect/v2 v2.0.0-20240207013822-c9ae7caed596
-	github.com/nautilus/gateway v0.3.19
+	github.com/nautilus/gateway v0.4.0
 	github.com/nautilus/graphql v0.0.26
 	github.com/samber/lo v1.47.0
 	github.com/stretchr/testify v1.9.0
