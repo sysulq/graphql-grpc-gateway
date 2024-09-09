@@ -4,8 +4,8 @@ go 1.22.4
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
-	github.com/go-kod/kod v0.14.0
-	github.com/go-kod/kod/ext v0.14.0
+	github.com/go-kod/kod v0.14.3
+	github.com/go-kod/kod/ext v0.14.3
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/grafana/pyroscope-go v1.1.2
 	github.com/hashicorp/golang-lru/v2 v2.0.7
@@ -32,6 +32,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dominikbraun/graph v0.23.0 // indirect
+	github.com/fatih/color v1.14.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
@@ -48,6 +49,8 @@ require (
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240819163618-b1d8f4d146e7 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
