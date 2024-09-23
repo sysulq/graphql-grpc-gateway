@@ -47,7 +47,7 @@ func (ins *reflection) ListPackages(ctx context.Context, cc grpc.ClientConnInter
 		if isReflectionServiceName(string(s)) {
 			continue
 		}
-		svc, err := client.AsResolver().FindServiceByName(s)
+		svc, err := client.AsResolver().FindDescriptorByName(s)
 		if err != nil {
 			return nil, err
 		}
