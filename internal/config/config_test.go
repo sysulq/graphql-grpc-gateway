@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/ext/client/kgrpc"
-	"github.com/go-kod/kod/ext/client/kpyroscope"
-	"github.com/go-kod/kod/ext/registry/etcdv3"
+	"github.com/go-kod/kod-ext/client/kgrpc"
+	"github.com/go-kod/kod-ext/client/kpyroscope"
+	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/stretchr/testify/require"
 )
 

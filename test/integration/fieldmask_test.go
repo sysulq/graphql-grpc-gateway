@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/ext/client/kgrpc"
+	"github.com/go-kod/kod-ext/client/kgrpc"
 	"github.com/nautilus/graphql"
 	apitest "github.com/sysulq/graphql-grpc-gateway/api/test"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"

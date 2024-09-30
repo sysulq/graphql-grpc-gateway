@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/ext/registry/etcdv3"
-	"github.com/go-kod/kod/ext/server/kgrpc"
+	"github.com/go-kod/kod-ext/registry/etcdv3"
+	"github.com/go-kod/kod-ext/server/kgrpc"
 	"github.com/samber/lo"
 	pb "github.com/sysulq/graphql-grpc-gateway/api/example/optionsserver"
 )

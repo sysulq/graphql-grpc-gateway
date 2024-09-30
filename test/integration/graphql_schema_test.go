@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/ext/client/kgrpc"
+	"github.com/go-kod/kod-ext/client/kgrpc"
 	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/require"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"

@@ -2,9 +2,9 @@ package config
 
 import (
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/ext/client/kgrpc"
-	"github.com/go-kod/kod/ext/client/kpyroscope"
-	"github.com/go-kod/kod/ext/registry/etcdv3"
+	"github.com/go-kod/kod-ext/client/kgrpc"
+	"github.com/go-kod/kod-ext/client/kpyroscope"
+	"github.com/go-kod/kod-ext/registry/etcdv3"
 )
 
 type config struct {

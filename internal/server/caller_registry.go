@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/ext/registry"
+	"github.com/go-kod/kod-ext/registry"
 	"github.com/jhump/protoreflect/v2/grpcdynamic"
 	"github.com/samber/lo"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
