@@ -4,7 +4,7 @@ go 1.22.4
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
-	github.com/go-kod/kod v0.15.0
+	github.com/go-kod/kod v0.15.2
 	github.com/go-kod/kod-ext v0.1.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/grafana/pyroscope-go v1.2.0

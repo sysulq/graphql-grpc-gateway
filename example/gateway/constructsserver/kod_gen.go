@@ -4,32 +4,20 @@
 package main
 
 import (
-	"context"
 	"github.com/go-kod/kod"
-	"github.com/go-kod/kod/interceptor"
 	"reflect"
 )
 
+// Full method names for components.
+const ()
+
 func init() {
 	kod.Register(&kod.Registration{
-		Name:      "github.com/go-kod/kod/Main",
-		Interface: reflect.TypeOf((*kod.Main)(nil)).Elem(),
-		Impl:      reflect.TypeOf(app{}),
-		Refs:      ``,
-		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			interceptors := info.Interceptors
-			if h, ok := info.Impl.(interface {
-				Interceptors() []interceptor.Interceptor
-			}); ok {
-				interceptors = append(interceptors, h.Interceptors()...)
-			}
-
-			return main_local_stub{
-				impl:        info.Impl.(kod.Main),
-				interceptor: interceptor.Chain(interceptors),
-				name:        info.Name,
-			}
-		},
+		Name:        "github.com/go-kod/kod/Main",
+		Interface:   reflect.TypeOf((*kod.Main)(nil)).Elem(),
+		Impl:        reflect.TypeOf(app{}),
+		Refs:        ``,
+		LocalStubFn: nil,
 	})
 }
 
@@ -37,13 +25,3 @@ func init() {
 var _ kod.InstanceOf[kod.Main] = (*app)(nil)
 
 // Local stub implementations.
-
-type main_local_stub struct {
-	impl        kod.Main
-	name        string
-	interceptor interceptor.Interceptor
-}
-
-// Check that main_local_stub implements the kod.Main interface.
-var _ kod.Main = (*main_local_stub)(nil)
-
