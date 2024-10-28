@@ -10,6 +10,12 @@ import (
 	"reflect"
 )
 
+// Full method names for components.
+const (
+	// Config_Config_FullMethodName is the full name of the method [config.Config].
+	Config_Config_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/config/Config.Config"
+)
+
 func init() {
 	kod.Register(&kod.Registration{
 		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/config/Config",
@@ -17,17 +23,9 @@ func init() {
 		Impl:      reflect.TypeOf(config{}),
 		Refs:      ``,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			interceptors := info.Interceptors
-			if h, ok := info.Impl.(interface {
-				Interceptors() []interceptor.Interceptor
-			}); ok {
-				interceptors = append(interceptors, h.Interceptors()...)
-			}
-
 			return config_local_stub{
 				impl:        info.Impl.(Config),
-				interceptor: interceptor.Chain(interceptors),
-				name:        info.Name,
+				interceptor: info.Interceptor,
 			}
 		},
 	})
@@ -37,16 +35,16 @@ func init() {
 var _ kod.InstanceOf[Config] = (*config)(nil)
 
 // Local stub implementations.
-
+// config_local_stub is a local stub implementation of [Config].
 type config_local_stub struct {
 	impl        Config
-	name        string
 	interceptor interceptor.Interceptor
 }
 
-// Check that config_local_stub implements the Config interface.
+// Check that [config_local_stub] implements the [Config] interface.
 var _ Config = (*config_local_stub)(nil)
 
+// Config wraps the method [config.Config].
 func (s config_local_stub) Config() (r0 *ConfigInfo) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0 = s.impl.Config()
