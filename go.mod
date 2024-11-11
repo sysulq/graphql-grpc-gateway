@@ -1,7 +1,8 @@
 module github.com/sysulq/graphql-grpc-gateway
 
-go 1.22.4
-toolchain go1.22.9
+go 1.22.7
+
+toolchain go1.23.0
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
