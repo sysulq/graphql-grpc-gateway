@@ -36,6 +36,7 @@ func TestConfig(t *testing.T) {
 				Etcd: etcdv3.Config{
 					Endpoints: []string{"localhost:2379"},
 					Timeout:   3 * time.Second,
+					TTL:       60,
 				},
 				Services: []kgrpc.Config{
 					{
