@@ -21,8 +21,7 @@ func (i *httpUpstreamInvoker) Invoke(ctx context.Context, rw http.ResponseWriter
 	parser, err := protojson.NewRequestParser(r, pathNames, upstream.resovler)
 	if err != nil {
 		i.L(ctx).Error("parse request", "error", err)
-		rw.WriteHeader(http.StatusBadRequest)
-		_, _ = rw.Write([]byte(err.Error()))
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -35,8 +34,7 @@ func (i *httpUpstreamInvoker) Invoke(ctx context.Context, rw http.ResponseWriter
 	if err != nil {
 		i.L(ctx).Error("invoke rpc", "error", err)
 		if handler.Status == nil {
-			rw.WriteHeader(http.StatusInternalServerError)
-			_, _ = rw.Write([]byte(err.Error()))
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
