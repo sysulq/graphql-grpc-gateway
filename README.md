@@ -136,6 +136,10 @@ Percentage of the requests served within a certain time (ms)
  100%    102 (longest request)
 ```
 
+## Call Graph
+
+![callgraph](./assets/callgraph.png)
+
 ## Pyroscope
 
 Visiting [http://localhost:4040](http://localhost:4040) will show the Pyroscope dashboard.

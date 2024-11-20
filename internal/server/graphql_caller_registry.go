@@ -15,16 +15,16 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-type callerRegistry struct {
-	kod.Implements[CallerRegistry]
+type graphqlCallerRegistry struct {
+	kod.Implements[GraphqlCallerRegistry]
 	config     kod.Ref[config.Config]
-	reflection kod.Ref[Reflection]
+	reflection kod.Ref[GraphqlReflection]
 
 	serviceStub map[string]*grpcdynamic.Stub
 	schema      *protographql.SchemaDescriptor
 }
 
-func (c *callerRegistry) Init(ctx context.Context) error {
+func (c *graphqlCallerRegistry) Init(ctx context.Context) error {
 	config := c.config.Get().Config().Grpc
 
 	serviceStub := map[string]*grpcdynamic.Stub{}
@@ -71,10 +71,10 @@ func (c *callerRegistry) Init(ctx context.Context) error {
 	return c.setFileDescriptors(descs)
 }
 
-func (r *callerRegistry) setFileDescriptors(files []protoreflect.FileDescriptor) error {
+func (r *graphqlCallerRegistry) setFileDescriptors(files []protoreflect.FileDescriptor) error {
 	schema := protographql.New()
 	for _, file := range files {
-		err := schema.RegisterFileDescriptor(r.config.Get().Config().GraphQL.GenerateUnboundMethods, file)
+		err := schema.RegisterFileDescriptor(r.config.Get().Config().Server.GraphQL.GenerateUnboundMethods, file)
 		if err != nil {
 			return err
 		}
@@ -84,22 +84,22 @@ func (r *callerRegistry) setFileDescriptors(files []protoreflect.FileDescriptor)
 	return nil
 }
 
-func (r *callerRegistry) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
+func (r *graphqlCallerRegistry) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
 	return r.schema.MethodsByName[op][name]
 }
 
-func (r *callerRegistry) GraphQLSchema() *ast.Schema {
+func (r *graphqlCallerRegistry) GraphQLSchema() *ast.Schema {
 	return r.schema.AsGraphQL()
 }
 
-func (r *callerRegistry) Marshal(proto proto.Message, field *ast.Field) (interface{}, error) {
+func (r *graphqlCallerRegistry) Marshal(proto proto.Message, field *ast.Field) (interface{}, error) {
 	return r.schema.Marshal(proto, field)
 }
 
-func (r *callerRegistry) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
+func (r *graphqlCallerRegistry) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error) {
 	return r.schema.Unmarshal(desc, field, vars)
 }
 
-func (r *callerRegistry) GetCallerStub(service string) *grpcdynamic.Stub {
+func (r *graphqlCallerRegistry) GetCallerStub(service string) *grpcdynamic.Stub {
 	return r.serviceStub[service]
 }

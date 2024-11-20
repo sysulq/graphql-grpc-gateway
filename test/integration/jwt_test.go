@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/client/kgrpc"
+	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/require"
@@ -24,6 +25,9 @@ func TestJwt(t *testing.T) {
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
 		Engine: config.EngineConfig{},
 		Grpc: config.Grpc{
+			Etcd: etcdv3.Config{
+				Endpoints: []string{"localhost:2379"},
+			},
 			Services: []kgrpc.Config{
 				{
 					Target: infos.ConstructsServerAddr.Addr().String(),
@@ -33,12 +37,14 @@ func TestJwt(t *testing.T) {
 				},
 			},
 		},
-		GraphQL: config.GraphQL{
-			GenerateUnboundMethods: true,
-			Jwt: config.Jwt{
-				Enable:               true,
-				LocalJwks:            "key",
-				ForwardPayloadHeader: "x-jwt-payload",
+		Server: config.ServerConfig{
+			GraphQL: config.GraphQLConfig{
+				GenerateUnboundMethods: true,
+				Jwt: config.Jwt{
+					Enable:               true,
+					LocalJwks:            "key",
+					ForwardPayloadHeader: "x-jwt-payload",
+				},
 			},
 		},
 	}).AnyTimes()
@@ -52,7 +58,7 @@ func TestJwt(t *testing.T) {
 			recv := map[string]interface{}{}
 			querier.WithMiddlewares([]graphql.NetworkMiddleware{
 				func(r *http.Request) error {
-					token, err := createToken("bob", mockConfig.Config().GraphQL.Jwt.LocalJwks)
+					token, err := createToken("bob", mockConfig.Config().Server.GraphQL.Jwt.LocalJwks)
 					require.Nil(t, err)
 
 					r.Header.Set("Authorization", "Bearer "+token)
@@ -101,7 +107,7 @@ func TestJwt(t *testing.T) {
 			recv := map[string]interface{}{}
 			querier.WithMiddlewares([]graphql.NetworkMiddleware{
 				func(r *http.Request) error {
-					token, err := createExpiredToken("bob", mockConfig.Config().GraphQL.Jwt.LocalJwks)
+					token, err := createExpiredToken("bob", mockConfig.Config().Server.GraphQL.Jwt.LocalJwks)
 					require.Nil(t, err)
 
 					r.Header.Set("Authorization", "Bearer "+token)

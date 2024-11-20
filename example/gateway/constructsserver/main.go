@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 
 	any "google.golang.org/protobuf/types/known/anypb"
 	empty "google.golang.org/protobuf/types/known/emptypb"
@@ -19,16 +18,15 @@ type app struct {
 }
 
 func main() {
-	_ = kod.Run(context.Background(), func(ctx context.Context, app *app) error {
+	kod.MustRun(context.Background(), func(ctx context.Context, app *app) error {
 		etcd := lo.Must(etcdv3.Config{Endpoints: []string{"localhost:2379"}}.Build(ctx))
 
 		s := kgrpc.Config{
 			Address: ":8081",
 		}.Build().WithRegistry(etcd)
 		pb.RegisterConstructsServer(s, &service{})
-		log.Fatal(s.Run(ctx))
 
-		return nil
+		return s.Run(ctx)
 	})
 }
 

@@ -21,10 +21,11 @@ type server struct {
 
 	profiler *pyroscope.Profiler
 
-	config   kod.Ref[config.Config]
-	_        kod.Ref[Caller]
-	queryer  kod.Ref[Queryer]
-	registry kod.Ref[CallerRegistry]
+	config       kod.Ref[config.Config]
+	_            kod.Ref[GraphqlCaller]
+	queryer      kod.Ref[GraphqlQueryer]
+	registry     kod.Ref[GraphqlCallerRegistry]
+	httpUpstream kod.Ref[HttpUpstream]
 }
 
 func (ins *server) Init(ctx context.Context) error {
@@ -63,7 +64,7 @@ func (s *server) BuildServer() (http.Handler, error) {
 		gateway.WithLogger(&noopLogger{}),
 		gateway.WithQueryerFactory(&queryFactory),
 	}
-	if s.config.Get().Config().GraphQL.QueryCache {
+	if s.config.Get().Config().Server.GraphQL.QueryCache {
 		opts = append(opts, gateway.WithQueryPlanCache(NewQueryPlanCacher()))
 	}
 
@@ -75,9 +76,9 @@ func (s *server) BuildServer() (http.Handler, error) {
 	mux := http.NewServeMux()
 	cfg := s.config.Get().Config()
 
-	if !cfg.GraphQL.Disable {
+	if !cfg.Server.GraphQL.Disable {
 		mux.HandleFunc("/query", g.GraphQLHandler)
-		if cfg.GraphQL.Playground {
+		if cfg.Server.GraphQL.Playground {
 			mux.HandleFunc("/playground", g.PlaygroundHandler)
 		}
 	}
@@ -85,7 +86,25 @@ func (s *server) BuildServer() (http.Handler, error) {
 	var handler http.Handler = addHeader(mux)
 	handler = otelhttp.NewMiddleware("graphql-gateway")(handler)
 
-	if cfg.GraphQL.Jwt.Enable {
+	if cfg.Server.GraphQL.Jwt.Enable {
+		handler = s.jwtAuthHandler(handler)
+	}
+
+	return handler, nil
+}
+
+func (s *server) BuildHTTPServer() (http.Handler, error) {
+	mux := http.NewServeMux()
+	cfg := s.config.Get().Config()
+
+	if !cfg.Server.HTTP.Disable {
+		s.httpUpstream.Get().Register(context.Background(), mux)
+	}
+
+	var handler http.Handler = addHeader(mux)
+	handler = otelhttp.NewMiddleware("graphql-gateway")(handler)
+
+	if cfg.Server.HTTP.Jwt.Enable {
 		handler = s.jwtAuthHandler(handler)
 	}
 

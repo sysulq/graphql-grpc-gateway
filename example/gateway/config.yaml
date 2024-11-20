@@ -1,10 +1,15 @@
-graphql:
-  address: ":8080"
-  disable: false
-  playground: true
-  generateUnboundMethods: true
-  queryCache: true
-  singleFlight: true
+server:
+  http:
+    address: ":9090"
+    singleFlight: true
+
+  graphql:
+    address: ":8080"
+    disable: false
+    playground: true
+    generateUnboundMethods: true
+    queryCache: true
+    singleFlight: true
 
 engine:
   rateLimit: true
@@ -22,4 +27,6 @@ grpc:
     - target: "etcd:///local/optionsserver/grpc"
       timeout: "1s"
     - target: "etcd:///local/constructsserver/grpc"
+      timeout: "1s"
+    - target: "etcd:///local/helloworld/grpc"
       timeout: "1s"

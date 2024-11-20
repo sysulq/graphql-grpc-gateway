@@ -18,73 +18,28 @@ import (
 
 // Full method names for components.
 const (
-	// Caller_Call_FullMethodName is the full name of the method [caller.Call].
-	Caller_Call_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Caller.Call"
-	// CallerRegistry_FindMethodByName_FullMethodName is the full name of the method [callerRegistry.FindMethodByName].
-	CallerRegistry_FindMethodByName_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.FindMethodByName"
-	// CallerRegistry_GetCallerStub_FullMethodName is the full name of the method [callerRegistry.GetCallerStub].
-	CallerRegistry_GetCallerStub_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.GetCallerStub"
-	// CallerRegistry_GraphQLSchema_FullMethodName is the full name of the method [callerRegistry.GraphQLSchema].
-	CallerRegistry_GraphQLSchema_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.GraphQLSchema"
-	// CallerRegistry_Marshal_FullMethodName is the full name of the method [callerRegistry.Marshal].
-	CallerRegistry_Marshal_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.Marshal"
-	// CallerRegistry_Unmarshal_FullMethodName is the full name of the method [callerRegistry.Unmarshal].
-	CallerRegistry_Unmarshal_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.Unmarshal"
-	// Reflection_ListPackages_FullMethodName is the full name of the method [reflection.ListPackages].
-	Reflection_ListPackages_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection.ListPackages"
-	// Gateway_BuildServer_FullMethodName is the full name of the method [server.BuildServer].
-	Gateway_BuildServer_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway.BuildServer"
-	// Queryer_Query_FullMethodName is the full name of the method [queryer.Query].
-	Queryer_Query_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer.Query"
+	// GraphqlCaller_Call_FullMethodName is the full name of the method [graphqlCaller.Call].
+	GraphqlCaller_Call_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller.Call"
+	// GraphqlReflection_ListPackages_FullMethodName is the full name of the method [graphqlReflection.ListPackages].
+	GraphqlReflection_ListPackages_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlReflection.ListPackages"
+	// GraphqlQueryer_Query_FullMethodName is the full name of the method [graphqlQueryer.Query].
+	GraphqlQueryer_Query_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer.Query"
+	// HttpUpstreamInvoker_Invoke_FullMethodName is the full name of the method [httpUpstreamInvoker.Invoke].
+	HttpUpstreamInvoker_Invoke_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstreamInvoker.Invoke"
+	// HttpUpstream_Register_FullMethodName is the full name of the method [httpUpstream.Register].
+	HttpUpstream_Register_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream.Register"
 )
 
 func init() {
-	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Caller",
-		Interface: reflect.TypeOf((*Caller)(nil)).Elem(),
-		Impl:      reflect.TypeOf(caller{}),
-		Refs: `⟦6b1d0901:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Caller→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦09e993b0:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Caller→github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry⟧`,
-		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			return caller_local_stub{
-				impl:        info.Impl.(Caller),
-				interceptor: info.Interceptor,
-			}
-		},
-	})
-	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry",
-		Interface: reflect.TypeOf((*CallerRegistry)(nil)).Elem(),
-		Impl:      reflect.TypeOf(callerRegistry{}),
-		Refs: `⟦86a35e79:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦a92f40b6:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection⟧`,
-		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			return callerRegistry_local_stub{
-				impl:        info.Impl.(CallerRegistry),
-				interceptor: info.Interceptor,
-			}
-		},
-	})
-	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection",
-		Interface: reflect.TypeOf((*Reflection)(nil)).Elem(),
-		Impl:      reflect.TypeOf(reflection{}),
-		Refs:      ``,
-		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			return reflection_local_stub{
-				impl:        info.Impl.(Reflection),
-				interceptor: info.Interceptor,
-			}
-		},
-	})
 	kod.Register(&kod.Registration{
 		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway",
 		Interface: reflect.TypeOf((*Gateway)(nil)).Elem(),
 		Impl:      reflect.TypeOf(server{}),
 		Refs: `⟦88a4dee9:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦f59f8a3c:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧,
-⟦b39287d6:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer⟧,
-⟦2bafdbff:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry⟧`,
+⟦03fef591:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller⟧,
+⟦48435518:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer⟧,
+⟦b5d756d3:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧,
+⟦1e218b19:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return gateway_local_stub{
 				impl:        info.Impl.(Gateway),
@@ -93,15 +48,78 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer",
-		Interface: reflect.TypeOf((*Queryer)(nil)).Elem(),
-		Impl:      reflect.TypeOf(queryer{}),
-		Refs: `⟦20a41d92:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦8d32f9dd:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer→github.com/sysulq/graphql-grpc-gateway/internal/server/Caller⟧,
-⟦bcaec4e2:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer→github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry⟧`,
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller",
+		Interface: reflect.TypeOf((*GraphqlCaller)(nil)).Elem(),
+		Impl:      reflect.TypeOf(graphqlCaller{}),
+		Refs: `⟦8c0cf75c:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
+⟦0cbfe1a9:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			return queryer_local_stub{
-				impl:        info.Impl.(Queryer),
+			return graphqlCaller_local_stub{
+				impl:        info.Impl.(GraphqlCaller),
+				interceptor: info.Interceptor,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry",
+		Interface: reflect.TypeOf((*GraphqlCallerRegistry)(nil)).Elem(),
+		Impl:      reflect.TypeOf(graphqlCallerRegistry{}),
+		Refs: `⟦1277b0bc:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
+⟦f05fe066:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlReflection⟧`,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			return graphqlCallerRegistry_local_stub{
+				impl:        info.Impl.(GraphqlCallerRegistry),
+				interceptor: info.Interceptor,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlReflection",
+		Interface: reflect.TypeOf((*GraphqlReflection)(nil)).Elem(),
+		Impl:      reflect.TypeOf(graphqlReflection{}),
+		Refs:      ``,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			return graphqlReflection_local_stub{
+				impl:        info.Impl.(GraphqlReflection),
+				interceptor: info.Interceptor,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer",
+		Interface: reflect.TypeOf((*GraphqlQueryer)(nil)).Elem(),
+		Impl:      reflect.TypeOf(graphqlQueryer{}),
+		Refs: `⟦858864af:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
+⟦83fcae6f:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller⟧,
+⟦b79d40cd:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧`,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			return graphqlQueryer_local_stub{
+				impl:        info.Impl.(GraphqlQueryer),
+				interceptor: info.Interceptor,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstreamInvoker",
+		Interface: reflect.TypeOf((*HttpUpstreamInvoker)(nil)).Elem(),
+		Impl:      reflect.TypeOf(httpUpstreamInvoker{}),
+		Refs:      `⟦6d3e4bdc:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstreamInvoker→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧`,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			return httpUpstreamInvoker_local_stub{
+				impl:        info.Impl.(HttpUpstreamInvoker),
+				interceptor: info.Interceptor,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream",
+		Interface: reflect.TypeOf((*HttpUpstream)(nil)).Elem(),
+		Impl:      reflect.TypeOf(httpUpstream{}),
+		Refs: `⟦84ecd651:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream→github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstreamInvoker⟧,
+⟦d6dccb8c:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧`,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			return httpUpstream_local_stub{
+				impl:        info.Impl.(HttpUpstream),
 				interceptor: info.Interceptor,
 			}
 		},
@@ -109,121 +127,15 @@ func init() {
 }
 
 // kod.InstanceOf checks.
-var _ kod.InstanceOf[Caller] = (*caller)(nil)
-var _ kod.InstanceOf[CallerRegistry] = (*callerRegistry)(nil)
-var _ kod.InstanceOf[Reflection] = (*reflection)(nil)
 var _ kod.InstanceOf[Gateway] = (*server)(nil)
-var _ kod.InstanceOf[Queryer] = (*queryer)(nil)
+var _ kod.InstanceOf[GraphqlCaller] = (*graphqlCaller)(nil)
+var _ kod.InstanceOf[GraphqlCallerRegistry] = (*graphqlCallerRegistry)(nil)
+var _ kod.InstanceOf[GraphqlReflection] = (*graphqlReflection)(nil)
+var _ kod.InstanceOf[GraphqlQueryer] = (*graphqlQueryer)(nil)
+var _ kod.InstanceOf[HttpUpstreamInvoker] = (*httpUpstreamInvoker)(nil)
+var _ kod.InstanceOf[HttpUpstream] = (*httpUpstream)(nil)
 
 // Local stub implementations.
-// caller_local_stub is a local stub implementation of [Caller].
-type caller_local_stub struct {
-	impl        Caller
-	interceptor interceptor.Interceptor
-}
-
-// Check that [caller_local_stub] implements the [Caller] interface.
-var _ Caller = (*caller_local_stub)(nil)
-
-// Call wraps the method [caller.Call].
-func (s caller_local_stub) Call(ctx context.Context, a1 protoreflect.MethodDescriptor, a2 protoreflect.ProtoMessage) (r0 protoreflect.ProtoMessage, err error) {
-
-	if s.interceptor == nil {
-		r0, err = s.impl.Call(ctx, a1, a2)
-		return
-	}
-
-	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
-		r0, err = s.impl.Call(ctx, a1, a2)
-		res[0] = r0
-		return
-	}
-
-	info := interceptor.CallInfo{
-		Impl:       s.impl,
-		FullMethod: Caller_Call_FullMethodName,
-	}
-
-	err = s.interceptor(ctx, info, []any{a1, a2}, []any{r0}, call)
-	return
-}
-
-// callerRegistry_local_stub is a local stub implementation of [CallerRegistry].
-type callerRegistry_local_stub struct {
-	impl        CallerRegistry
-	interceptor interceptor.Interceptor
-}
-
-// Check that [callerRegistry_local_stub] implements the [CallerRegistry] interface.
-var _ CallerRegistry = (*callerRegistry_local_stub)(nil)
-
-// FindMethodByName wraps the method [callerRegistry.FindMethodByName].
-func (s callerRegistry_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 protoreflect.MethodDescriptor) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.FindMethodByName(a0, a1)
-	return
-}
-
-// GetCallerStub wraps the method [callerRegistry.GetCallerStub].
-func (s callerRegistry_local_stub) GetCallerStub(a0 string) (r0 *grpcdynamic.Stub) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.GetCallerStub(a0)
-	return
-}
-
-// GraphQLSchema wraps the method [callerRegistry.GraphQLSchema].
-func (s callerRegistry_local_stub) GraphQLSchema() (r0 *ast.Schema) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0 = s.impl.GraphQLSchema()
-	return
-}
-
-// Marshal wraps the method [callerRegistry.Marshal].
-func (s callerRegistry_local_stub) Marshal(a0 protoreflect.ProtoMessage, a1 *ast.Field) (r0 interface{}, err error) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0, err = s.impl.Marshal(a0, a1)
-	return
-}
-
-// Unmarshal wraps the method [callerRegistry.Unmarshal].
-func (s callerRegistry_local_stub) Unmarshal(a0 protoreflect.MessageDescriptor, a1 *ast.Field, a2 map[string]interface{}) (r0 protoreflect.ProtoMessage, err error) {
-	// Because the first argument is not context.Context, so interceptors are not supported.
-	r0, err = s.impl.Unmarshal(a0, a1, a2)
-	return
-}
-
-// reflection_local_stub is a local stub implementation of [Reflection].
-type reflection_local_stub struct {
-	impl        Reflection
-	interceptor interceptor.Interceptor
-}
-
-// Check that [reflection_local_stub] implements the [Reflection] interface.
-var _ Reflection = (*reflection_local_stub)(nil)
-
-// ListPackages wraps the method [reflection.ListPackages].
-func (s reflection_local_stub) ListPackages(ctx context.Context, a1 grpc.ClientConnInterface) (r0 []protoreflect.FileDescriptor, err error) {
-
-	if s.interceptor == nil {
-		r0, err = s.impl.ListPackages(ctx, a1)
-		return
-	}
-
-	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
-		r0, err = s.impl.ListPackages(ctx, a1)
-		res[0] = r0
-		return
-	}
-
-	info := interceptor.CallInfo{
-		Impl:       s.impl,
-		FullMethod: Reflection_ListPackages_FullMethodName,
-	}
-
-	err = s.interceptor(ctx, info, []any{a1}, []any{r0}, call)
-	return
-}
-
 // gateway_local_stub is a local stub implementation of [Gateway].
 type gateway_local_stub struct {
 	impl        Gateway
@@ -233,6 +145,13 @@ type gateway_local_stub struct {
 // Check that [gateway_local_stub] implements the [Gateway] interface.
 var _ Gateway = (*gateway_local_stub)(nil)
 
+// BuildHTTPServer wraps the method [server.BuildHTTPServer].
+func (s gateway_local_stub) BuildHTTPServer() (r0 http.Handler, err error) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0, err = s.impl.BuildHTTPServer()
+	return
+}
+
 // BuildServer wraps the method [server.BuildServer].
 func (s gateway_local_stub) BuildServer() (r0 http.Handler, err error) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
@@ -240,17 +159,125 @@ func (s gateway_local_stub) BuildServer() (r0 http.Handler, err error) {
 	return
 }
 
-// queryer_local_stub is a local stub implementation of [Queryer].
-type queryer_local_stub struct {
-	impl        Queryer
+// graphqlCaller_local_stub is a local stub implementation of [GraphqlCaller].
+type graphqlCaller_local_stub struct {
+	impl        GraphqlCaller
 	interceptor interceptor.Interceptor
 }
 
-// Check that [queryer_local_stub] implements the [Queryer] interface.
-var _ Queryer = (*queryer_local_stub)(nil)
+// Check that [graphqlCaller_local_stub] implements the [GraphqlCaller] interface.
+var _ GraphqlCaller = (*graphqlCaller_local_stub)(nil)
 
-// Query wraps the method [queryer.Query].
-func (s queryer_local_stub) Query(ctx context.Context, a1 *graphql.QueryInput, a2 interface{}) (err error) {
+// Call wraps the method [graphqlCaller.Call].
+func (s graphqlCaller_local_stub) Call(ctx context.Context, a1 protoreflect.MethodDescriptor, a2 protoreflect.ProtoMessage) (r0 protoreflect.ProtoMessage, err error) {
+
+	if s.interceptor == nil {
+		r0, err = s.impl.Call(ctx, a1, a2)
+		return
+	}
+
+	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
+		r0, err = s.impl.Call(ctx, a1, a2)
+		res[0] = r0
+		return
+	}
+
+	info := interceptor.CallInfo{
+		Impl:       s.impl,
+		FullMethod: GraphqlCaller_Call_FullMethodName,
+	}
+
+	err = s.interceptor(ctx, info, []any{a1, a2}, []any{r0}, call)
+	return
+}
+
+// graphqlCallerRegistry_local_stub is a local stub implementation of [GraphqlCallerRegistry].
+type graphqlCallerRegistry_local_stub struct {
+	impl        GraphqlCallerRegistry
+	interceptor interceptor.Interceptor
+}
+
+// Check that [graphqlCallerRegistry_local_stub] implements the [GraphqlCallerRegistry] interface.
+var _ GraphqlCallerRegistry = (*graphqlCallerRegistry_local_stub)(nil)
+
+// FindMethodByName wraps the method [graphqlCallerRegistry.FindMethodByName].
+func (s graphqlCallerRegistry_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 protoreflect.MethodDescriptor) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.FindMethodByName(a0, a1)
+	return
+}
+
+// GetCallerStub wraps the method [graphqlCallerRegistry.GetCallerStub].
+func (s graphqlCallerRegistry_local_stub) GetCallerStub(a0 string) (r0 *grpcdynamic.Stub) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.GetCallerStub(a0)
+	return
+}
+
+// GraphQLSchema wraps the method [graphqlCallerRegistry.GraphQLSchema].
+func (s graphqlCallerRegistry_local_stub) GraphQLSchema() (r0 *ast.Schema) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0 = s.impl.GraphQLSchema()
+	return
+}
+
+// Marshal wraps the method [graphqlCallerRegistry.Marshal].
+func (s graphqlCallerRegistry_local_stub) Marshal(a0 protoreflect.ProtoMessage, a1 *ast.Field) (r0 interface{}, err error) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0, err = s.impl.Marshal(a0, a1)
+	return
+}
+
+// Unmarshal wraps the method [graphqlCallerRegistry.Unmarshal].
+func (s graphqlCallerRegistry_local_stub) Unmarshal(a0 protoreflect.MessageDescriptor, a1 *ast.Field, a2 map[string]interface{}) (r0 protoreflect.ProtoMessage, err error) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0, err = s.impl.Unmarshal(a0, a1, a2)
+	return
+}
+
+// graphqlReflection_local_stub is a local stub implementation of [GraphqlReflection].
+type graphqlReflection_local_stub struct {
+	impl        GraphqlReflection
+	interceptor interceptor.Interceptor
+}
+
+// Check that [graphqlReflection_local_stub] implements the [GraphqlReflection] interface.
+var _ GraphqlReflection = (*graphqlReflection_local_stub)(nil)
+
+// ListPackages wraps the method [graphqlReflection.ListPackages].
+func (s graphqlReflection_local_stub) ListPackages(ctx context.Context, a1 grpc.ClientConnInterface) (r0 []protoreflect.FileDescriptor, err error) {
+
+	if s.interceptor == nil {
+		r0, err = s.impl.ListPackages(ctx, a1)
+		return
+	}
+
+	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
+		r0, err = s.impl.ListPackages(ctx, a1)
+		res[0] = r0
+		return
+	}
+
+	info := interceptor.CallInfo{
+		Impl:       s.impl,
+		FullMethod: GraphqlReflection_ListPackages_FullMethodName,
+	}
+
+	err = s.interceptor(ctx, info, []any{a1}, []any{r0}, call)
+	return
+}
+
+// graphqlQueryer_local_stub is a local stub implementation of [GraphqlQueryer].
+type graphqlQueryer_local_stub struct {
+	impl        GraphqlQueryer
+	interceptor interceptor.Interceptor
+}
+
+// Check that [graphqlQueryer_local_stub] implements the [GraphqlQueryer] interface.
+var _ GraphqlQueryer = (*graphqlQueryer_local_stub)(nil)
+
+// Query wraps the method [graphqlQueryer.Query].
+func (s graphqlQueryer_local_stub) Query(ctx context.Context, a1 *graphql.QueryInput, a2 interface{}) (err error) {
 
 	if s.interceptor == nil {
 		err = s.impl.Query(ctx, a1, a2)
@@ -264,9 +291,69 @@ func (s queryer_local_stub) Query(ctx context.Context, a1 *graphql.QueryInput, a
 
 	info := interceptor.CallInfo{
 		Impl:       s.impl,
-		FullMethod: Queryer_Query_FullMethodName,
+		FullMethod: GraphqlQueryer_Query_FullMethodName,
 	}
 
 	err = s.interceptor(ctx, info, []any{a1, a2}, []any{}, call)
 	return
+}
+
+// httpUpstreamInvoker_local_stub is a local stub implementation of [HttpUpstreamInvoker].
+type httpUpstreamInvoker_local_stub struct {
+	impl        HttpUpstreamInvoker
+	interceptor interceptor.Interceptor
+}
+
+// Check that [httpUpstreamInvoker_local_stub] implements the [HttpUpstreamInvoker] interface.
+var _ HttpUpstreamInvoker = (*httpUpstreamInvoker_local_stub)(nil)
+
+// Invoke wraps the method [httpUpstreamInvoker.Invoke].
+func (s httpUpstreamInvoker_local_stub) Invoke(ctx context.Context, a1 http.ResponseWriter, a2 *http.Request, a3 upstreamInfo, a4 string, a5 []string) {
+
+	if s.interceptor == nil {
+		s.impl.Invoke(ctx, a1, a2, a3, a4, a5)
+		return
+	}
+
+	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
+		s.impl.Invoke(ctx, a1, a2, a3, a4, a5)
+		return
+	}
+
+	info := interceptor.CallInfo{
+		Impl:       s.impl,
+		FullMethod: HttpUpstreamInvoker_Invoke_FullMethodName,
+	}
+
+	_ = s.interceptor(ctx, info, []any{a1, a2, a3, a4, a5}, []any{}, call)
+}
+
+// httpUpstream_local_stub is a local stub implementation of [HttpUpstream].
+type httpUpstream_local_stub struct {
+	impl        HttpUpstream
+	interceptor interceptor.Interceptor
+}
+
+// Check that [httpUpstream_local_stub] implements the [HttpUpstream] interface.
+var _ HttpUpstream = (*httpUpstream_local_stub)(nil)
+
+// Register wraps the method [httpUpstream.Register].
+func (s httpUpstream_local_stub) Register(ctx context.Context, a1 *http.ServeMux) {
+
+	if s.interceptor == nil {
+		s.impl.Register(ctx, a1)
+		return
+	}
+
+	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
+		s.impl.Register(ctx, a1)
+		return
+	}
+
+	info := interceptor.CallInfo{
+		Impl:       s.impl,
+		FullMethod: HttpUpstream_Register_FullMethodName,
+	}
+
+	_ = s.interceptor(ctx, info, []any{a1}, []any{}, call)
 }

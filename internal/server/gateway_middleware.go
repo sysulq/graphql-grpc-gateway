@@ -6,13 +6,14 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/header"
 	"google.golang.org/grpc/metadata"
 )
 
 func addHeader(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		md, _ := metadata.FromOutgoingContext(r.Context())
-		md = metadata.Join(md, httpHeadersToGRPCMetadata(r.Header))
+		md = metadata.Join(md, header.HttpHeadersToGRPCMetadata(r.Header))
 
 		ctx := metadata.NewOutgoingContext(r.Context(), md)
 		handler.ServeHTTP(w, r.WithContext(ctx))
@@ -41,7 +42,7 @@ func (ins *server) jwtAuthHandler(handler http.Handler) http.Handler {
 			md = metadata.New(nil)
 		}
 
-		forwardPayloadHeader := ins.config.Get().Config().GraphQL.Jwt.ForwardPayloadHeader
+		forwardPayloadHeader := ins.config.Get().Config().Server.GraphQL.Jwt.ForwardPayloadHeader
 		if len(forwardPayloadHeader) > 0 {
 			md.Set(forwardPayloadHeader, strings.Split(token.Raw, ".")[1])
 		}
@@ -54,7 +55,7 @@ func (ins *server) jwtAuthHandler(handler http.Handler) http.Handler {
 
 func (ins *server) verifyToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(ins.config.Get().Config().GraphQL.Jwt.LocalJwks), nil
+		return []byte(ins.config.Get().Config().Server.GraphQL.Jwt.LocalJwks), nil
 	})
 	if err != nil {
 		return nil, err

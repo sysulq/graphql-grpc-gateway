@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/client/kgrpc"
+	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/require"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
@@ -32,6 +33,9 @@ func TestGraphqlSchema(t *testing.T) {
 	mockConfig := config.NewMockConfig(gomock.NewController(t))
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
 		Grpc: config.Grpc{
+			Etcd: etcdv3.Config{
+				Endpoints: []string{"localhost:2379"},
+			},
 			Services: []kgrpc.Config{
 				{
 					Target: infos.ConstructsServerAddr.Addr().String(),
@@ -41,9 +45,11 @@ func TestGraphqlSchema(t *testing.T) {
 				},
 			},
 		},
-		GraphQL: config.GraphQL{
-			GenerateUnboundMethods: true,
-			Playground:             true,
+		Server: config.ServerConfig{
+			GraphQL: config.GraphQLConfig{
+				GenerateUnboundMethods: true,
+				Playground:             true,
+			},
 		},
 	}).AnyTimes()
 
@@ -73,6 +79,9 @@ func TestGraphqlSchemaWithoutUnboundMethod(t *testing.T) {
 	mockConfig := config.NewMockConfig(gomock.NewController(t))
 	mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
 		Grpc: config.Grpc{
+			Etcd: etcdv3.Config{
+				Endpoints: []string{"localhost:2379"},
+			},
 			Services: []kgrpc.Config{
 				{
 					Target: infos.ConstructsServerAddr.Addr().String(),
@@ -82,9 +91,11 @@ func TestGraphqlSchemaWithoutUnboundMethod(t *testing.T) {
 				},
 			},
 		},
-		GraphQL: config.GraphQL{
-			Playground:             true,
-			GenerateUnboundMethods: false,
+		Server: config.ServerConfig{
+			GraphQL: config.GraphQLConfig{
+				Playground:             true,
+				GenerateUnboundMethods: false,
+			},
 		},
 	}).AnyTimes()
 

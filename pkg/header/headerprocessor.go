@@ -1,4 +1,4 @@
-package server
+package header
 
 import (
 	"net/http"
@@ -8,8 +8,22 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// httpHeadersToGRPCMetadata converts HTTP headers to gRPC metadata.
-func httpHeadersToGRPCMetadata(headers http.Header) metadata.MD {
+// ProcessHeaders builds the headers for the gateway from HTTP headers.
+func ProcessHeaders(header http.Header) []string {
+	var headers []string
+
+	for key := range header {
+		_, ok := DefaultHeaderMatcher(key)
+		if ok {
+			headers = append(headers, key)
+		}
+	}
+
+	return headers
+}
+
+// HttpHeadersToGRPCMetadata converts HTTP headers to gRPC metadata.
+func HttpHeadersToGRPCMetadata(headers http.Header) metadata.MD {
 	grpcMetadata := metadata.MD{}
 	for key, values := range headers {
 		grpcKey, ok := DefaultHeaderMatcher(key)

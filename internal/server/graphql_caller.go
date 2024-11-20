@@ -10,27 +10,28 @@ import (
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/header"
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-type caller struct {
-	kod.Implements[Caller]
+type graphqlCaller struct {
+	kod.Implements[GraphqlCaller]
 
 	config   kod.Ref[config.Config]
-	registry kod.Ref[CallerRegistry]
+	registry kod.Ref[GraphqlCallerRegistry]
 
 	singleflight singleflight.Group
 }
 
-func (c *caller) Init(ctx context.Context) error {
+func (c *graphqlCaller) Init(ctx context.Context) error {
 	return nil
 }
 
-func (c *caller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
-	if c.config.Get().Config().GraphQL.SingleFlight {
+func (c *graphqlCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
+	if c.config.Get().Config().Server.GraphQL.SingleFlight {
 		if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
 			hash := Hash64.Get()
 			defer Hash64.Put(hash)
@@ -40,7 +41,7 @@ func (c *caller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, me
 				hd := make([]string, 0, len(md))
 				for k, v := range md {
 					// skip grpc gateway prefixed metadata
-					if strings.Contains(k, MetadataPrefix) {
+					if strings.Contains(k, header.MetadataPrefix) {
 						continue
 					}
 					hd = append(hd, k+strings.Join(v, ","))
@@ -86,7 +87,7 @@ func (c *caller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, me
 	return res, err
 }
 
-func (c *caller) Interceptors() []interceptor.Interceptor {
+func (c *graphqlCaller) Interceptors() []interceptor.Interceptor {
 	if c.config.Get().Config().Engine.CircuitBreaker {
 		return []interceptor.Interceptor{
 			kcircuitbreaker.Interceptor(),

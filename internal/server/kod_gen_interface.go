@@ -14,45 +14,61 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-// Caller is implemented by [caller],
-// which can be mocked with [NewMockCaller].
-type Caller interface {
-	// Call is implemented by [caller.Call]
-	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
-}
-
-// CallerRegistry is implemented by [callerRegistry],
-// which can be mocked with [NewMockCallerRegistry].
-type CallerRegistry interface {
-	// FindMethodByName is implemented by [callerRegistry.FindMethodByName]
-	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
-	// GraphQLSchema is implemented by [callerRegistry.GraphQLSchema]
-	GraphQLSchema() *ast.Schema
-	// Marshal is implemented by [callerRegistry.Marshal]
-	Marshal(proto proto.Message, field *ast.Field) (interface{}, error)
-	// Unmarshal is implemented by [callerRegistry.Unmarshal]
-	Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error)
-	// GetCallerStub is implemented by [callerRegistry.GetCallerStub]
-	GetCallerStub(service string) *grpcdynamic.Stub
-}
-
-// Reflection is implemented by [reflection],
-// which can be mocked with [NewMockReflection].
-type Reflection interface {
-	// ListPackages is implemented by [reflection.ListPackages]
-	ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error)
-}
-
 // Gateway is implemented by [server],
 // which can be mocked with [NewMockGateway].
 type Gateway interface {
 	// BuildServer is implemented by [server.BuildServer]
 	BuildServer() (http.Handler, error)
+	// BuildHTTPServer is implemented by [server.BuildHTTPServer]
+	BuildHTTPServer() (http.Handler, error)
 }
 
-// Queryer is implemented by [queryer],
-// which can be mocked with [NewMockQueryer].
-type Queryer interface {
-	// Query is implemented by [queryer.Query]
+// GraphqlCaller is implemented by [graphqlCaller],
+// which can be mocked with [NewMockGraphqlCaller].
+type GraphqlCaller interface {
+	// Call is implemented by [graphqlCaller.Call]
+	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
+}
+
+// GraphqlCallerRegistry is implemented by [graphqlCallerRegistry],
+// which can be mocked with [NewMockGraphqlCallerRegistry].
+type GraphqlCallerRegistry interface {
+	// FindMethodByName is implemented by [graphqlCallerRegistry.FindMethodByName]
+	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
+	// GraphQLSchema is implemented by [graphqlCallerRegistry.GraphQLSchema]
+	GraphQLSchema() *ast.Schema
+	// Marshal is implemented by [graphqlCallerRegistry.Marshal]
+	Marshal(proto proto.Message, field *ast.Field) (interface{}, error)
+	// Unmarshal is implemented by [graphqlCallerRegistry.Unmarshal]
+	Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error)
+	// GetCallerStub is implemented by [graphqlCallerRegistry.GetCallerStub]
+	GetCallerStub(service string) *grpcdynamic.Stub
+}
+
+// GraphqlReflection is implemented by [graphqlReflection],
+// which can be mocked with [NewMockGraphqlReflection].
+type GraphqlReflection interface {
+	// ListPackages is implemented by [graphqlReflection.ListPackages]
+	ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error)
+}
+
+// GraphqlQueryer is implemented by [graphqlQueryer],
+// which can be mocked with [NewMockGraphqlQueryer].
+type GraphqlQueryer interface {
+	// Query is implemented by [graphqlQueryer.Query]
 	Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error
+}
+
+// HttpUpstreamInvoker is implemented by [httpUpstreamInvoker],
+// which can be mocked with [NewMockHttpUpstreamInvoker].
+type HttpUpstreamInvoker interface {
+	// Invoke is implemented by [httpUpstreamInvoker.Invoke]
+	Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Request, upstream upstreamInfo, rpcPath string, pathNames []string)
+}
+
+// HttpUpstream is implemented by [httpUpstream],
+// which can be mocked with [NewMockHttpUpstream].
+type HttpUpstream interface {
+	// Register is implemented by [httpUpstream.Register]
+	Register(ctx context.Context, router *http.ServeMux)
 }

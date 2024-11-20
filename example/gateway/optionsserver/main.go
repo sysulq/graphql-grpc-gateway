@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/registry/etcdv3"
@@ -16,16 +15,15 @@ type app struct {
 }
 
 func main() {
-	_ = kod.Run(context.Background(), func(ctx context.Context, app *app) error {
+	kod.MustRun(context.Background(), func(ctx context.Context, app *app) error {
 		etcd := lo.Must(etcdv3.Config{Endpoints: []string{"localhost:2379"}}.Build(ctx))
 
 		s := kgrpc.Config{
 			Address: ":8082",
 		}.Build().WithRegistry(etcd)
 		pb.RegisterServiceServer(s, &service{})
-		log.Fatal(s.Run(ctx))
 
-		return nil
+		return s.Run(ctx)
 	})
 }
 

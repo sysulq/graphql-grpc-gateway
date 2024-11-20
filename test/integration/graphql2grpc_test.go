@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/client/kgrpc"
+	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/nautilus/graphql"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
@@ -24,6 +25,9 @@ func TestGraphql2Grpc(t *testing.T) {
 			CircuitBreaker: true,
 		},
 		Grpc: config.Grpc{
+			Etcd: etcdv3.Config{
+				Endpoints: []string{"localhost:2379"},
+			},
 			Services: []kgrpc.Config{
 				{
 					Target: infos.ConstructsServerAddr.Addr().String(),
@@ -33,11 +37,13 @@ func TestGraphql2Grpc(t *testing.T) {
 				},
 			},
 		},
-		GraphQL: config.GraphQL{
-			Playground:             true,
-			GenerateUnboundMethods: true,
-			SingleFlight:           true,
-			QueryCache:             true,
+		Server: config.ServerConfig{
+			GraphQL: config.GraphQLConfig{
+				Playground:             true,
+				GenerateUnboundMethods: true,
+				SingleFlight:           true,
+				QueryCache:             true,
+			},
 		},
 	}).AnyTimes()
 
