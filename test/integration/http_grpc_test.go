@@ -117,7 +117,7 @@ func TestHTTP2Grpc(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			router.ServeHTTP(rec, req)
-			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, http.StatusBadRequest, rec.Code)
 			assert.Equal(t, `invalid character 'i' looking for beginning of object key string`, rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
