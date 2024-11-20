@@ -38,7 +38,7 @@ func init() {
 		Refs: `⟦88a4dee9:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
 ⟦03fef591:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller⟧,
 ⟦48435518:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer⟧,
-⟦2bafdbff:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry⟧,
+⟦b5d756d3:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧,
 ⟦1e218b19:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return gateway_local_stub{
@@ -52,7 +52,7 @@ func init() {
 		Interface: reflect.TypeOf((*GraphqlCaller)(nil)).Elem(),
 		Impl:      reflect.TypeOf(graphqlCaller{}),
 		Refs: `⟦8c0cf75c:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦612e1c2b:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller→github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry⟧`,
+⟦0cbfe1a9:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return graphqlCaller_local_stub{
 				impl:        info.Impl.(GraphqlCaller),
@@ -61,13 +61,13 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry",
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry",
 		Interface: reflect.TypeOf((*GraphqlCallerRegistry)(nil)).Elem(),
 		Impl:      reflect.TypeOf(graphqlCallerRegistry{}),
-		Refs: `⟦86a35e79:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦aeb38dd5:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlReflection⟧`,
+		Refs: `⟦1277b0bc:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
+⟦f05fe066:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlReflection⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
-			return callerRegistry_local_stub{
+			return graphqlCallerRegistry_local_stub{
 				impl:        info.Impl.(GraphqlCallerRegistry),
 				interceptor: info.Interceptor,
 			}
@@ -91,7 +91,7 @@ func init() {
 		Impl:      reflect.TypeOf(graphqlQueryer{}),
 		Refs: `⟦858864af:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
 ⟦83fcae6f:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller⟧,
-⟦0684b42f:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry⟧`,
+⟦b79d40cd:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return graphqlQueryer_local_stub{
 				impl:        info.Impl.(GraphqlQueryer),
@@ -191,45 +191,45 @@ func (s graphqlCaller_local_stub) Call(ctx context.Context, a1 protoreflect.Meth
 	return
 }
 
-// callerRegistry_local_stub is a local stub implementation of [GraphqlCallerRegistry].
-type callerRegistry_local_stub struct {
+// graphqlCallerRegistry_local_stub is a local stub implementation of [GraphqlCallerRegistry].
+type graphqlCallerRegistry_local_stub struct {
 	impl        GraphqlCallerRegistry
 	interceptor interceptor.Interceptor
 }
 
-// Check that [callerRegistry_local_stub] implements the [GraphqlCallerRegistry] interface.
-var _ GraphqlCallerRegistry = (*callerRegistry_local_stub)(nil)
+// Check that [graphqlCallerRegistry_local_stub] implements the [GraphqlCallerRegistry] interface.
+var _ GraphqlCallerRegistry = (*graphqlCallerRegistry_local_stub)(nil)
 
-// FindMethodByName wraps the method [callerRegistry.FindMethodByName].
-func (s callerRegistry_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 protoreflect.MethodDescriptor) {
+// FindMethodByName wraps the method [graphqlCallerRegistry.FindMethodByName].
+func (s graphqlCallerRegistry_local_stub) FindMethodByName(a0 ast.Operation, a1 string) (r0 protoreflect.MethodDescriptor) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0 = s.impl.FindMethodByName(a0, a1)
 	return
 }
 
-// GetCallerStub wraps the method [callerRegistry.GetCallerStub].
-func (s callerRegistry_local_stub) GetCallerStub(a0 string) (r0 *grpcdynamic.Stub) {
+// GetCallerStub wraps the method [graphqlCallerRegistry.GetCallerStub].
+func (s graphqlCallerRegistry_local_stub) GetCallerStub(a0 string) (r0 *grpcdynamic.Stub) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0 = s.impl.GetCallerStub(a0)
 	return
 }
 
-// GraphQLSchema wraps the method [callerRegistry.GraphQLSchema].
-func (s callerRegistry_local_stub) GraphQLSchema() (r0 *ast.Schema) {
+// GraphQLSchema wraps the method [graphqlCallerRegistry.GraphQLSchema].
+func (s graphqlCallerRegistry_local_stub) GraphQLSchema() (r0 *ast.Schema) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0 = s.impl.GraphQLSchema()
 	return
 }
 
-// Marshal wraps the method [callerRegistry.Marshal].
-func (s callerRegistry_local_stub) Marshal(a0 protoreflect.ProtoMessage, a1 *ast.Field) (r0 interface{}, err error) {
+// Marshal wraps the method [graphqlCallerRegistry.Marshal].
+func (s graphqlCallerRegistry_local_stub) Marshal(a0 protoreflect.ProtoMessage, a1 *ast.Field) (r0 interface{}, err error) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0, err = s.impl.Marshal(a0, a1)
 	return
 }
 
-// Unmarshal wraps the method [callerRegistry.Unmarshal].
-func (s callerRegistry_local_stub) Unmarshal(a0 protoreflect.MessageDescriptor, a1 *ast.Field, a2 map[string]interface{}) (r0 protoreflect.ProtoMessage, err error) {
+// Unmarshal wraps the method [graphqlCallerRegistry.Unmarshal].
+func (s graphqlCallerRegistry_local_stub) Unmarshal(a0 protoreflect.MessageDescriptor, a1 *ast.Field, a2 map[string]interface{}) (r0 protoreflect.ProtoMessage, err error) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0, err = s.impl.Unmarshal(a0, a1, a2)
 	return

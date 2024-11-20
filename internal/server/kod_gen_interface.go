@@ -30,18 +30,18 @@ type GraphqlCaller interface {
 	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
 }
 
-// GraphqlCallerRegistry is implemented by [callerRegistry],
-// which can be mocked with [NewMockCallerRegistry].
+// GraphqlCallerRegistry is implemented by [graphqlCallerRegistry],
+// which can be mocked with [NewMockGraphqlCallerRegistry].
 type GraphqlCallerRegistry interface {
-	// FindMethodByName is implemented by [callerRegistry.FindMethodByName]
+	// FindMethodByName is implemented by [graphqlCallerRegistry.FindMethodByName]
 	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
-	// GraphQLSchema is implemented by [callerRegistry.GraphQLSchema]
+	// GraphQLSchema is implemented by [graphqlCallerRegistry.GraphQLSchema]
 	GraphQLSchema() *ast.Schema
-	// Marshal is implemented by [callerRegistry.Marshal]
+	// Marshal is implemented by [graphqlCallerRegistry.Marshal]
 	Marshal(proto proto.Message, field *ast.Field) (interface{}, error)
-	// Unmarshal is implemented by [callerRegistry.Unmarshal]
+	// Unmarshal is implemented by [graphqlCallerRegistry.Unmarshal]
 	Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]interface{}) (proto.Message, error)
-	// GetCallerStub is implemented by [callerRegistry.GetCallerStub]
+	// GetCallerStub is implemented by [graphqlCallerRegistry.GetCallerStub]
 	GetCallerStub(service string) *grpcdynamic.Stub
 }
 

@@ -190,32 +190,32 @@ func (c *MockGraphqlCallerCallCall) DoAndReturn(f func(context.Context, protoref
 	return c
 }
 
-// MockCallerRegistry is a mock of CallerRegistry interface.
-type MockCallerRegistry struct {
+// MockGraphqlCallerRegistry is a mock of GraphqlCallerRegistry interface.
+type MockGraphqlCallerRegistry struct {
 	ctrl     *gomock.Controller
-	recorder *MockCallerRegistryMockRecorder
+	recorder *MockGraphqlCallerRegistryMockRecorder
 	isgomock struct{}
 }
 
-// MockCallerRegistryMockRecorder is the mock recorder for MockCallerRegistry.
-type MockCallerRegistryMockRecorder struct {
-	mock *MockCallerRegistry
+// MockGraphqlCallerRegistryMockRecorder is the mock recorder for MockGraphqlCallerRegistry.
+type MockGraphqlCallerRegistryMockRecorder struct {
+	mock *MockGraphqlCallerRegistry
 }
 
-// NewMockCallerRegistry creates a new mock instance.
-func NewMockCallerRegistry(ctrl *gomock.Controller) *MockCallerRegistry {
-	mock := &MockCallerRegistry{ctrl: ctrl}
-	mock.recorder = &MockCallerRegistryMockRecorder{mock}
+// NewMockGraphqlCallerRegistry creates a new mock instance.
+func NewMockGraphqlCallerRegistry(ctrl *gomock.Controller) *MockGraphqlCallerRegistry {
+	mock := &MockGraphqlCallerRegistry{ctrl: ctrl}
+	mock.recorder = &MockGraphqlCallerRegistryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCallerRegistry) EXPECT() *MockCallerRegistryMockRecorder {
+func (m *MockGraphqlCallerRegistry) EXPECT() *MockGraphqlCallerRegistryMockRecorder {
 	return m.recorder
 }
 
 // FindMethodByName mocks base method.
-func (m *MockCallerRegistry) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
+func (m *MockGraphqlCallerRegistry) FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindMethodByName", op, name)
 	ret0, _ := ret[0].(protoreflect.MethodDescriptor)
@@ -223,37 +223,37 @@ func (m *MockCallerRegistry) FindMethodByName(op ast.Operation, name string) pro
 }
 
 // FindMethodByName indicates an expected call of FindMethodByName.
-func (mr *MockCallerRegistryMockRecorder) FindMethodByName(op, name any) *MockCallerRegistryFindMethodByNameCall {
+func (mr *MockGraphqlCallerRegistryMockRecorder) FindMethodByName(op, name any) *MockGraphqlCallerRegistryFindMethodByNameCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindMethodByName", reflect.TypeOf((*MockCallerRegistry)(nil).FindMethodByName), op, name)
-	return &MockCallerRegistryFindMethodByNameCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindMethodByName", reflect.TypeOf((*MockGraphqlCallerRegistry)(nil).FindMethodByName), op, name)
+	return &MockGraphqlCallerRegistryFindMethodByNameCall{Call: call}
 }
 
-// MockCallerRegistryFindMethodByNameCall wrap *gomock.Call
-type MockCallerRegistryFindMethodByNameCall struct {
+// MockGraphqlCallerRegistryFindMethodByNameCall wrap *gomock.Call
+type MockGraphqlCallerRegistryFindMethodByNameCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockCallerRegistryFindMethodByNameCall) Return(arg0 protoreflect.MethodDescriptor) *MockCallerRegistryFindMethodByNameCall {
+func (c *MockGraphqlCallerRegistryFindMethodByNameCall) Return(arg0 protoreflect.MethodDescriptor) *MockGraphqlCallerRegistryFindMethodByNameCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCallerRegistryFindMethodByNameCall) Do(f func(ast.Operation, string) protoreflect.MethodDescriptor) *MockCallerRegistryFindMethodByNameCall {
+func (c *MockGraphqlCallerRegistryFindMethodByNameCall) Do(f func(ast.Operation, string) protoreflect.MethodDescriptor) *MockGraphqlCallerRegistryFindMethodByNameCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCallerRegistryFindMethodByNameCall) DoAndReturn(f func(ast.Operation, string) protoreflect.MethodDescriptor) *MockCallerRegistryFindMethodByNameCall {
+func (c *MockGraphqlCallerRegistryFindMethodByNameCall) DoAndReturn(f func(ast.Operation, string) protoreflect.MethodDescriptor) *MockGraphqlCallerRegistryFindMethodByNameCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // GetCallerStub mocks base method.
-func (m *MockCallerRegistry) GetCallerStub(service string) *grpcdynamic.Stub {
+func (m *MockGraphqlCallerRegistry) GetCallerStub(service string) *grpcdynamic.Stub {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCallerStub", service)
 	ret0, _ := ret[0].(*grpcdynamic.Stub)
@@ -261,37 +261,37 @@ func (m *MockCallerRegistry) GetCallerStub(service string) *grpcdynamic.Stub {
 }
 
 // GetCallerStub indicates an expected call of GetCallerStub.
-func (mr *MockCallerRegistryMockRecorder) GetCallerStub(service any) *MockCallerRegistryGetCallerStubCall {
+func (mr *MockGraphqlCallerRegistryMockRecorder) GetCallerStub(service any) *MockGraphqlCallerRegistryGetCallerStubCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCallerStub", reflect.TypeOf((*MockCallerRegistry)(nil).GetCallerStub), service)
-	return &MockCallerRegistryGetCallerStubCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCallerStub", reflect.TypeOf((*MockGraphqlCallerRegistry)(nil).GetCallerStub), service)
+	return &MockGraphqlCallerRegistryGetCallerStubCall{Call: call}
 }
 
-// MockCallerRegistryGetCallerStubCall wrap *gomock.Call
-type MockCallerRegistryGetCallerStubCall struct {
+// MockGraphqlCallerRegistryGetCallerStubCall wrap *gomock.Call
+type MockGraphqlCallerRegistryGetCallerStubCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockCallerRegistryGetCallerStubCall) Return(arg0 *grpcdynamic.Stub) *MockCallerRegistryGetCallerStubCall {
+func (c *MockGraphqlCallerRegistryGetCallerStubCall) Return(arg0 *grpcdynamic.Stub) *MockGraphqlCallerRegistryGetCallerStubCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCallerRegistryGetCallerStubCall) Do(f func(string) *grpcdynamic.Stub) *MockCallerRegistryGetCallerStubCall {
+func (c *MockGraphqlCallerRegistryGetCallerStubCall) Do(f func(string) *grpcdynamic.Stub) *MockGraphqlCallerRegistryGetCallerStubCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCallerRegistryGetCallerStubCall) DoAndReturn(f func(string) *grpcdynamic.Stub) *MockCallerRegistryGetCallerStubCall {
+func (c *MockGraphqlCallerRegistryGetCallerStubCall) DoAndReturn(f func(string) *grpcdynamic.Stub) *MockGraphqlCallerRegistryGetCallerStubCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // GraphQLSchema mocks base method.
-func (m *MockCallerRegistry) GraphQLSchema() *ast.Schema {
+func (m *MockGraphqlCallerRegistry) GraphQLSchema() *ast.Schema {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GraphQLSchema")
 	ret0, _ := ret[0].(*ast.Schema)
@@ -299,37 +299,37 @@ func (m *MockCallerRegistry) GraphQLSchema() *ast.Schema {
 }
 
 // GraphQLSchema indicates an expected call of GraphQLSchema.
-func (mr *MockCallerRegistryMockRecorder) GraphQLSchema() *MockCallerRegistryGraphQLSchemaCall {
+func (mr *MockGraphqlCallerRegistryMockRecorder) GraphQLSchema() *MockGraphqlCallerRegistryGraphQLSchemaCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GraphQLSchema", reflect.TypeOf((*MockCallerRegistry)(nil).GraphQLSchema))
-	return &MockCallerRegistryGraphQLSchemaCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GraphQLSchema", reflect.TypeOf((*MockGraphqlCallerRegistry)(nil).GraphQLSchema))
+	return &MockGraphqlCallerRegistryGraphQLSchemaCall{Call: call}
 }
 
-// MockCallerRegistryGraphQLSchemaCall wrap *gomock.Call
-type MockCallerRegistryGraphQLSchemaCall struct {
+// MockGraphqlCallerRegistryGraphQLSchemaCall wrap *gomock.Call
+type MockGraphqlCallerRegistryGraphQLSchemaCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockCallerRegistryGraphQLSchemaCall) Return(arg0 *ast.Schema) *MockCallerRegistryGraphQLSchemaCall {
+func (c *MockGraphqlCallerRegistryGraphQLSchemaCall) Return(arg0 *ast.Schema) *MockGraphqlCallerRegistryGraphQLSchemaCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCallerRegistryGraphQLSchemaCall) Do(f func() *ast.Schema) *MockCallerRegistryGraphQLSchemaCall {
+func (c *MockGraphqlCallerRegistryGraphQLSchemaCall) Do(f func() *ast.Schema) *MockGraphqlCallerRegistryGraphQLSchemaCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCallerRegistryGraphQLSchemaCall) DoAndReturn(f func() *ast.Schema) *MockCallerRegistryGraphQLSchemaCall {
+func (c *MockGraphqlCallerRegistryGraphQLSchemaCall) DoAndReturn(f func() *ast.Schema) *MockGraphqlCallerRegistryGraphQLSchemaCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Marshal mocks base method.
-func (m *MockCallerRegistry) Marshal(proto proto.Message, field *ast.Field) (any, error) {
+func (m *MockGraphqlCallerRegistry) Marshal(proto proto.Message, field *ast.Field) (any, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Marshal", proto, field)
 	ret0, _ := ret[0].(any)
@@ -338,37 +338,37 @@ func (m *MockCallerRegistry) Marshal(proto proto.Message, field *ast.Field) (any
 }
 
 // Marshal indicates an expected call of Marshal.
-func (mr *MockCallerRegistryMockRecorder) Marshal(proto, field any) *MockCallerRegistryMarshalCall {
+func (mr *MockGraphqlCallerRegistryMockRecorder) Marshal(proto, field any) *MockGraphqlCallerRegistryMarshalCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Marshal", reflect.TypeOf((*MockCallerRegistry)(nil).Marshal), proto, field)
-	return &MockCallerRegistryMarshalCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Marshal", reflect.TypeOf((*MockGraphqlCallerRegistry)(nil).Marshal), proto, field)
+	return &MockGraphqlCallerRegistryMarshalCall{Call: call}
 }
 
-// MockCallerRegistryMarshalCall wrap *gomock.Call
-type MockCallerRegistryMarshalCall struct {
+// MockGraphqlCallerRegistryMarshalCall wrap *gomock.Call
+type MockGraphqlCallerRegistryMarshalCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockCallerRegistryMarshalCall) Return(arg0 any, arg1 error) *MockCallerRegistryMarshalCall {
+func (c *MockGraphqlCallerRegistryMarshalCall) Return(arg0 any, arg1 error) *MockGraphqlCallerRegistryMarshalCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCallerRegistryMarshalCall) Do(f func(proto.Message, *ast.Field) (any, error)) *MockCallerRegistryMarshalCall {
+func (c *MockGraphqlCallerRegistryMarshalCall) Do(f func(proto.Message, *ast.Field) (any, error)) *MockGraphqlCallerRegistryMarshalCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCallerRegistryMarshalCall) DoAndReturn(f func(proto.Message, *ast.Field) (any, error)) *MockCallerRegistryMarshalCall {
+func (c *MockGraphqlCallerRegistryMarshalCall) DoAndReturn(f func(proto.Message, *ast.Field) (any, error)) *MockGraphqlCallerRegistryMarshalCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Unmarshal mocks base method.
-func (m *MockCallerRegistry) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]any) (proto.Message, error) {
+func (m *MockGraphqlCallerRegistry) Unmarshal(desc protoreflect.MessageDescriptor, field *ast.Field, vars map[string]any) (proto.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Unmarshal", desc, field, vars)
 	ret0, _ := ret[0].(proto.Message)
@@ -377,31 +377,31 @@ func (m *MockCallerRegistry) Unmarshal(desc protoreflect.MessageDescriptor, fiel
 }
 
 // Unmarshal indicates an expected call of Unmarshal.
-func (mr *MockCallerRegistryMockRecorder) Unmarshal(desc, field, vars any) *MockCallerRegistryUnmarshalCall {
+func (mr *MockGraphqlCallerRegistryMockRecorder) Unmarshal(desc, field, vars any) *MockGraphqlCallerRegistryUnmarshalCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unmarshal", reflect.TypeOf((*MockCallerRegistry)(nil).Unmarshal), desc, field, vars)
-	return &MockCallerRegistryUnmarshalCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unmarshal", reflect.TypeOf((*MockGraphqlCallerRegistry)(nil).Unmarshal), desc, field, vars)
+	return &MockGraphqlCallerRegistryUnmarshalCall{Call: call}
 }
 
-// MockCallerRegistryUnmarshalCall wrap *gomock.Call
-type MockCallerRegistryUnmarshalCall struct {
+// MockGraphqlCallerRegistryUnmarshalCall wrap *gomock.Call
+type MockGraphqlCallerRegistryUnmarshalCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockCallerRegistryUnmarshalCall) Return(arg0 proto.Message, arg1 error) *MockCallerRegistryUnmarshalCall {
+func (c *MockGraphqlCallerRegistryUnmarshalCall) Return(arg0 proto.Message, arg1 error) *MockGraphqlCallerRegistryUnmarshalCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCallerRegistryUnmarshalCall) Do(f func(protoreflect.MessageDescriptor, *ast.Field, map[string]any) (proto.Message, error)) *MockCallerRegistryUnmarshalCall {
+func (c *MockGraphqlCallerRegistryUnmarshalCall) Do(f func(protoreflect.MessageDescriptor, *ast.Field, map[string]any) (proto.Message, error)) *MockGraphqlCallerRegistryUnmarshalCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCallerRegistryUnmarshalCall) DoAndReturn(f func(protoreflect.MessageDescriptor, *ast.Field, map[string]any) (proto.Message, error)) *MockCallerRegistryUnmarshalCall {
+func (c *MockGraphqlCallerRegistryUnmarshalCall) DoAndReturn(f func(protoreflect.MessageDescriptor, *ast.Field, map[string]any) (proto.Message, error)) *MockGraphqlCallerRegistryUnmarshalCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
