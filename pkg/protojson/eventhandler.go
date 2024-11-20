@@ -9,22 +9,19 @@ import (
 	"github.com/golang/protobuf/proto"
 	// nolint
 	"github.com/jhump/protoreflect/desc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
 type EventHandler struct {
 	Status    *status.Status
-	writer    io.Writer
-	marshaler jsonpb.Marshaler
+	Message   proto.Message
+	Marshaler jsonpb.Marshaler
 }
 
 func NewEventHandler(writer io.Writer, resolver jsonpb.AnyResolver) *EventHandler {
 	return &EventHandler{
-		Status: nil,
-		writer: writer,
-		marshaler: jsonpb.Marshaler{
+		Marshaler: jsonpb.Marshaler{
 			OrigName:     false,
 			EmitDefaults: true,
 			EnumsAsInts:  true,
@@ -35,18 +32,11 @@ func NewEventHandler(writer io.Writer, resolver jsonpb.AnyResolver) *EventHandle
 }
 
 func (h *EventHandler) OnReceiveResponse(message proto.Message) {
-	if err := h.marshaler.Marshal(h.writer, message); err != nil {
-		panic(err)
-	}
+	h.Message = message
 }
 
 func (h *EventHandler) OnReceiveTrailers(status *status.Status, _ metadata.MD) {
 	h.Status = status
-	if status.Code() != codes.OK {
-		if err := h.marshaler.Marshal(h.writer, status.Proto()); err != nil {
-			panic(err)
-		}
-	}
 }
 
 func (h *EventHandler) OnResolveMethod(_ *desc.MethodDescriptor) {

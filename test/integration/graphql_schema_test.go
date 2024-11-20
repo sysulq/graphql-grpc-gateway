@@ -46,7 +46,7 @@ func TestGraphqlSchema(t *testing.T) {
 			},
 		},
 		Server: config.ServerConfig{
-			GraphQL: config.GraphQL{
+			GraphQL: config.GraphQLConfig{
 				GenerateUnboundMethods: true,
 				Playground:             true,
 			},
@@ -92,7 +92,7 @@ func TestGraphqlSchemaWithoutUnboundMethod(t *testing.T) {
 			},
 		},
 		Server: config.ServerConfig{
-			GraphQL: config.GraphQL{
+			GraphQL: config.GraphQLConfig{
 				Playground:             true,
 				GenerateUnboundMethods: false,
 			},

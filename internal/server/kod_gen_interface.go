@@ -30,9 +30,9 @@ type GraphqlCaller interface {
 	Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error)
 }
 
-// CallerRegistry is implemented by [callerRegistry],
+// GraphqlCallerRegistry is implemented by [callerRegistry],
 // which can be mocked with [NewMockCallerRegistry].
-type CallerRegistry interface {
+type GraphqlCallerRegistry interface {
 	// FindMethodByName is implemented by [callerRegistry.FindMethodByName]
 	FindMethodByName(op ast.Operation, name string) protoreflect.MethodDescriptor
 	// GraphQLSchema is implemented by [callerRegistry.GraphQLSchema]

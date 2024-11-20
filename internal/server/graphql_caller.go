@@ -10,6 +10,7 @@ import (
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/header"
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
@@ -20,7 +21,7 @@ type graphqlCaller struct {
 	kod.Implements[GraphqlCaller]
 
 	config   kod.Ref[config.Config]
-	registry kod.Ref[CallerRegistry]
+	registry kod.Ref[GraphqlCallerRegistry]
 
 	singleflight singleflight.Group
 }
@@ -40,7 +41,7 @@ func (c *graphqlCaller) Call(ctx context.Context, rpc protoreflect.MethodDescrip
 				hd := make([]string, 0, len(md))
 				for k, v := range md {
 					// skip grpc gateway prefixed metadata
-					if strings.Contains(k, MetadataPrefix) {
+					if strings.Contains(k, header.MetadataPrefix) {
 						continue
 					}
 					hd = append(hd, k+strings.Join(v, ","))

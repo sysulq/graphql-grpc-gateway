@@ -24,7 +24,7 @@ type server struct {
 	config       kod.Ref[config.Config]
 	_            kod.Ref[GraphqlCaller]
 	queryer      kod.Ref[GraphqlQueryer]
-	registry     kod.Ref[CallerRegistry]
+	registry     kod.Ref[GraphqlCallerRegistry]
 	httpUpstream kod.Ref[HttpUpstream]
 }
 

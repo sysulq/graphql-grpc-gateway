@@ -21,7 +21,7 @@ type graphqlQueryer struct {
 
 	config   kod.Ref[config.Config]
 	caller   kod.Ref[GraphqlCaller]
-	registry kod.Ref[CallerRegistry]
+	registry kod.Ref[GraphqlCallerRegistry]
 }
 
 func (q *graphqlQueryer) Interceptors() []interceptor.Interceptor {

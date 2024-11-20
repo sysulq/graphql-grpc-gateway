@@ -6,13 +6,14 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/header"
 	"google.golang.org/grpc/metadata"
 )
 
 func addHeader(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		md, _ := metadata.FromOutgoingContext(r.Context())
-		md = metadata.Join(md, httpHeadersToGRPCMetadata(r.Header))
+		md = metadata.Join(md, header.HttpHeadersToGRPCMetadata(r.Header))
 
 		ctx := metadata.NewOutgoingContext(r.Context(), md)
 		handler.ServeHTTP(w, r.WithContext(ctx))

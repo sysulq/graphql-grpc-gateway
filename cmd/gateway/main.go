@@ -30,7 +30,7 @@ func run(ctx context.Context, app *app) error {
 	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
 	handler, err := app.server.Get().BuildServer()
 	lo.Must0(err)
-	go lo.Must0(http.Serve(l, handler))
+	go func() { lo.Must0(http.Serve(l, handler)) }()
 
 	l, err = net.Listen("tcp", cfg.Server.HTTP.Address)
 	lo.Must0(err)

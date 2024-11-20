@@ -43,7 +43,7 @@ func TestHTTP2Grpc(t *testing.T) {
 			},
 		},
 		Server: config.ServerConfig{
-			GraphQL: config.GraphQL{
+			GraphQL: config.GraphQLConfig{
 				Playground:             true,
 				GenerateUnboundMethods: true,
 				SingleFlight:           true,
@@ -58,10 +58,11 @@ func TestHTTP2Grpc(t *testing.T) {
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, "/say/bob", nil)
-			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Content-Type", "application/json; charset=utf-8")
 
 			router.ServeHTTP(rec, req)
 			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, "application/json; charset=utf-8", rec.Header().Get("Content-Type"))
 			assert.Equal(t, "{\"message\":\"Hello bob\"}", rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
@@ -72,10 +73,11 @@ func TestHTTP2Grpc(t *testing.T) {
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, "/say-notfound", nil)
-			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Content-Type", "application/json; charset=utf-8")
 
 			router.ServeHTTP(rec, req)
 			assert.Equal(t, http.StatusNotFound, rec.Code)
+			assert.Equal(t, "text/plain; charset=utf-8", rec.Header().Get("Content-Type"))
 			assert.Equal(t, "404 page not found\n", rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
@@ -86,10 +88,11 @@ func TestHTTP2Grpc(t *testing.T) {
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, "/say/error", nil)
-			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Content-Type", "application/json; charset=utf-8")
 
 			router.ServeHTTP(rec, req)
 			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, "application/json; charset=utf-8", rec.Header().Get("Content-Type"))
 			assert.Equal(t, `{"code":2,"message":"error","details":[]}`, rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
@@ -100,10 +103,11 @@ func TestHTTP2Grpc(t *testing.T) {
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, "/say/sam", bytes.NewBufferString("{\"name\":\"bob\"}"))
-			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Content-Type", "application/json; charset=utf-8")
 
 			router.ServeHTTP(rec, req)
 			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, "application/json; charset=utf-8", rec.Header().Get("Content-Type"))
 			assert.Equal(t, `{"message":"Hello sam"}`, rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
@@ -114,11 +118,56 @@ func TestHTTP2Grpc(t *testing.T) {
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, "/say/sam", bytes.NewBufferString("{invalid data}"))
-			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Content-Type", "application/json; charset=utf-8")
 
 			router.ServeHTTP(rec, req)
 			assert.Equal(t, http.StatusBadRequest, rec.Code)
-			assert.Equal(t, `invalid character 'i' looking for beginning of object key string`, rec.Body.String())
+			assert.Equal(t, "text/plain; charset=utf-8", rec.Header().Get("Content-Type"))
+			assert.Equal(t, "rpc error: code = InvalidArgument desc = invalid character 'i' looking for beginning of object key string\n", rec.Body.String())
+		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
+	})
+}
+
+func TestHTTP2Grpc_Singleflight(t *testing.T) {
+	infos := test.SetupDeps(t)
+
+	t.Run("singleflight", func(t *testing.T) {
+		mockConfig := config.NewMockConfig(gomock.NewController(t))
+		mockConfig.EXPECT().Config().Return(&config.ConfigInfo{
+			Grpc: config.Grpc{
+				Etcd: etcdv3.Config{
+					Endpoints: []string{"localhost:2379"},
+				},
+				Services: []kgrpc.Config{
+					{
+						Target: infos.ConstructsServerAddr.Addr().String(),
+					},
+					{
+						Target: infos.OptionsServerAddr.Addr().String(),
+					},
+					{
+						Target: infos.HelloworldServerAddr.Addr().String(),
+					},
+				},
+			},
+			Server: config.ServerConfig{
+				HTTP: config.HTTPConfig{
+					SingleFlight: true,
+				},
+			},
+		}).AnyTimes()
+
+		kod.RunTest(t, func(ctx context.Context, up server.HttpUpstream) {
+			router := http.NewServeMux()
+			up.Register(ctx, router)
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodGet, "/say/bob", nil)
+			req.Header.Set("Content-Type", "application/json; charset=utf-8")
+
+			router.ServeHTTP(rec, req)
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, "application/json; charset=utf-8", rec.Header().Get("Content-Type"))
+			assert.Equal(t, "{\"message\":\"Hello bob\"}", rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
 }

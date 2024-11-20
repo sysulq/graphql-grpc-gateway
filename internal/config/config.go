@@ -17,16 +17,6 @@ type Pyroscope struct {
 	Enable            bool
 }
 
-type GraphQL struct {
-	Address                string
-	Disable                bool
-	Playground             bool
-	Jwt                    Jwt
-	GenerateUnboundMethods bool
-	QueryCache             bool
-	SingleFlight           bool
-}
-
 type Jwt struct {
 	Enable               bool
 	LocalJwks            string
@@ -51,14 +41,25 @@ type ConfigInfo struct {
 }
 
 type ServerConfig struct {
-	GraphQL GraphQL
+	GraphQL GraphQLConfig
 	HTTP    HTTPConfig
 }
 
 type HTTPConfig struct {
-	Address string
-	Disable bool
-	Jwt     Jwt
+	Address      string
+	Disable      bool
+	Jwt          Jwt
+	SingleFlight bool
+}
+
+type GraphQLConfig struct {
+	Address                string
+	Disable                bool
+	Playground             bool
+	Jwt                    Jwt
+	GenerateUnboundMethods bool
+	QueryCache             bool
+	SingleFlight           bool
 }
 
 type Grpc struct {

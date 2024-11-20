@@ -1,6 +1,7 @@
 server:
   http:
     address: ":9090"
+    singleFlight: true
 
   graphql:
     address: ":8080"

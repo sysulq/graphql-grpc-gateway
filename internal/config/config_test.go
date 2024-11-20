@@ -25,7 +25,7 @@ func TestConfig(t *testing.T) {
 				},
 			},
 			Server: ServerConfig{
-				GraphQL: GraphQL{
+				GraphQL: GraphQLConfig{
 					Address:                ":8080",
 					Disable:                false,
 					Playground:             true,
@@ -34,7 +34,8 @@ func TestConfig(t *testing.T) {
 					SingleFlight:           true,
 				},
 				HTTP: HTTPConfig{
-					Address: ":9090",
+					Address:      ":9090",
+					SingleFlight: true,
 				},
 			},
 			Grpc: Grpc{

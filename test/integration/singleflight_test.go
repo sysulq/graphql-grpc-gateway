@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
+	"github.com/sysulq/graphql-grpc-gateway/pkg/header"
 	"github.com/sysulq/graphql-grpc-gateway/test"
 	"go.uber.org/mock/gomock"
 )
@@ -37,7 +38,7 @@ func TestSingleFlight(t *testing.T) {
 			},
 		},
 		Server: config.ServerConfig{
-			GraphQL: config.GraphQL{
+			GraphQL: config.GraphQLConfig{
 				GenerateUnboundMethods: true,
 				SingleFlight:           true,
 			},
@@ -69,7 +70,7 @@ func TestSingleFlight(t *testing.T) {
 					querier.WithMiddlewares([]graphql.NetworkMiddleware{
 						func(r *http.Request) error {
 							r.Header.Set("Authorization", "Bearer ")
-							r.Header.Set(server.MetadataHeaderPrefix+"singleflight", "true")
+							r.Header.Set(header.MetadataHeaderPrefix+"singleflight", "true")
 							return nil
 						},
 					})

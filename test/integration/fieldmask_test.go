@@ -42,7 +42,7 @@ func TestFieldMask(t *testing.T) {
 			},
 		},
 		Server: config.ServerConfig{
-			GraphQL: config.GraphQL{
+			GraphQL: config.GraphQLConfig{
 				Playground:             true,
 				GenerateUnboundMethods: true,
 				SingleFlight:           true,

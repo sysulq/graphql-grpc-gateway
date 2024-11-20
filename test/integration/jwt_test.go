@@ -38,7 +38,7 @@ func TestJwt(t *testing.T) {
 			},
 		},
 		Server: config.ServerConfig{
-			GraphQL: config.GraphQL{
+			GraphQL: config.GraphQLConfig{
 				GenerateUnboundMethods: true,
 				Jwt: config.Jwt{
 					Enable:               true,
