@@ -16,15 +16,15 @@ import (
 
 type anyMap = map[string]interface{}
 
-type queryer struct {
-	kod.Implements[Queryer]
+type graphqlQueryer struct {
+	kod.Implements[GraphqlQueryer]
 
 	config   kod.Ref[config.Config]
-	caller   kod.Ref[Caller]
+	caller   kod.Ref[GraphqlCaller]
 	registry kod.Ref[CallerRegistry]
 }
 
-func (q *queryer) Interceptors() []interceptor.Interceptor {
+func (q *graphqlQueryer) Interceptors() []interceptor.Interceptor {
 	if q.config.Get().Config().Engine.RateLimit {
 		return []interceptor.Interceptor{
 			kratelimit.Interceptor(),
@@ -34,7 +34,7 @@ func (q *queryer) Interceptors() []interceptor.Interceptor {
 	return nil
 }
 
-func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error {
+func (q *graphqlQueryer) Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error {
 	res := map[string]interface{}{}
 	var err error
 	var selection ast.SelectionSet
@@ -78,7 +78,7 @@ func (q *queryer) Query(ctx context.Context, input *graphql.QueryInput, result i
 	return nil
 }
 
-func (q *queryer) resolveMutation(ctx context.Context, selection ast.SelectionSet, res anyMap, vars map[string]interface{}) (err error) {
+func (q *graphqlQueryer) resolveMutation(ctx context.Context, selection ast.SelectionSet, res anyMap, vars map[string]interface{}) (err error) {
 	for _, ss := range selection {
 		field, ok := ss.(*ast.Field)
 		if !ok {
@@ -96,7 +96,7 @@ func (q *queryer) resolveMutation(ctx context.Context, selection ast.SelectionSe
 	return
 }
 
-func (q *queryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, res anyMap, vars map[string]interface{}) (err error) {
+func (q *graphqlQueryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, res anyMap, vars map[string]interface{}) (err error) {
 	type mapEntry struct {
 		key string
 		val interface{}
@@ -144,7 +144,7 @@ func (q *queryer) resolveQuery(ctx context.Context, selection ast.SelectionSet, 
 	return
 }
 
-func (q *queryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.Field, vars map[string]interface{}) (interface{}, error) {
+func (q *graphqlQueryer) resolveCall(ctx context.Context, op ast.Operation, field *ast.Field, vars map[string]interface{}) (interface{}, error) {
 	method := q.registry.Get().FindMethodByName(op, field.Name)
 	if method == nil {
 		return nil, errors.New("method not found")

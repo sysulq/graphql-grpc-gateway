@@ -53,7 +53,7 @@ func TestHTTP2Grpc(t *testing.T) {
 	}).AnyTimes()
 
 	t.Run("http to grpc", func(t *testing.T) {
-		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
+		kod.RunTest(t, func(ctx context.Context, up server.HttpUpstream) {
 			router := http.NewServeMux()
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
@@ -67,7 +67,7 @@ func TestHTTP2Grpc(t *testing.T) {
 	})
 
 	t.Run("not found", func(t *testing.T) {
-		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
+		kod.RunTest(t, func(ctx context.Context, up server.HttpUpstream) {
 			router := http.NewServeMux()
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
@@ -81,7 +81,7 @@ func TestHTTP2Grpc(t *testing.T) {
 	})
 
 	t.Run("error", func(t *testing.T) {
-		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
+		kod.RunTest(t, func(ctx context.Context, up server.HttpUpstream) {
 			router := http.NewServeMux()
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
@@ -95,7 +95,7 @@ func TestHTTP2Grpc(t *testing.T) {
 	})
 
 	t.Run("http body", func(t *testing.T) {
-		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
+		kod.RunTest(t, func(ctx context.Context, up server.HttpUpstream) {
 			router := http.NewServeMux()
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
@@ -109,7 +109,7 @@ func TestHTTP2Grpc(t *testing.T) {
 	})
 
 	t.Run("invalid http body", func(t *testing.T) {
-		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
+		kod.RunTest(t, func(ctx context.Context, up server.HttpUpstream) {
 			router := http.NewServeMux()
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()

@@ -44,8 +44,8 @@ func SetupGateway(t testing.TB, s server.Gateway) string {
 			serverCh <- l.Addr()
 		}()
 
-		handler, err := s.BuildHTTPServer()
-		handler, err = s.BuildServer()
+		_, _ = s.BuildHTTPServer()
+		handler, err := s.BuildServer()
 		require.Nil(t, err)
 		_ = http.Serve(l, handler)
 	}()

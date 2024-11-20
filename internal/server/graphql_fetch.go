@@ -22,11 +22,11 @@ func isReflectionServiceName(name string) bool {
 
 var ErrTLSHandshakeFailed = errors.New("TLS handshake failed")
 
-type reflection struct {
-	kod.Implements[Reflection]
+type graphqlReflection struct {
+	kod.Implements[GraphqlReflection]
 }
 
-func (ins *reflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error) {
+func (ins *graphqlReflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error) {
 	client := grpcreflect.NewClientAuto(ctx, cc)
 	ssvcs, err := client.ListServices()
 	if err != nil {

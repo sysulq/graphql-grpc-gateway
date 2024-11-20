@@ -22,10 +22,10 @@ type server struct {
 	profiler *pyroscope.Profiler
 
 	config       kod.Ref[config.Config]
-	_            kod.Ref[Caller]
-	queryer      kod.Ref[Queryer]
+	_            kod.Ref[GraphqlCaller]
+	queryer      kod.Ref[GraphqlQueryer]
 	registry     kod.Ref[CallerRegistry]
-	httpUpstream kod.Ref[Upstream]
+	httpUpstream kod.Ref[HttpUpstream]
 }
 
 func (ins *server) Init(ctx context.Context) error {

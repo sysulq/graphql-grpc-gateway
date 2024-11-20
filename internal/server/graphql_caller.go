@@ -16,8 +16,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-type caller struct {
-	kod.Implements[Caller]
+type graphqlCaller struct {
+	kod.Implements[GraphqlCaller]
 
 	config   kod.Ref[config.Config]
 	registry kod.Ref[CallerRegistry]
@@ -25,11 +25,11 @@ type caller struct {
 	singleflight singleflight.Group
 }
 
-func (c *caller) Init(ctx context.Context) error {
+func (c *graphqlCaller) Init(ctx context.Context) error {
 	return nil
 }
 
-func (c *caller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
+func (c *graphqlCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
 	if c.config.Get().Config().Server.GraphQL.SingleFlight {
 		if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
 			hash := Hash64.Get()
@@ -86,7 +86,7 @@ func (c *caller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, me
 	return res, err
 }
 
-func (c *caller) Interceptors() []interceptor.Interceptor {
+func (c *graphqlCaller) Interceptors() []interceptor.Interceptor {
 	if c.config.Get().Config().Engine.CircuitBreaker {
 		return []interceptor.Interceptor{
 			kcircuitbreaker.Interceptor(),

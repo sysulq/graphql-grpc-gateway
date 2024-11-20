@@ -13,16 +13,16 @@ import (
 	"github.com/sysulq/graphql-grpc-gateway/pkg/protojson"
 )
 
-type invoker struct {
-	kod.Implements[Invoker]
+type httpUpstreamInvoker struct {
+	kod.Implements[HttpUpstreamInvoker]
 }
 
-func (i *invoker) Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Request, upstream upstreamInfo, rpcPath string, pathNames []string) {
+func (i *httpUpstreamInvoker) Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Request, upstream upstreamInfo, rpcPath string, pathNames []string) {
 	parser, err := protojson.NewRequestParser(r, pathNames, upstream.resovler)
 	if err != nil {
 		i.L(ctx).Error("parse request", "error", err)
 		rw.WriteHeader(http.StatusBadRequest)
-		rw.Write([]byte(err.Error()))
+		_, _ = rw.Write([]byte(err.Error()))
 		return
 	}
 
@@ -36,13 +36,13 @@ func (i *invoker) Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Re
 		i.L(ctx).Error("invoke rpc", "error", err)
 		if handler.Status == nil {
 			rw.WriteHeader(http.StatusInternalServerError)
-			rw.Write([]byte(err.Error()))
+			_, _ = rw.Write([]byte(err.Error()))
 			return
 		}
 	}
 }
 
-func (invoker) Interceptors() []interceptor.Interceptor {
+func (httpUpstreamInvoker) Interceptors() []interceptor.Interceptor {
 	return []interceptor.Interceptor{
 		kaccesslog.Interceptor(),
 		kmetric.Interceptor(),

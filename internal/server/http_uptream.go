@@ -19,10 +19,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-type upstream struct {
-	kod.Implements[Upstream]
+type httpUpstream struct {
+	kod.Implements[HttpUpstream]
 
-	invoker kod.Ref[Invoker]
+	invoker kod.Ref[HttpUpstreamInvoker]
 	config  kod.Ref[config.Config]
 
 	upstreams map[string]upstreamInfo
@@ -36,7 +36,7 @@ type upstreamInfo struct {
 	methods  []protojson.Method
 }
 
-func (u *upstream) Init(ctx context.Context) error {
+func (u *httpUpstream) Init(ctx context.Context) error {
 	u.upstreams = make(map[string]upstreamInfo)
 
 	lo.ForEach(u.config.Get().Config().Grpc.Services, func(item kgrpc.Config, index int) {
@@ -65,7 +65,7 @@ func (u *upstream) Init(ctx context.Context) error {
 	return nil
 }
 
-func (u *upstream) Register(ctx context.Context, router *http.ServeMux) {
+func (u *httpUpstream) Register(ctx context.Context, router *http.ServeMux) {
 	for _, upstream := range u.upstreams {
 		for _, v := range upstream.methods {
 			if v.HttpPath == "" {
@@ -78,7 +78,7 @@ func (u *upstream) Register(ctx context.Context, router *http.ServeMux) {
 	}
 }
 
-func (u *upstream) buildHandler(_ context.Context, upstream upstreamInfo, rpcPath string, pathNames []string) http.HandlerFunc {
+func (u *httpUpstream) buildHandler(_ context.Context, upstream upstreamInfo, rpcPath string, pathNames []string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		u.invoker.Get().Invoke(r.Context(), rw, r, upstream, rpcPath, pathNames)
 	}

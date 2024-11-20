@@ -55,7 +55,7 @@ func TestFieldMask(t *testing.T) {
 		Double: 1.1, Float: 2.2, Int32: 3, Int64: -4, Uint32: 5, Uint64: 6, Sint32: 7, Sint64: 8, Fixed32: 9, Fixed64: 10, Sfixed32: 11,
 		Sfixed64: 12, Bool: true, StringX: "test", Bytes: []byte("test"), Paths: &fieldmaskpb.FieldMask{Paths: []string{"double", "float"}},
 	}
-	mockCaller := server.NewMockCaller(gomock.NewController(t))
+	mockCaller := server.NewMockGraphqlCaller(gomock.NewController(t))
 	mockCaller.EXPECT().Call(gomock.Any(), gomock.Any(), gomock.Cond(func(x any) bool {
 		d1, _ := protojson.Marshal(x.(*dynamicpb.Message))
 		d2, _ := protojson.Marshal(scalars)
@@ -105,5 +105,5 @@ func TestFieldMask(t *testing.T) {
 				t.Errorf("mutation failed: expected: %s got: %s", tc.wantResponse, recv)
 			}
 		}
-	}, kod.WithFakes(kod.Fake[config.Config](mockConfig), kod.Fake[server.Caller](mockCaller)))
+	}, kod.WithFakes(kod.Fake[config.Config](mockConfig), kod.Fake[server.GraphqlCaller](mockCaller)))
 }

@@ -18,7 +18,7 @@ import (
 type callerRegistry struct {
 	kod.Implements[CallerRegistry]
 	config     kod.Ref[config.Config]
-	reflection kod.Ref[Reflection]
+	reflection kod.Ref[GraphqlReflection]
 
 	serviceStub map[string]*grpcdynamic.Stub
 	schema      *protographql.SchemaDescriptor

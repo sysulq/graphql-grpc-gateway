@@ -127,32 +127,32 @@ func (c *MockGatewayBuildServerCall) DoAndReturn(f func() (http.Handler, error))
 	return c
 }
 
-// MockCaller is a mock of Caller interface.
-type MockCaller struct {
+// MockGraphqlCaller is a mock of GraphqlCaller interface.
+type MockGraphqlCaller struct {
 	ctrl     *gomock.Controller
-	recorder *MockCallerMockRecorder
+	recorder *MockGraphqlCallerMockRecorder
 	isgomock struct{}
 }
 
-// MockCallerMockRecorder is the mock recorder for MockCaller.
-type MockCallerMockRecorder struct {
-	mock *MockCaller
+// MockGraphqlCallerMockRecorder is the mock recorder for MockGraphqlCaller.
+type MockGraphqlCallerMockRecorder struct {
+	mock *MockGraphqlCaller
 }
 
-// NewMockCaller creates a new mock instance.
-func NewMockCaller(ctrl *gomock.Controller) *MockCaller {
-	mock := &MockCaller{ctrl: ctrl}
-	mock.recorder = &MockCallerMockRecorder{mock}
+// NewMockGraphqlCaller creates a new mock instance.
+func NewMockGraphqlCaller(ctrl *gomock.Controller) *MockGraphqlCaller {
+	mock := &MockGraphqlCaller{ctrl: ctrl}
+	mock.recorder = &MockGraphqlCallerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCaller) EXPECT() *MockCallerMockRecorder {
+func (m *MockGraphqlCaller) EXPECT() *MockGraphqlCallerMockRecorder {
 	return m.recorder
 }
 
 // Call mocks base method.
-func (m *MockCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
+func (m *MockGraphqlCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Call", ctx, rpc, message)
 	ret0, _ := ret[0].(proto.Message)
@@ -161,31 +161,31 @@ func (m *MockCaller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor
 }
 
 // Call indicates an expected call of Call.
-func (mr *MockCallerMockRecorder) Call(ctx, rpc, message any) *MockCallerCallCall {
+func (mr *MockGraphqlCallerMockRecorder) Call(ctx, rpc, message any) *MockGraphqlCallerCallCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Call", reflect.TypeOf((*MockCaller)(nil).Call), ctx, rpc, message)
-	return &MockCallerCallCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Call", reflect.TypeOf((*MockGraphqlCaller)(nil).Call), ctx, rpc, message)
+	return &MockGraphqlCallerCallCall{Call: call}
 }
 
-// MockCallerCallCall wrap *gomock.Call
-type MockCallerCallCall struct {
+// MockGraphqlCallerCallCall wrap *gomock.Call
+type MockGraphqlCallerCallCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockCallerCallCall) Return(arg0 proto.Message, arg1 error) *MockCallerCallCall {
+func (c *MockGraphqlCallerCallCall) Return(arg0 proto.Message, arg1 error) *MockGraphqlCallerCallCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockCallerCallCall) Do(f func(context.Context, protoreflect.MethodDescriptor, proto.Message) (proto.Message, error)) *MockCallerCallCall {
+func (c *MockGraphqlCallerCallCall) Do(f func(context.Context, protoreflect.MethodDescriptor, proto.Message) (proto.Message, error)) *MockGraphqlCallerCallCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockCallerCallCall) DoAndReturn(f func(context.Context, protoreflect.MethodDescriptor, proto.Message) (proto.Message, error)) *MockCallerCallCall {
+func (c *MockGraphqlCallerCallCall) DoAndReturn(f func(context.Context, protoreflect.MethodDescriptor, proto.Message) (proto.Message, error)) *MockGraphqlCallerCallCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -406,32 +406,32 @@ func (c *MockCallerRegistryUnmarshalCall) DoAndReturn(f func(protoreflect.Messag
 	return c
 }
 
-// MockReflection is a mock of Reflection interface.
-type MockReflection struct {
+// MockGraphqlReflection is a mock of GraphqlReflection interface.
+type MockGraphqlReflection struct {
 	ctrl     *gomock.Controller
-	recorder *MockReflectionMockRecorder
+	recorder *MockGraphqlReflectionMockRecorder
 	isgomock struct{}
 }
 
-// MockReflectionMockRecorder is the mock recorder for MockReflection.
-type MockReflectionMockRecorder struct {
-	mock *MockReflection
+// MockGraphqlReflectionMockRecorder is the mock recorder for MockGraphqlReflection.
+type MockGraphqlReflectionMockRecorder struct {
+	mock *MockGraphqlReflection
 }
 
-// NewMockReflection creates a new mock instance.
-func NewMockReflection(ctrl *gomock.Controller) *MockReflection {
-	mock := &MockReflection{ctrl: ctrl}
-	mock.recorder = &MockReflectionMockRecorder{mock}
+// NewMockGraphqlReflection creates a new mock instance.
+func NewMockGraphqlReflection(ctrl *gomock.Controller) *MockGraphqlReflection {
+	mock := &MockGraphqlReflection{ctrl: ctrl}
+	mock.recorder = &MockGraphqlReflectionMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockReflection) EXPECT() *MockReflectionMockRecorder {
+func (m *MockGraphqlReflection) EXPECT() *MockGraphqlReflectionMockRecorder {
 	return m.recorder
 }
 
 // ListPackages mocks base method.
-func (m *MockReflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error) {
+func (m *MockGraphqlReflection) ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListPackages", ctx, cc)
 	ret0, _ := ret[0].([]protoreflect.FileDescriptor)
@@ -440,61 +440,61 @@ func (m *MockReflection) ListPackages(ctx context.Context, cc grpc.ClientConnInt
 }
 
 // ListPackages indicates an expected call of ListPackages.
-func (mr *MockReflectionMockRecorder) ListPackages(ctx, cc any) *MockReflectionListPackagesCall {
+func (mr *MockGraphqlReflectionMockRecorder) ListPackages(ctx, cc any) *MockGraphqlReflectionListPackagesCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListPackages", reflect.TypeOf((*MockReflection)(nil).ListPackages), ctx, cc)
-	return &MockReflectionListPackagesCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListPackages", reflect.TypeOf((*MockGraphqlReflection)(nil).ListPackages), ctx, cc)
+	return &MockGraphqlReflectionListPackagesCall{Call: call}
 }
 
-// MockReflectionListPackagesCall wrap *gomock.Call
-type MockReflectionListPackagesCall struct {
+// MockGraphqlReflectionListPackagesCall wrap *gomock.Call
+type MockGraphqlReflectionListPackagesCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockReflectionListPackagesCall) Return(arg0 []protoreflect.FileDescriptor, arg1 error) *MockReflectionListPackagesCall {
+func (c *MockGraphqlReflectionListPackagesCall) Return(arg0 []protoreflect.FileDescriptor, arg1 error) *MockGraphqlReflectionListPackagesCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockReflectionListPackagesCall) Do(f func(context.Context, grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error)) *MockReflectionListPackagesCall {
+func (c *MockGraphqlReflectionListPackagesCall) Do(f func(context.Context, grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error)) *MockGraphqlReflectionListPackagesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockReflectionListPackagesCall) DoAndReturn(f func(context.Context, grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error)) *MockReflectionListPackagesCall {
+func (c *MockGraphqlReflectionListPackagesCall) DoAndReturn(f func(context.Context, grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error)) *MockGraphqlReflectionListPackagesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
-// MockQueryer is a mock of Queryer interface.
-type MockQueryer struct {
+// MockGraphqlQueryer is a mock of GraphqlQueryer interface.
+type MockGraphqlQueryer struct {
 	ctrl     *gomock.Controller
-	recorder *MockQueryerMockRecorder
+	recorder *MockGraphqlQueryerMockRecorder
 	isgomock struct{}
 }
 
-// MockQueryerMockRecorder is the mock recorder for MockQueryer.
-type MockQueryerMockRecorder struct {
-	mock *MockQueryer
+// MockGraphqlQueryerMockRecorder is the mock recorder for MockGraphqlQueryer.
+type MockGraphqlQueryerMockRecorder struct {
+	mock *MockGraphqlQueryer
 }
 
-// NewMockQueryer creates a new mock instance.
-func NewMockQueryer(ctrl *gomock.Controller) *MockQueryer {
-	mock := &MockQueryer{ctrl: ctrl}
-	mock.recorder = &MockQueryerMockRecorder{mock}
+// NewMockGraphqlQueryer creates a new mock instance.
+func NewMockGraphqlQueryer(ctrl *gomock.Controller) *MockGraphqlQueryer {
+	mock := &MockGraphqlQueryer{ctrl: ctrl}
+	mock.recorder = &MockGraphqlQueryerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockQueryer) EXPECT() *MockQueryerMockRecorder {
+func (m *MockGraphqlQueryer) EXPECT() *MockGraphqlQueryerMockRecorder {
 	return m.recorder
 }
 
 // Query mocks base method.
-func (m *MockQueryer) Query(ctx context.Context, input *graphql.QueryInput, result any) error {
+func (m *MockGraphqlQueryer) Query(ctx context.Context, input *graphql.QueryInput, result any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Query", ctx, input, result)
 	ret0, _ := ret[0].(error)
@@ -502,151 +502,151 @@ func (m *MockQueryer) Query(ctx context.Context, input *graphql.QueryInput, resu
 }
 
 // Query indicates an expected call of Query.
-func (mr *MockQueryerMockRecorder) Query(ctx, input, result any) *MockQueryerQueryCall {
+func (mr *MockGraphqlQueryerMockRecorder) Query(ctx, input, result any) *MockGraphqlQueryerQueryCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockQueryer)(nil).Query), ctx, input, result)
-	return &MockQueryerQueryCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockGraphqlQueryer)(nil).Query), ctx, input, result)
+	return &MockGraphqlQueryerQueryCall{Call: call}
 }
 
-// MockQueryerQueryCall wrap *gomock.Call
-type MockQueryerQueryCall struct {
+// MockGraphqlQueryerQueryCall wrap *gomock.Call
+type MockGraphqlQueryerQueryCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockQueryerQueryCall) Return(arg0 error) *MockQueryerQueryCall {
+func (c *MockGraphqlQueryerQueryCall) Return(arg0 error) *MockGraphqlQueryerQueryCall {
 	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockQueryerQueryCall) Do(f func(context.Context, *graphql.QueryInput, any) error) *MockQueryerQueryCall {
+func (c *MockGraphqlQueryerQueryCall) Do(f func(context.Context, *graphql.QueryInput, any) error) *MockGraphqlQueryerQueryCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockQueryerQueryCall) DoAndReturn(f func(context.Context, *graphql.QueryInput, any) error) *MockQueryerQueryCall {
+func (c *MockGraphqlQueryerQueryCall) DoAndReturn(f func(context.Context, *graphql.QueryInput, any) error) *MockGraphqlQueryerQueryCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
-// MockInvoker is a mock of Invoker interface.
-type MockInvoker struct {
+// MockHttpUpstreamInvoker is a mock of HttpUpstreamInvoker interface.
+type MockHttpUpstreamInvoker struct {
 	ctrl     *gomock.Controller
-	recorder *MockInvokerMockRecorder
+	recorder *MockHttpUpstreamInvokerMockRecorder
 	isgomock struct{}
 }
 
-// MockInvokerMockRecorder is the mock recorder for MockInvoker.
-type MockInvokerMockRecorder struct {
-	mock *MockInvoker
+// MockHttpUpstreamInvokerMockRecorder is the mock recorder for MockHttpUpstreamInvoker.
+type MockHttpUpstreamInvokerMockRecorder struct {
+	mock *MockHttpUpstreamInvoker
 }
 
-// NewMockInvoker creates a new mock instance.
-func NewMockInvoker(ctrl *gomock.Controller) *MockInvoker {
-	mock := &MockInvoker{ctrl: ctrl}
-	mock.recorder = &MockInvokerMockRecorder{mock}
+// NewMockHttpUpstreamInvoker creates a new mock instance.
+func NewMockHttpUpstreamInvoker(ctrl *gomock.Controller) *MockHttpUpstreamInvoker {
+	mock := &MockHttpUpstreamInvoker{ctrl: ctrl}
+	mock.recorder = &MockHttpUpstreamInvokerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockInvoker) EXPECT() *MockInvokerMockRecorder {
+func (m *MockHttpUpstreamInvoker) EXPECT() *MockHttpUpstreamInvokerMockRecorder {
 	return m.recorder
 }
 
 // Invoke mocks base method.
-func (m *MockInvoker) Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Request, upstream upstreamInfo, rpcPath string, pathNames []string) {
+func (m *MockHttpUpstreamInvoker) Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Request, upstream upstreamInfo, rpcPath string, pathNames []string) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Invoke", ctx, rw, r, upstream, rpcPath, pathNames)
 }
 
 // Invoke indicates an expected call of Invoke.
-func (mr *MockInvokerMockRecorder) Invoke(ctx, rw, r, upstream, rpcPath, pathNames any) *MockInvokerInvokeCall {
+func (mr *MockHttpUpstreamInvokerMockRecorder) Invoke(ctx, rw, r, upstream, rpcPath, pathNames any) *MockHttpUpstreamInvokerInvokeCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Invoke", reflect.TypeOf((*MockInvoker)(nil).Invoke), ctx, rw, r, upstream, rpcPath, pathNames)
-	return &MockInvokerInvokeCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Invoke", reflect.TypeOf((*MockHttpUpstreamInvoker)(nil).Invoke), ctx, rw, r, upstream, rpcPath, pathNames)
+	return &MockHttpUpstreamInvokerInvokeCall{Call: call}
 }
 
-// MockInvokerInvokeCall wrap *gomock.Call
-type MockInvokerInvokeCall struct {
+// MockHttpUpstreamInvokerInvokeCall wrap *gomock.Call
+type MockHttpUpstreamInvokerInvokeCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockInvokerInvokeCall) Return() *MockInvokerInvokeCall {
+func (c *MockHttpUpstreamInvokerInvokeCall) Return() *MockHttpUpstreamInvokerInvokeCall {
 	c.Call = c.Call.Return()
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockInvokerInvokeCall) Do(f func(context.Context, http.ResponseWriter, *http.Request, upstreamInfo, string, []string)) *MockInvokerInvokeCall {
+func (c *MockHttpUpstreamInvokerInvokeCall) Do(f func(context.Context, http.ResponseWriter, *http.Request, upstreamInfo, string, []string)) *MockHttpUpstreamInvokerInvokeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockInvokerInvokeCall) DoAndReturn(f func(context.Context, http.ResponseWriter, *http.Request, upstreamInfo, string, []string)) *MockInvokerInvokeCall {
+func (c *MockHttpUpstreamInvokerInvokeCall) DoAndReturn(f func(context.Context, http.ResponseWriter, *http.Request, upstreamInfo, string, []string)) *MockHttpUpstreamInvokerInvokeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
-// MockUpstream is a mock of Upstream interface.
-type MockUpstream struct {
+// MockHttpUpstream is a mock of HttpUpstream interface.
+type MockHttpUpstream struct {
 	ctrl     *gomock.Controller
-	recorder *MockUpstreamMockRecorder
+	recorder *MockHttpUpstreamMockRecorder
 	isgomock struct{}
 }
 
-// MockUpstreamMockRecorder is the mock recorder for MockUpstream.
-type MockUpstreamMockRecorder struct {
-	mock *MockUpstream
+// MockHttpUpstreamMockRecorder is the mock recorder for MockHttpUpstream.
+type MockHttpUpstreamMockRecorder struct {
+	mock *MockHttpUpstream
 }
 
-// NewMockUpstream creates a new mock instance.
-func NewMockUpstream(ctrl *gomock.Controller) *MockUpstream {
-	mock := &MockUpstream{ctrl: ctrl}
-	mock.recorder = &MockUpstreamMockRecorder{mock}
+// NewMockHttpUpstream creates a new mock instance.
+func NewMockHttpUpstream(ctrl *gomock.Controller) *MockHttpUpstream {
+	mock := &MockHttpUpstream{ctrl: ctrl}
+	mock.recorder = &MockHttpUpstreamMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockUpstream) EXPECT() *MockUpstreamMockRecorder {
+func (m *MockHttpUpstream) EXPECT() *MockHttpUpstreamMockRecorder {
 	return m.recorder
 }
 
 // Register mocks base method.
-func (m *MockUpstream) Register(ctx context.Context, router *http.ServeMux) {
+func (m *MockHttpUpstream) Register(ctx context.Context, router *http.ServeMux) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Register", ctx, router)
 }
 
 // Register indicates an expected call of Register.
-func (mr *MockUpstreamMockRecorder) Register(ctx, router any) *MockUpstreamRegisterCall {
+func (mr *MockHttpUpstreamMockRecorder) Register(ctx, router any) *MockHttpUpstreamRegisterCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockUpstream)(nil).Register), ctx, router)
-	return &MockUpstreamRegisterCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockHttpUpstream)(nil).Register), ctx, router)
+	return &MockHttpUpstreamRegisterCall{Call: call}
 }
 
-// MockUpstreamRegisterCall wrap *gomock.Call
-type MockUpstreamRegisterCall struct {
+// MockHttpUpstreamRegisterCall wrap *gomock.Call
+type MockHttpUpstreamRegisterCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockUpstreamRegisterCall) Return() *MockUpstreamRegisterCall {
+func (c *MockHttpUpstreamRegisterCall) Return() *MockHttpUpstreamRegisterCall {
 	c.Call = c.Call.Return()
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockUpstreamRegisterCall) Do(f func(context.Context, *http.ServeMux)) *MockUpstreamRegisterCall {
+func (c *MockHttpUpstreamRegisterCall) Do(f func(context.Context, *http.ServeMux)) *MockHttpUpstreamRegisterCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockUpstreamRegisterCall) DoAndReturn(f func(context.Context, *http.ServeMux)) *MockUpstreamRegisterCall {
+func (c *MockHttpUpstreamRegisterCall) DoAndReturn(f func(context.Context, *http.ServeMux)) *MockHttpUpstreamRegisterCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
