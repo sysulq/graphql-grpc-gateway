@@ -5,6 +5,7 @@ package server
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/jhump/protoreflect/v2/grpcdynamic"
@@ -22,6 +23,10 @@ const (
 	Caller_Call_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Caller.Call"
 	// Reflection_ListPackages_FullMethodName is the full name of the method [reflection.ListPackages].
 	Reflection_ListPackages_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection.ListPackages"
+	// Invoker_Invoke_FullMethodName is the full name of the method [invoker.Invoke].
+	Invoker_Invoke_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Invoker.Invoke"
+	// Upstream_Register_FullMethodName is the full name of the method [upstream.Register].
+	Upstream_Register_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Upstream.Register"
 	// Queryer_Query_FullMethodName is the full name of the method [queryer.Query].
 	Queryer_Query_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer.Query"
 )
@@ -81,6 +86,31 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Invoker",
+		Interface: reflect.TypeOf((*Invoker)(nil)).Elem(),
+		Impl:      reflect.TypeOf(invoker{}),
+		Refs:      ``,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			return invoker_local_stub{
+				impl:        info.Impl.(Invoker),
+				interceptor: info.Interceptor,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
+		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Upstream",
+		Interface: reflect.TypeOf((*Upstream)(nil)).Elem(),
+		Impl:      reflect.TypeOf(upstream{}),
+		Refs: `⟦0f6f4389:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Upstream→github.com/sysulq/graphql-grpc-gateway/internal/server/Invoker⟧,
+⟦bef0f87d:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Upstream→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧`,
+		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
+			return upstream_local_stub{
+				impl:        info.Impl.(Upstream),
+				interceptor: info.Interceptor,
+			}
+		},
+	})
+	kod.Register(&kod.Registration{
 		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer",
 		Interface: reflect.TypeOf((*Queryer)(nil)).Elem(),
 		Impl:      reflect.TypeOf(queryer{}),
@@ -101,6 +131,8 @@ var _ kod.InstanceOf[Caller] = (*caller)(nil)
 var _ kod.InstanceOf[CallerRegistry] = (*callerRegistry)(nil)
 var _ kod.InstanceOf[Reflection] = (*reflection)(nil)
 var _ kod.InstanceOf[Gateway] = (*server)(nil)
+var _ kod.InstanceOf[Invoker] = (*invoker)(nil)
+var _ kod.InstanceOf[Upstream] = (*upstream)(nil)
 var _ kod.InstanceOf[Queryer] = (*queryer)(nil)
 
 // Local stub implementations.
@@ -226,6 +258,66 @@ func (s gateway_local_stub) BuildServer() (r0 http.Handler, err error) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
 	r0, err = s.impl.BuildServer()
 	return
+}
+
+// invoker_local_stub is a local stub implementation of [Invoker].
+type invoker_local_stub struct {
+	impl        Invoker
+	interceptor interceptor.Interceptor
+}
+
+// Check that [invoker_local_stub] implements the [Invoker] interface.
+var _ Invoker = (*invoker_local_stub)(nil)
+
+// Invoke wraps the method [invoker.Invoke].
+func (s invoker_local_stub) Invoke(ctx context.Context, a1 *gin.Context, a2 upstreamInfo, a3 string) {
+
+	if s.interceptor == nil {
+		s.impl.Invoke(ctx, a1, a2, a3)
+		return
+	}
+
+	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
+		s.impl.Invoke(ctx, a1, a2, a3)
+		return
+	}
+
+	info := interceptor.CallInfo{
+		Impl:       s.impl,
+		FullMethod: Invoker_Invoke_FullMethodName,
+	}
+
+	_ = s.interceptor(ctx, info, []any{a1, a2, a3}, []any{}, call)
+}
+
+// upstream_local_stub is a local stub implementation of [Upstream].
+type upstream_local_stub struct {
+	impl        Upstream
+	interceptor interceptor.Interceptor
+}
+
+// Check that [upstream_local_stub] implements the [Upstream] interface.
+var _ Upstream = (*upstream_local_stub)(nil)
+
+// Register wraps the method [upstream.Register].
+func (s upstream_local_stub) Register(ctx context.Context, a1 *gin.Engine) {
+
+	if s.interceptor == nil {
+		s.impl.Register(ctx, a1)
+		return
+	}
+
+	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
+		s.impl.Register(ctx, a1)
+		return
+	}
+
+	info := interceptor.CallInfo{
+		Impl:       s.impl,
+		FullMethod: Upstream_Register_FullMethodName,
+	}
+
+	_ = s.interceptor(ctx, info, []any{a1}, []any{}, call)
 }
 
 // queryer_local_stub is a local stub implementation of [Queryer].

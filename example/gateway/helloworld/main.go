@@ -7,7 +7,7 @@ import (
 	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/go-kod/kod-ext/server/kgrpc"
 	"github.com/samber/lo"
-	pb "github.com/sysulq/graphql-grpc-gateway/api/example/helloworld"
+	"github.com/sysulq/graphql-grpc-gateway/api/example/helloworld"
 )
 
 type app struct {
@@ -19,20 +19,20 @@ func main() {
 		etcd := lo.Must(etcdv3.Config{Endpoints: []string{"localhost:2379"}}.Build(ctx))
 
 		s := kgrpc.Config{
-			Address: ":8081",
+			Address: ":8083",
 		}.Build().WithRegistry(etcd)
-		pb.RegisterGreeterServer(s, &service{})
+		helloworld.RegisterGreeterServer(s, &service{})
 
 		return s.Run(ctx)
 	})
 }
 
 type service struct {
-	pb.UnimplementedGreeterServer
+	helloworld.UnimplementedGreeterServer
 }
 
-func (s *service) SayHello(ctx context.Context, req *pb.HelloRequest) (*pb.HelloReply, error) {
-	return &pb.HelloReply{
+func (s *service) SayHello(ctx context.Context, req *helloworld.HelloRequest) (*helloworld.HelloReply, error) {
+	return &helloworld.HelloReply{
 		Message: "Hello " + req.Name,
 	}, nil
 }

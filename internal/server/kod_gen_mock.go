@@ -16,6 +16,7 @@ import (
 	http "net/http"
 	reflect "reflect"
 
+	gin "github.com/gin-gonic/gin"
 	grpcdynamic "github.com/jhump/protoreflect/v2/grpcdynamic"
 	graphql "github.com/nautilus/graphql"
 	ast "github.com/vektah/gqlparser/v2/ast"
@@ -426,6 +427,126 @@ func (c *MockGatewayBuildServerCall) Do(f func() (http.Handler, error)) *MockGat
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockGatewayBuildServerCall) DoAndReturn(f func() (http.Handler, error)) *MockGatewayBuildServerCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// MockInvoker is a mock of Invoker interface.
+type MockInvoker struct {
+	ctrl     *gomock.Controller
+	recorder *MockInvokerMockRecorder
+	isgomock struct{}
+}
+
+// MockInvokerMockRecorder is the mock recorder for MockInvoker.
+type MockInvokerMockRecorder struct {
+	mock *MockInvoker
+}
+
+// NewMockInvoker creates a new mock instance.
+func NewMockInvoker(ctrl *gomock.Controller) *MockInvoker {
+	mock := &MockInvoker{ctrl: ctrl}
+	mock.recorder = &MockInvokerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockInvoker) EXPECT() *MockInvokerMockRecorder {
+	return m.recorder
+}
+
+// Invoke mocks base method.
+func (m *MockInvoker) Invoke(ctx context.Context, c *gin.Context, upstream upstreamInfo, rpcPath string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Invoke", ctx, c, upstream, rpcPath)
+}
+
+// Invoke indicates an expected call of Invoke.
+func (mr *MockInvokerMockRecorder) Invoke(ctx, c, upstream, rpcPath any) *MockInvokerInvokeCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Invoke", reflect.TypeOf((*MockInvoker)(nil).Invoke), ctx, c, upstream, rpcPath)
+	return &MockInvokerInvokeCall{Call: call}
+}
+
+// MockInvokerInvokeCall wrap *gomock.Call
+type MockInvokerInvokeCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c_2 *MockInvokerInvokeCall) Return() *MockInvokerInvokeCall {
+	c_2.Call = c_2.Call.Return()
+	return c_2
+}
+
+// Do rewrite *gomock.Call.Do
+func (c_2 *MockInvokerInvokeCall) Do(f func(context.Context, *gin.Context, upstreamInfo, string)) *MockInvokerInvokeCall {
+	c_2.Call = c_2.Call.Do(f)
+	return c_2
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c_2 *MockInvokerInvokeCall) DoAndReturn(f func(context.Context, *gin.Context, upstreamInfo, string)) *MockInvokerInvokeCall {
+	c_2.Call = c_2.Call.DoAndReturn(f)
+	return c_2
+}
+
+// MockUpstream is a mock of Upstream interface.
+type MockUpstream struct {
+	ctrl     *gomock.Controller
+	recorder *MockUpstreamMockRecorder
+	isgomock struct{}
+}
+
+// MockUpstreamMockRecorder is the mock recorder for MockUpstream.
+type MockUpstreamMockRecorder struct {
+	mock *MockUpstream
+}
+
+// NewMockUpstream creates a new mock instance.
+func NewMockUpstream(ctrl *gomock.Controller) *MockUpstream {
+	mock := &MockUpstream{ctrl: ctrl}
+	mock.recorder = &MockUpstreamMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUpstream) EXPECT() *MockUpstreamMockRecorder {
+	return m.recorder
+}
+
+// Register mocks base method.
+func (m *MockUpstream) Register(ctx context.Context, router *gin.Engine) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Register", ctx, router)
+}
+
+// Register indicates an expected call of Register.
+func (mr *MockUpstreamMockRecorder) Register(ctx, router any) *MockUpstreamRegisterCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockUpstream)(nil).Register), ctx, router)
+	return &MockUpstreamRegisterCall{Call: call}
+}
+
+// MockUpstreamRegisterCall wrap *gomock.Call
+type MockUpstreamRegisterCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockUpstreamRegisterCall) Return() *MockUpstreamRegisterCall {
+	c.Call = c.Call.Return()
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockUpstreamRegisterCall) Do(f func(context.Context, *gin.Engine)) *MockUpstreamRegisterCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockUpstreamRegisterCall) DoAndReturn(f func(context.Context, *gin.Engine)) *MockUpstreamRegisterCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

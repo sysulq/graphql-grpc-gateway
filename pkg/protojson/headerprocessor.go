@@ -1,4 +1,4 @@
-package utils
+package protojson
 
 import (
 	"fmt"

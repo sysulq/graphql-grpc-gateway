@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/sysulq/graphql-grpc-gateway/api/example/helloworld"
 	pb "github.com/sysulq/graphql-grpc-gateway/api/test"
 	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 	"google.golang.org/grpc"
@@ -27,8 +28,10 @@ import (
 type DepsInfo struct {
 	OptionsServerAddr    net.Listener
 	ConstructsServerAddr net.Listener
+	HelloworldServerAddr net.Listener
 	OptionServer         *grpc.Server
 	ConstructServer      *grpc.Server
+	HelloworldServer     *grpc.Server
 }
 
 func SetupGateway(t testing.TB, s server.Gateway) string {
@@ -55,9 +58,11 @@ func SetupDeps(t testing.TB) DepsInfo {
 	var (
 		optionsServerCh    = make(chan net.Listener)
 		constructsServerCh = make(chan net.Listener)
+		HelloworldServerCh = make(chan net.Listener)
 
 		optionsServer    atomic.Pointer[*grpc.Server]
 		constructsServer atomic.Pointer[*grpc.Server]
+		helloworldServer atomic.Pointer[*grpc.Server]
 	)
 	go func() {
 		l, err := net.Listen("tcp", "localhost:0")
@@ -86,12 +91,27 @@ func SetupDeps(t testing.TB) DepsInfo {
 		constructsServer.Store(&s)
 		_ = s.Serve(l)
 	}()
+	go func() {
+		l, err := net.Listen("tcp", "localhost:0")
+		require.Nil(t, err)
+		go func() {
+			time.Sleep(10 * time.Millisecond)
+			HelloworldServerCh <- l
+		}()
+		s := grpc.NewServer()
+		helloworld.RegisterGreeterServer(s, &helloworldService{})
+		reflection.Register(s)
+		helloworldServer.Store(&s)
+		_ = s.Serve(l)
+	}()
 
 	return DepsInfo{
 		OptionsServerAddr:    <-optionsServerCh,
 		ConstructsServerAddr: <-constructsServerCh,
+		HelloworldServerAddr: <-HelloworldServerCh,
 		OptionServer:         *optionsServer.Load(),
 		ConstructServer:      *constructsServer.Load(),
+		HelloworldServer:     *helloworldServer.Load(),
 	}
 }
 
@@ -202,4 +222,18 @@ func (o *optionsQueryMock) Query1(ctx context.Context, data *pb.Data) (*pb.Data,
 func (o *optionsQueryMock) Query2(ctx context.Context, data *pb.Data) (*pb.Data, error) {
 	fmt.Println(metadata.FromIncomingContext(ctx))
 	return data, nil
+}
+
+type helloworldService struct {
+	helloworld.UnimplementedGreeterServer
+}
+
+func (s *helloworldService) SayHello(ctx context.Context, req *helloworld.HelloRequest) (*helloworld.HelloReply, error) {
+	if req.Name == "error" {
+		return nil, fmt.Errorf("error")
+	}
+
+	return &helloworld.HelloReply{
+		Message: "Hello " + req.Name,
+	}, nil
 }
