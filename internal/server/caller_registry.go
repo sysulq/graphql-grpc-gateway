@@ -74,7 +74,7 @@ func (c *callerRegistry) Init(ctx context.Context) error {
 func (r *callerRegistry) setFileDescriptors(files []protoreflect.FileDescriptor) error {
 	schema := protographql.New()
 	for _, file := range files {
-		err := schema.RegisterFileDescriptor(r.config.Get().Config().GraphQL.GenerateUnboundMethods, file)
+		err := schema.RegisterFileDescriptor(r.config.Get().Config().Server.GraphQL.GenerateUnboundMethods, file)
 		if err != nil {
 			return err
 		}

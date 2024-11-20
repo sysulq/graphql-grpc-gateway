@@ -33,11 +33,13 @@ func TestGraphql2Grpc(t *testing.T) {
 				},
 			},
 		},
-		GraphQL: config.GraphQL{
-			Playground:             true,
-			GenerateUnboundMethods: true,
-			SingleFlight:           true,
-			QueryCache:             true,
+		Server: config.ServerConfig{
+			GraphQL: config.GraphQL{
+				Playground:             true,
+				GenerateUnboundMethods: true,
+				SingleFlight:           true,
+				QueryCache:             true,
+			},
 		},
 	}).AnyTimes()
 

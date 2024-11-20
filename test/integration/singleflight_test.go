@@ -32,9 +32,11 @@ func TestSingleFlight(t *testing.T) {
 				},
 			},
 		},
-		GraphQL: config.GraphQL{
-			GenerateUnboundMethods: true,
-			SingleFlight:           true,
+		Server: config.ServerConfig{
+			GraphQL: config.GraphQL{
+				GenerateUnboundMethods: true,
+				SingleFlight:           true,
+			},
 		},
 	}).AnyTimes()
 

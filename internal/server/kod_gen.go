@@ -20,20 +20,8 @@ import (
 const (
 	// Caller_Call_FullMethodName is the full name of the method [caller.Call].
 	Caller_Call_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Caller.Call"
-	// CallerRegistry_FindMethodByName_FullMethodName is the full name of the method [callerRegistry.FindMethodByName].
-	CallerRegistry_FindMethodByName_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.FindMethodByName"
-	// CallerRegistry_GetCallerStub_FullMethodName is the full name of the method [callerRegistry.GetCallerStub].
-	CallerRegistry_GetCallerStub_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.GetCallerStub"
-	// CallerRegistry_GraphQLSchema_FullMethodName is the full name of the method [callerRegistry.GraphQLSchema].
-	CallerRegistry_GraphQLSchema_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.GraphQLSchema"
-	// CallerRegistry_Marshal_FullMethodName is the full name of the method [callerRegistry.Marshal].
-	CallerRegistry_Marshal_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.Marshal"
-	// CallerRegistry_Unmarshal_FullMethodName is the full name of the method [callerRegistry.Unmarshal].
-	CallerRegistry_Unmarshal_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/CallerRegistry.Unmarshal"
 	// Reflection_ListPackages_FullMethodName is the full name of the method [reflection.ListPackages].
 	Reflection_ListPackages_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Reflection.ListPackages"
-	// Gateway_BuildServer_FullMethodName is the full name of the method [server.BuildServer].
-	Gateway_BuildServer_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway.BuildServer"
 	// Queryer_Query_FullMethodName is the full name of the method [queryer.Query].
 	Queryer_Query_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/Queryer.Query"
 )

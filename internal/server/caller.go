@@ -30,7 +30,7 @@ func (c *caller) Init(ctx context.Context) error {
 }
 
 func (c *caller) Call(ctx context.Context, rpc protoreflect.MethodDescriptor, message proto.Message) (proto.Message, error) {
-	if c.config.Get().Config().GraphQL.SingleFlight {
+	if c.config.Get().Config().Server.GraphQL.SingleFlight {
 		if enable, ok := ctx.Value(allowSingleFlightKey).(bool); ok && enable {
 			hash := Hash64.Get()
 			defer Hash64.Put(hash)

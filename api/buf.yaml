@@ -1,5 +1,8 @@
 version: v1
 
+deps:
+  - buf.build/googleapis/googleapis
+
 lint:
   rpc_allow_same_request_response: false
   rpc_allow_google_protobuf_empty_requests: true

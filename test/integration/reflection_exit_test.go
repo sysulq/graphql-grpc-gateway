@@ -30,8 +30,10 @@ func TestReflectionExit(t *testing.T) {
 				},
 			},
 		},
-		GraphQL: config.GraphQL{
-			GenerateUnboundMethods: true,
+		Server: config.ServerConfig{
+			GraphQL: config.GraphQL{
+				GenerateUnboundMethods: true,
+			},
 		},
 	}).AnyTimes()
 

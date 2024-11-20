@@ -25,7 +25,7 @@ type app struct {
 func run(ctx context.Context, app *app) error {
 	cfg := app.config.Get().Config()
 
-	l, err := net.Listen("tcp", cfg.GraphQL.Address)
+	l, err := net.Listen("tcp", cfg.Server.GraphQL.Address)
 	lo.Must0(err)
 	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
 	handler, err := app.server.Get().BuildServer()

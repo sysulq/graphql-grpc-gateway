@@ -45,9 +45,18 @@ type EngineConfig struct {
 }
 
 type ConfigInfo struct {
-	Engine  EngineConfig
-	Grpc    Grpc
+	Server ServerConfig
+	Engine EngineConfig
+	Grpc   Grpc
+}
+
+type ServerConfig struct {
 	GraphQL GraphQL
+	HTTP    HTTPConfig
+}
+
+type HTTPConfig struct {
+	Address string
 }
 
 type Grpc struct {

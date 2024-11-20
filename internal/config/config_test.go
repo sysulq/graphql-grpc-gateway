@@ -24,13 +24,18 @@ func TestConfig(t *testing.T) {
 					Config: kpyroscope.Config{ServerAddress: "http://localhost:4040"},
 				},
 			},
-			GraphQL: GraphQL{
-				Address:                ":8080",
-				Disable:                false,
-				Playground:             true,
-				GenerateUnboundMethods: true,
-				QueryCache:             true,
-				SingleFlight:           true,
+			Server: ServerConfig{
+				GraphQL: GraphQL{
+					Address:                ":8080",
+					Disable:                false,
+					Playground:             true,
+					GenerateUnboundMethods: true,
+					QueryCache:             true,
+					SingleFlight:           true,
+				},
+				HTTP: HTTPConfig{
+					Address: ":8081",
+				},
 			},
 			Grpc: Grpc{
 				Etcd: etcdv3.Config{
@@ -45,6 +50,10 @@ func TestConfig(t *testing.T) {
 					},
 					{
 						Target:  "etcd:///local/constructsserver/grpc",
+						Timeout: time.Second,
+					},
+					{
+						Target:  "etcd:///local/helloworld/grpc",
 						Timeout: time.Second,
 					},
 				},

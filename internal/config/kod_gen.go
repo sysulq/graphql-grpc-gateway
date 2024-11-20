@@ -11,10 +11,7 @@ import (
 )
 
 // Full method names for components.
-const (
-	// Config_Config_FullMethodName is the full name of the method [config.Config].
-	Config_Config_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/config/Config.Config"
-)
+const ()
 
 func init() {
 	kod.Register(&kod.Registration{
