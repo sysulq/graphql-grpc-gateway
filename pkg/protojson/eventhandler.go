@@ -9,6 +9,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	// nolint
 	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -41,6 +42,11 @@ func (h *EventHandler) OnReceiveResponse(message proto.Message) {
 
 func (h *EventHandler) OnReceiveTrailers(status *status.Status, _ metadata.MD) {
 	h.Status = status
+	if status.Code() != codes.OK {
+		if err := h.marshaler.Marshal(h.writer, status.Proto()); err != nil {
+			panic(err)
+		}
+	}
 }
 
 func (h *EventHandler) OnResolveMethod(_ *desc.MethodDescriptor) {

@@ -90,7 +90,7 @@ func TestHTTP2Grpc(t *testing.T) {
 
 			router.ServeHTTP(rec, req)
 			assert.Equal(t, http.StatusOK, rec.Code)
-			assert.Equal(t, `{"error":2,"message":"error"}`, rec.Body.String())
+			assert.Equal(t, `{"code":2,"message":"error","details":[]}`, rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
 }
