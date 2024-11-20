@@ -16,6 +16,7 @@ tasks:
     deps:
       - constructsserver
       - optionsserver
+      - helloworld
       - gateway
 
   gateway:
@@ -30,6 +31,10 @@ tasks:
     cmds:
       - go run ./example/gateway/optionsserver  
 
+  helloworld:
+    cmds:
+      - go run ./example/gateway/helloworld  
+
   bench:
     cmds:
       - "ab -n 50000 -kc 500 -T 'application/json' -p test/post1.json http://localhost:8080/query"
@@ -38,9 +43,17 @@ tasks:
     cmds:
       - "ab -n 50000 -kc 500 -T 'application/json' -p test/post2.json http://localhost:8080/query"
 
+  bench3:
+    cmds:
+      - "ab -n 50000 -kc 500 'http://localhost:9090/say/bob'"
+
   curl:
     cmds:
       - "curl 'http://localhost:8080/playground' -H 'Content-Type: application/json' --data-binary @test/post2.json -v"
+
+  curlhttp:
+    cmds:
+      - "curl 'http://localhost:9090/say/bob'"
 
   test:
     cmds:

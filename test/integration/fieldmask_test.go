@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/client/kgrpc"
+	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/nautilus/graphql"
 	apitest "github.com/sysulq/graphql-grpc-gateway/api/test"
 	"github.com/sysulq/graphql-grpc-gateway/internal/config"
@@ -28,6 +29,9 @@ func TestFieldMask(t *testing.T) {
 			CircuitBreaker: true,
 		},
 		Grpc: config.Grpc{
+			Etcd: etcdv3.Config{
+				Endpoints: []string{"localhost:2379"},
+			},
 			Services: []kgrpc.Config{
 				{
 					Target: infos.ConstructsServerAddr.Addr().String(),

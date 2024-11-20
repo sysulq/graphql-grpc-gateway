@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-kod/kod"
 	"github.com/grafana/pyroscope-go"
 	"github.com/hashicorp/golang-lru/v2/expirable"
@@ -21,10 +22,11 @@ type server struct {
 
 	profiler *pyroscope.Profiler
 
-	config   kod.Ref[config.Config]
-	_        kod.Ref[Caller]
-	queryer  kod.Ref[Queryer]
-	registry kod.Ref[CallerRegistry]
+	config       kod.Ref[config.Config]
+	_            kod.Ref[Caller]
+	queryer      kod.Ref[Queryer]
+	registry     kod.Ref[CallerRegistry]
+	httpUpstream kod.Ref[Upstream]
 }
 
 func (ins *server) Init(ctx context.Context) error {
@@ -80,6 +82,12 @@ func (s *server) BuildServer() (http.Handler, error) {
 		if cfg.Server.GraphQL.Playground {
 			mux.HandleFunc("/playground", g.PlaygroundHandler)
 		}
+	}
+
+	if cfg.Server.HTTP.Address != "" {
+		g := gin.New()
+		s.httpUpstream.Get().Register(context.Background(), g)
+		go g.Run(cfg.Server.HTTP.Address)
 	}
 
 	var handler http.Handler = addHeader(mux)

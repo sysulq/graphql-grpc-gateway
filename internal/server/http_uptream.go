@@ -28,12 +28,11 @@ type upstream struct {
 }
 
 type upstreamInfo struct {
-	target          string
-	conn            grpc.ClientConnInterface
-	source          grpcurl.DescriptorSource
-	resovler        jsonpb.AnyResolver
-	methods         []protojson.Method
-	httpToRpcMethod map[string]string
+	target   string
+	conn     grpc.ClientConnInterface
+	source   grpcurl.DescriptorSource
+	resovler jsonpb.AnyResolver
+	methods  []protojson.Method
 }
 
 func (u *upstream) Init(ctx context.Context) error {

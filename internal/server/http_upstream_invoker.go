@@ -20,8 +20,7 @@ type invoker struct {
 func (i *invoker) Invoke(ctx context.Context, c *gin.Context, upstream upstreamInfo, rpcPath string) {
 	parser, err := protojson.NewRequestParser(c, upstream.resovler)
 	if err != nil {
-		_ = c.Error(err)
-
+		i.L(ctx).Error("parse request", "error", err)
 		return
 	}
 
@@ -32,7 +31,7 @@ func (i *invoker) Invoke(ctx context.Context, c *gin.Context, upstream upstreamI
 		protojson.ProcessHeaders(c.Request.Header),
 		handler, parser.Next)
 	if err != nil {
-		return
+		i.L(ctx).Error("invoke rpc", "error", err)
 	}
 }
 

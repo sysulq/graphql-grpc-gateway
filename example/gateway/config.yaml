@@ -1,6 +1,6 @@
 server:
   http:
-    address: ":8081"
+    address: ":9090"
 
   graphql:
     address: ":8080"
