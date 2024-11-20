@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"bytes"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -90,6 +91,34 @@ func TestHTTP2Grpc(t *testing.T) {
 			router.ServeHTTP(rec, req)
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.Equal(t, `{"code":2,"message":"error","details":[]}`, rec.Body.String())
+		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
+	})
+
+	t.Run("http body", func(t *testing.T) {
+		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
+			router := http.NewServeMux()
+			up.Register(ctx, router)
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodGet, "/say/sam", bytes.NewBufferString("{\"name\":\"bob\"}"))
+			req.Header.Set("Content-Type", "application/json")
+
+			router.ServeHTTP(rec, req)
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, `{"message":"Hello sam"}`, rec.Body.String())
+		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
+	})
+
+	t.Run("invalid http body", func(t *testing.T) {
+		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
+			router := http.NewServeMux()
+			up.Register(ctx, router)
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodGet, "/say/sam", bytes.NewBufferString("{invalid data}"))
+			req.Header.Set("Content-Type", "application/json")
+
+			router.ServeHTTP(rec, req)
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, `invalid character 'i' looking for beginning of object key string`, rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
 }

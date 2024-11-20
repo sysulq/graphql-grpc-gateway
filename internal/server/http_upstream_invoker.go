@@ -21,6 +21,7 @@ func (i *invoker) Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Re
 	parser, err := protojson.NewRequestParser(r, pathNames, upstream.resovler)
 	if err != nil {
 		i.L(ctx).Error("parse request", "error", err)
+		rw.Write([]byte(err.Error()))
 		return
 	}
 
