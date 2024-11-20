@@ -6,7 +6,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jhump/protoreflect/v2/grpcdynamic"
 	"github.com/nautilus/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -49,20 +48,22 @@ type Reflection interface {
 type Gateway interface {
 	// BuildServer is implemented by [server.BuildServer]
 	BuildServer() (http.Handler, error)
+	// BuildHTTPServer is implemented by [server.BuildHTTPServer]
+	BuildHTTPServer() (http.Handler, error)
 }
 
 // Invoker is implemented by [invoker],
 // which can be mocked with [NewMockInvoker].
 type Invoker interface {
 	// Invoke is implemented by [invoker.Invoke]
-	Invoke(ctx context.Context, c *gin.Context, upstream upstreamInfo, rpcPath string)
+	Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Request, upstream upstreamInfo, rpcPath string, pathNames []string)
 }
 
 // Upstream is implemented by [upstream],
 // which can be mocked with [NewMockUpstream].
 type Upstream interface {
 	// Register is implemented by [upstream.Register]
-	Register(ctx context.Context, router *gin.Engine)
+	Register(ctx context.Context, router *http.ServeMux)
 }
 
 // Queryer is implemented by [queryer],

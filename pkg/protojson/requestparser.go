@@ -7,21 +7,20 @@ import (
 	"net/http"
 
 	"github.com/fullstorydev/grpcurl"
-	"github.com/gin-gonic/gin"
 
 	// nolint
 	"github.com/golang/protobuf/jsonpb"
 )
 
 // NewRequestParser creates a new request parser from the given http.Request and resolver.
-func NewRequestParser(r *gin.Context, resolver jsonpb.AnyResolver) (grpcurl.RequestParser, error) {
+func NewRequestParser(r *http.Request, pathName []string, resolver jsonpb.AnyResolver) (grpcurl.RequestParser, error) {
 	params := make(map[string]any)
 
-	for _, v := range r.Params {
-		params[v.Key] = v.Value
+	for _, v := range pathName {
+		params[v] = r.PathValue(v)
 	}
 
-	body, ok := getBody(r.Request)
+	body, ok := getBody(r)
 	if !ok {
 		return buildJsonRequestParser(params, resolver)
 	}

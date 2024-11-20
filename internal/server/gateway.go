@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-kod/kod"
 	"github.com/grafana/pyroscope-go"
 	"github.com/hashicorp/golang-lru/v2/expirable"
@@ -84,11 +83,21 @@ func (s *server) BuildServer() (http.Handler, error) {
 		}
 	}
 
-	if cfg.Server.HTTP.Address != "" {
-		g := gin.New()
-		s.httpUpstream.Get().Register(context.Background(), g)
-		go g.Run(cfg.Server.HTTP.Address)
+	var handler http.Handler = addHeader(mux)
+	handler = otelhttp.NewMiddleware("graphql-gateway")(handler)
+
+	if cfg.Server.GraphQL.Jwt.Enable {
+		handler = s.jwtAuthHandler(handler)
 	}
+
+	return handler, nil
+}
+
+func (s *server) BuildHTTPServer() (http.Handler, error) {
+	mux := http.NewServeMux()
+	cfg := s.config.Get().Config()
+
+	s.httpUpstream.Get().Register(context.Background(), mux)
 
 	var handler http.Handler = addHeader(mux)
 	handler = otelhttp.NewMiddleware("graphql-gateway")(handler)

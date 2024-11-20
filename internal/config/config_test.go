@@ -34,7 +34,7 @@ func TestConfig(t *testing.T) {
 					SingleFlight:           true,
 				},
 				HTTP: HTTPConfig{
-					Address: ":8081",
+					Address: ":9090",
 				},
 			},
 			Grpc: Grpc{

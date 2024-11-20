@@ -30,14 +30,20 @@ func run(ctx context.Context, app *app) error {
 	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
 	handler, err := app.server.Get().BuildServer()
 	lo.Must0(err)
+	go lo.Must0(http.Serve(l, handler))
 
+	l, err = net.Listen("tcp", cfg.Server.HTTP.Address)
+	lo.Must0(err)
+	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
+	handler, err = app.server.Get().BuildHTTPServer()
+	lo.Must0(err)
 	lo.Must0(http.Serve(l, handler))
 
 	return nil
 }
 
 func main() {
-	_ = kod.Run(context.Background(), run,
+	kod.MustRun(context.Background(), run,
 		kod.WithInterceptors(krecovery.Interceptor(), ktrace.Interceptor(), kmetric.Interceptor()),
 	)
 }

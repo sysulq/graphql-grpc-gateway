@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/client/kgrpc"
 	"github.com/go-kod/kod-ext/registry/etcdv3"
@@ -54,7 +53,7 @@ func TestHTTP2Grpc(t *testing.T) {
 
 	t.Run("http to grpc", func(t *testing.T) {
 		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
-			router := gin.New()
+			router := http.NewServeMux()
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, "/say/bob", nil)
@@ -68,7 +67,7 @@ func TestHTTP2Grpc(t *testing.T) {
 
 	t.Run("not found", func(t *testing.T) {
 		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
-			router := gin.New()
+			router := http.NewServeMux()
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, "/say-notfound", nil)
@@ -76,13 +75,13 @@ func TestHTTP2Grpc(t *testing.T) {
 
 			router.ServeHTTP(rec, req)
 			assert.Equal(t, http.StatusNotFound, rec.Code)
-			assert.Equal(t, "404 page not found", rec.Body.String())
+			assert.Equal(t, "404 page not found\n", rec.Body.String())
 		}, kod.WithFakes(kod.Fake[config.Config](mockConfig)), kod.WithOpenTelemetryDisabled())
 	})
 
 	t.Run("error", func(t *testing.T) {
 		kod.RunTest(t, func(ctx context.Context, up server.Upstream) {
-			router := gin.New()
+			router := http.NewServeMux()
 			up.Register(ctx, router)
 			rec := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, "/say/error", nil)

@@ -2,10 +2,11 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/fullstorydev/grpcurl"
-	"github.com/gin-gonic/gin"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/client/kgrpc"
 	"github.com/jhump/protoreflect/grpcreflect"
@@ -64,7 +65,7 @@ func (u *upstream) Init(ctx context.Context) error {
 	return nil
 }
 
-func (u *upstream) Register(ctx context.Context, router *gin.Engine) {
+func (u *upstream) Register(ctx context.Context, router *http.ServeMux) {
 	for _, upstream := range u.upstreams {
 		for _, v := range upstream.methods {
 			if v.HttpPath == "" {
@@ -72,13 +73,13 @@ func (u *upstream) Register(ctx context.Context, router *gin.Engine) {
 			}
 
 			u.L(ctx).Info("register upstream", "http", v.HttpPath, "rpc", v.RpcPath)
-			router.Handle(v.HttpMethod, v.HttpPath, u.buildHandler(ctx, upstream, v.RpcPath))
+			router.Handle(fmt.Sprintf("%s %s", v.HttpMethod, v.HttpPath), u.buildHandler(ctx, upstream, v.RpcPath, v.PathNames))
 		}
 	}
 }
 
-func (u *upstream) buildHandler(_ context.Context, upstream upstreamInfo, rpcPath string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		u.invoker.Get().Invoke(c.Request.Context(), c, upstream, rpcPath)
+func (u *upstream) buildHandler(_ context.Context, upstream upstreamInfo, rpcPath string, pathNames []string) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		u.invoker.Get().Invoke(r.Context(), rw, r, upstream, rpcPath, pathNames)
 	}
 }

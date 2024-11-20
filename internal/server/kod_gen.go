@@ -5,7 +5,6 @@ package server
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/jhump/protoreflect/v2/grpcdynamic"
@@ -254,6 +253,13 @@ type gateway_local_stub struct {
 // Check that [gateway_local_stub] implements the [Gateway] interface.
 var _ Gateway = (*gateway_local_stub)(nil)
 
+// BuildHTTPServer wraps the method [server.BuildHTTPServer].
+func (s gateway_local_stub) BuildHTTPServer() (r0 http.Handler, err error) {
+	// Because the first argument is not context.Context, so interceptors are not supported.
+	r0, err = s.impl.BuildHTTPServer()
+	return
+}
+
 // BuildServer wraps the method [server.BuildServer].
 func (s gateway_local_stub) BuildServer() (r0 http.Handler, err error) {
 	// Because the first argument is not context.Context, so interceptors are not supported.
@@ -271,15 +277,15 @@ type invoker_local_stub struct {
 var _ Invoker = (*invoker_local_stub)(nil)
 
 // Invoke wraps the method [invoker.Invoke].
-func (s invoker_local_stub) Invoke(ctx context.Context, a1 *gin.Context, a2 upstreamInfo, a3 string) {
+func (s invoker_local_stub) Invoke(ctx context.Context, a1 http.ResponseWriter, a2 *http.Request, a3 upstreamInfo, a4 string, a5 []string) {
 
 	if s.interceptor == nil {
-		s.impl.Invoke(ctx, a1, a2, a3)
+		s.impl.Invoke(ctx, a1, a2, a3, a4, a5)
 		return
 	}
 
 	call := func(ctx context.Context, info interceptor.CallInfo, req, res []any) (err error) {
-		s.impl.Invoke(ctx, a1, a2, a3)
+		s.impl.Invoke(ctx, a1, a2, a3, a4, a5)
 		return
 	}
 
@@ -288,7 +294,7 @@ func (s invoker_local_stub) Invoke(ctx context.Context, a1 *gin.Context, a2 upst
 		FullMethod: Invoker_Invoke_FullMethodName,
 	}
 
-	_ = s.interceptor(ctx, info, []any{a1, a2, a3}, []any{}, call)
+	_ = s.interceptor(ctx, info, []any{a1, a2, a3, a4, a5}, []any{}, call)
 }
 
 // upstream_local_stub is a local stub implementation of [Upstream].
@@ -301,7 +307,7 @@ type upstream_local_stub struct {
 var _ Upstream = (*upstream_local_stub)(nil)
 
 // Register wraps the method [upstream.Register].
-func (s upstream_local_stub) Register(ctx context.Context, a1 *gin.Engine) {
+func (s upstream_local_stub) Register(ctx context.Context, a1 *http.ServeMux) {
 
 	if s.interceptor == nil {
 		s.impl.Register(ctx, a1)

@@ -16,7 +16,6 @@ import (
 	http "net/http"
 	reflect "reflect"
 
-	gin "github.com/gin-gonic/gin"
 	grpcdynamic "github.com/jhump/protoreflect/v2/grpcdynamic"
 	graphql "github.com/nautilus/graphql"
 	ast "github.com/vektah/gqlparser/v2/ast"
@@ -392,6 +391,45 @@ func (m *MockGateway) EXPECT() *MockGatewayMockRecorder {
 	return m.recorder
 }
 
+// BuildHTTPServer mocks base method.
+func (m *MockGateway) BuildHTTPServer() (http.Handler, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BuildHTTPServer")
+	ret0, _ := ret[0].(http.Handler)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BuildHTTPServer indicates an expected call of BuildHTTPServer.
+func (mr *MockGatewayMockRecorder) BuildHTTPServer() *MockGatewayBuildHTTPServerCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildHTTPServer", reflect.TypeOf((*MockGateway)(nil).BuildHTTPServer))
+	return &MockGatewayBuildHTTPServerCall{Call: call}
+}
+
+// MockGatewayBuildHTTPServerCall wrap *gomock.Call
+type MockGatewayBuildHTTPServerCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockGatewayBuildHTTPServerCall) Return(arg0 http.Handler, arg1 error) *MockGatewayBuildHTTPServerCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockGatewayBuildHTTPServerCall) Do(f func() (http.Handler, error)) *MockGatewayBuildHTTPServerCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockGatewayBuildHTTPServerCall) DoAndReturn(f func() (http.Handler, error)) *MockGatewayBuildHTTPServerCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // BuildServer mocks base method.
 func (m *MockGateway) BuildServer() (http.Handler, error) {
 	m.ctrl.T.Helper()
@@ -456,15 +494,15 @@ func (m *MockInvoker) EXPECT() *MockInvokerMockRecorder {
 }
 
 // Invoke mocks base method.
-func (m *MockInvoker) Invoke(ctx context.Context, c *gin.Context, upstream upstreamInfo, rpcPath string) {
+func (m *MockInvoker) Invoke(ctx context.Context, rw http.ResponseWriter, r *http.Request, upstream upstreamInfo, rpcPath string, pathNames []string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Invoke", ctx, c, upstream, rpcPath)
+	m.ctrl.Call(m, "Invoke", ctx, rw, r, upstream, rpcPath, pathNames)
 }
 
 // Invoke indicates an expected call of Invoke.
-func (mr *MockInvokerMockRecorder) Invoke(ctx, c, upstream, rpcPath any) *MockInvokerInvokeCall {
+func (mr *MockInvokerMockRecorder) Invoke(ctx, rw, r, upstream, rpcPath, pathNames any) *MockInvokerInvokeCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Invoke", reflect.TypeOf((*MockInvoker)(nil).Invoke), ctx, c, upstream, rpcPath)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Invoke", reflect.TypeOf((*MockInvoker)(nil).Invoke), ctx, rw, r, upstream, rpcPath, pathNames)
 	return &MockInvokerInvokeCall{Call: call}
 }
 
@@ -474,21 +512,21 @@ type MockInvokerInvokeCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c_2 *MockInvokerInvokeCall) Return() *MockInvokerInvokeCall {
-	c_2.Call = c_2.Call.Return()
-	return c_2
+func (c *MockInvokerInvokeCall) Return() *MockInvokerInvokeCall {
+	c.Call = c.Call.Return()
+	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c_2 *MockInvokerInvokeCall) Do(f func(context.Context, *gin.Context, upstreamInfo, string)) *MockInvokerInvokeCall {
-	c_2.Call = c_2.Call.Do(f)
-	return c_2
+func (c *MockInvokerInvokeCall) Do(f func(context.Context, http.ResponseWriter, *http.Request, upstreamInfo, string, []string)) *MockInvokerInvokeCall {
+	c.Call = c.Call.Do(f)
+	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c_2 *MockInvokerInvokeCall) DoAndReturn(f func(context.Context, *gin.Context, upstreamInfo, string)) *MockInvokerInvokeCall {
-	c_2.Call = c_2.Call.DoAndReturn(f)
-	return c_2
+func (c *MockInvokerInvokeCall) DoAndReturn(f func(context.Context, http.ResponseWriter, *http.Request, upstreamInfo, string, []string)) *MockInvokerInvokeCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // MockUpstream is a mock of Upstream interface.
@@ -516,7 +554,7 @@ func (m *MockUpstream) EXPECT() *MockUpstreamMockRecorder {
 }
 
 // Register mocks base method.
-func (m *MockUpstream) Register(ctx context.Context, router *gin.Engine) {
+func (m *MockUpstream) Register(ctx context.Context, router *http.ServeMux) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Register", ctx, router)
 }
@@ -540,13 +578,13 @@ func (c *MockUpstreamRegisterCall) Return() *MockUpstreamRegisterCall {
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockUpstreamRegisterCall) Do(f func(context.Context, *gin.Engine)) *MockUpstreamRegisterCall {
+func (c *MockUpstreamRegisterCall) Do(f func(context.Context, *http.ServeMux)) *MockUpstreamRegisterCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockUpstreamRegisterCall) DoAndReturn(f func(context.Context, *gin.Engine)) *MockUpstreamRegisterCall {
+func (c *MockUpstreamRegisterCall) DoAndReturn(f func(context.Context, *http.ServeMux)) *MockUpstreamRegisterCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
