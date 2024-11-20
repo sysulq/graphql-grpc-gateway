@@ -57,6 +57,8 @@ type ServerConfig struct {
 
 type HTTPConfig struct {
 	Address string
+	Disable bool
+	Jwt     Jwt
 }
 
 type Grpc struct {

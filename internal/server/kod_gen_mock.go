@@ -25,6 +25,108 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 )
 
+// MockGateway is a mock of Gateway interface.
+type MockGateway struct {
+	ctrl     *gomock.Controller
+	recorder *MockGatewayMockRecorder
+	isgomock struct{}
+}
+
+// MockGatewayMockRecorder is the mock recorder for MockGateway.
+type MockGatewayMockRecorder struct {
+	mock *MockGateway
+}
+
+// NewMockGateway creates a new mock instance.
+func NewMockGateway(ctrl *gomock.Controller) *MockGateway {
+	mock := &MockGateway{ctrl: ctrl}
+	mock.recorder = &MockGatewayMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockGateway) EXPECT() *MockGatewayMockRecorder {
+	return m.recorder
+}
+
+// BuildHTTPServer mocks base method.
+func (m *MockGateway) BuildHTTPServer() (http.Handler, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BuildHTTPServer")
+	ret0, _ := ret[0].(http.Handler)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BuildHTTPServer indicates an expected call of BuildHTTPServer.
+func (mr *MockGatewayMockRecorder) BuildHTTPServer() *MockGatewayBuildHTTPServerCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildHTTPServer", reflect.TypeOf((*MockGateway)(nil).BuildHTTPServer))
+	return &MockGatewayBuildHTTPServerCall{Call: call}
+}
+
+// MockGatewayBuildHTTPServerCall wrap *gomock.Call
+type MockGatewayBuildHTTPServerCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockGatewayBuildHTTPServerCall) Return(arg0 http.Handler, arg1 error) *MockGatewayBuildHTTPServerCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockGatewayBuildHTTPServerCall) Do(f func() (http.Handler, error)) *MockGatewayBuildHTTPServerCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockGatewayBuildHTTPServerCall) DoAndReturn(f func() (http.Handler, error)) *MockGatewayBuildHTTPServerCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// BuildServer mocks base method.
+func (m *MockGateway) BuildServer() (http.Handler, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BuildServer")
+	ret0, _ := ret[0].(http.Handler)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BuildServer indicates an expected call of BuildServer.
+func (mr *MockGatewayMockRecorder) BuildServer() *MockGatewayBuildServerCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildServer", reflect.TypeOf((*MockGateway)(nil).BuildServer))
+	return &MockGatewayBuildServerCall{Call: call}
+}
+
+// MockGatewayBuildServerCall wrap *gomock.Call
+type MockGatewayBuildServerCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockGatewayBuildServerCall) Return(arg0 http.Handler, arg1 error) *MockGatewayBuildServerCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockGatewayBuildServerCall) Do(f func() (http.Handler, error)) *MockGatewayBuildServerCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockGatewayBuildServerCall) DoAndReturn(f func() (http.Handler, error)) *MockGatewayBuildServerCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // MockCaller is a mock of Caller interface.
 type MockCaller struct {
 	ctrl     *gomock.Controller
@@ -367,104 +469,64 @@ func (c *MockReflectionListPackagesCall) DoAndReturn(f func(context.Context, grp
 	return c
 }
 
-// MockGateway is a mock of Gateway interface.
-type MockGateway struct {
+// MockQueryer is a mock of Queryer interface.
+type MockQueryer struct {
 	ctrl     *gomock.Controller
-	recorder *MockGatewayMockRecorder
+	recorder *MockQueryerMockRecorder
 	isgomock struct{}
 }
 
-// MockGatewayMockRecorder is the mock recorder for MockGateway.
-type MockGatewayMockRecorder struct {
-	mock *MockGateway
+// MockQueryerMockRecorder is the mock recorder for MockQueryer.
+type MockQueryerMockRecorder struct {
+	mock *MockQueryer
 }
 
-// NewMockGateway creates a new mock instance.
-func NewMockGateway(ctrl *gomock.Controller) *MockGateway {
-	mock := &MockGateway{ctrl: ctrl}
-	mock.recorder = &MockGatewayMockRecorder{mock}
+// NewMockQueryer creates a new mock instance.
+func NewMockQueryer(ctrl *gomock.Controller) *MockQueryer {
+	mock := &MockQueryer{ctrl: ctrl}
+	mock.recorder = &MockQueryerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockGateway) EXPECT() *MockGatewayMockRecorder {
+func (m *MockQueryer) EXPECT() *MockQueryerMockRecorder {
 	return m.recorder
 }
 
-// BuildHTTPServer mocks base method.
-func (m *MockGateway) BuildHTTPServer() (http.Handler, error) {
+// Query mocks base method.
+func (m *MockQueryer) Query(ctx context.Context, input *graphql.QueryInput, result any) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BuildHTTPServer")
-	ret0, _ := ret[0].(http.Handler)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "Query", ctx, input, result)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// BuildHTTPServer indicates an expected call of BuildHTTPServer.
-func (mr *MockGatewayMockRecorder) BuildHTTPServer() *MockGatewayBuildHTTPServerCall {
+// Query indicates an expected call of Query.
+func (mr *MockQueryerMockRecorder) Query(ctx, input, result any) *MockQueryerQueryCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildHTTPServer", reflect.TypeOf((*MockGateway)(nil).BuildHTTPServer))
-	return &MockGatewayBuildHTTPServerCall{Call: call}
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockQueryer)(nil).Query), ctx, input, result)
+	return &MockQueryerQueryCall{Call: call}
 }
 
-// MockGatewayBuildHTTPServerCall wrap *gomock.Call
-type MockGatewayBuildHTTPServerCall struct {
+// MockQueryerQueryCall wrap *gomock.Call
+type MockQueryerQueryCall struct {
 	*gomock.Call
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockGatewayBuildHTTPServerCall) Return(arg0 http.Handler, arg1 error) *MockGatewayBuildHTTPServerCall {
-	c.Call = c.Call.Return(arg0, arg1)
+func (c *MockQueryerQueryCall) Return(arg0 error) *MockQueryerQueryCall {
+	c.Call = c.Call.Return(arg0)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockGatewayBuildHTTPServerCall) Do(f func() (http.Handler, error)) *MockGatewayBuildHTTPServerCall {
+func (c *MockQueryerQueryCall) Do(f func(context.Context, *graphql.QueryInput, any) error) *MockQueryerQueryCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockGatewayBuildHTTPServerCall) DoAndReturn(f func() (http.Handler, error)) *MockGatewayBuildHTTPServerCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// BuildServer mocks base method.
-func (m *MockGateway) BuildServer() (http.Handler, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BuildServer")
-	ret0, _ := ret[0].(http.Handler)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BuildServer indicates an expected call of BuildServer.
-func (mr *MockGatewayMockRecorder) BuildServer() *MockGatewayBuildServerCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BuildServer", reflect.TypeOf((*MockGateway)(nil).BuildServer))
-	return &MockGatewayBuildServerCall{Call: call}
-}
-
-// MockGatewayBuildServerCall wrap *gomock.Call
-type MockGatewayBuildServerCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockGatewayBuildServerCall) Return(arg0 http.Handler, arg1 error) *MockGatewayBuildServerCall {
-	c.Call = c.Call.Return(arg0, arg1)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockGatewayBuildServerCall) Do(f func() (http.Handler, error)) *MockGatewayBuildServerCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockGatewayBuildServerCall) DoAndReturn(f func() (http.Handler, error)) *MockGatewayBuildServerCall {
+func (c *MockQueryerQueryCall) DoAndReturn(f func(context.Context, *graphql.QueryInput, any) error) *MockQueryerQueryCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -585,68 +647,6 @@ func (c *MockUpstreamRegisterCall) Do(f func(context.Context, *http.ServeMux)) *
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockUpstreamRegisterCall) DoAndReturn(f func(context.Context, *http.ServeMux)) *MockUpstreamRegisterCall {
-	c.Call = c.Call.DoAndReturn(f)
-	return c
-}
-
-// MockQueryer is a mock of Queryer interface.
-type MockQueryer struct {
-	ctrl     *gomock.Controller
-	recorder *MockQueryerMockRecorder
-	isgomock struct{}
-}
-
-// MockQueryerMockRecorder is the mock recorder for MockQueryer.
-type MockQueryerMockRecorder struct {
-	mock *MockQueryer
-}
-
-// NewMockQueryer creates a new mock instance.
-func NewMockQueryer(ctrl *gomock.Controller) *MockQueryer {
-	mock := &MockQueryer{ctrl: ctrl}
-	mock.recorder = &MockQueryerMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockQueryer) EXPECT() *MockQueryerMockRecorder {
-	return m.recorder
-}
-
-// Query mocks base method.
-func (m *MockQueryer) Query(ctx context.Context, input *graphql.QueryInput, result any) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Query", ctx, input, result)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Query indicates an expected call of Query.
-func (mr *MockQueryerMockRecorder) Query(ctx, input, result any) *MockQueryerQueryCall {
-	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockQueryer)(nil).Query), ctx, input, result)
-	return &MockQueryerQueryCall{Call: call}
-}
-
-// MockQueryerQueryCall wrap *gomock.Call
-type MockQueryerQueryCall struct {
-	*gomock.Call
-}
-
-// Return rewrite *gomock.Call.Return
-func (c *MockQueryerQueryCall) Return(arg0 error) *MockQueryerQueryCall {
-	c.Call = c.Call.Return(arg0)
-	return c
-}
-
-// Do rewrite *gomock.Call.Do
-func (c *MockQueryerQueryCall) Do(f func(context.Context, *graphql.QueryInput, any) error) *MockQueryerQueryCall {
-	c.Call = c.Call.Do(f)
-	return c
-}
-
-// DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockQueryerQueryCall) DoAndReturn(f func(context.Context, *graphql.QueryInput, any) error) *MockQueryerQueryCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

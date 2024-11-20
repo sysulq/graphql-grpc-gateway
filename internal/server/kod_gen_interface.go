@@ -14,6 +14,15 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
+// Gateway is implemented by [server],
+// which can be mocked with [NewMockGateway].
+type Gateway interface {
+	// BuildServer is implemented by [server.BuildServer]
+	BuildServer() (http.Handler, error)
+	// BuildHTTPServer is implemented by [server.BuildHTTPServer]
+	BuildHTTPServer() (http.Handler, error)
+}
+
 // Caller is implemented by [caller],
 // which can be mocked with [NewMockCaller].
 type Caller interface {
@@ -43,13 +52,11 @@ type Reflection interface {
 	ListPackages(ctx context.Context, cc grpc.ClientConnInterface) ([]protoreflect.FileDescriptor, error)
 }
 
-// Gateway is implemented by [server],
-// which can be mocked with [NewMockGateway].
-type Gateway interface {
-	// BuildServer is implemented by [server.BuildServer]
-	BuildServer() (http.Handler, error)
-	// BuildHTTPServer is implemented by [server.BuildHTTPServer]
-	BuildHTTPServer() (http.Handler, error)
+// Queryer is implemented by [queryer],
+// which can be mocked with [NewMockQueryer].
+type Queryer interface {
+	// Query is implemented by [queryer.Query]
+	Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error
 }
 
 // Invoker is implemented by [invoker],
@@ -64,11 +71,4 @@ type Invoker interface {
 type Upstream interface {
 	// Register is implemented by [upstream.Register]
 	Register(ctx context.Context, router *http.ServeMux)
-}
-
-// Queryer is implemented by [queryer],
-// which can be mocked with [NewMockQueryer].
-type Queryer interface {
-	// Query is implemented by [queryer.Query]
-	Query(ctx context.Context, input *graphql.QueryInput, result interface{}) error
 }
