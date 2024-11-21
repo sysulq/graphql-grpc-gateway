@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/fullstorydev/grpcurl"
+	"github.com/go-kod/grpc-gateway/internal/config"
+	"github.com/go-kod/grpc-gateway/pkg/protojson"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/client/kgrpc"
 	"github.com/jhump/protoreflect/grpcreflect"
-	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/protojson"
 
 	// nolint
 	"github.com/golang/protobuf/jsonpb"

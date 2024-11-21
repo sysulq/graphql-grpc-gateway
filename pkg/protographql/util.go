@@ -7,7 +7,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
 
-	graphqlv1 "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1"
+	graphqlv1 "github.com/go-kod/grpc-gateway/api/graphql/v1"
 )
 
 func GraphqlMethodOptions(opts proto.Message) *graphqlv1.Rpc {

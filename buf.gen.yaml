@@ -2,7 +2,7 @@ version: v1
 managed:
   enabled: true
   go_package_prefix:
-    default: github.com/sysulq/graphql-grpc-gateway/api
+    default: github.com/go-kod/grpc-gateway/api
     except:
       - buf.build/googleapis/googleapis
 plugins:

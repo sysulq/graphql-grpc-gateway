@@ -1,4 +1,4 @@
-module github.com/sysulq/graphql-grpc-gateway
+module github.com/go-kod/grpc-gateway
 
 go 1.22.7
 

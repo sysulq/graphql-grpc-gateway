@@ -6,11 +6,11 @@ import (
 	any "google.golang.org/protobuf/types/known/anypb"
 	empty "google.golang.org/protobuf/types/known/emptypb"
 
+	pb "github.com/go-kod/grpc-gateway/api/example/constructsserver"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/go-kod/kod-ext/server/kgrpc"
 	"github.com/samber/lo"
-	pb "github.com/sysulq/graphql-grpc-gateway/api/example/constructsserver"
 )
 
 type app struct {

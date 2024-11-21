@@ -19,27 +19,27 @@ import (
 // Full method names for components.
 const (
 	// GraphqlCaller_Call_FullMethodName is the full name of the method [graphqlCaller.Call].
-	GraphqlCaller_Call_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller.Call"
+	GraphqlCaller_Call_FullMethodName = "github.com/go-kod/grpc-gateway/internal/server/GraphqlCaller.Call"
 	// GraphqlReflection_ListPackages_FullMethodName is the full name of the method [graphqlReflection.ListPackages].
-	GraphqlReflection_ListPackages_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlReflection.ListPackages"
+	GraphqlReflection_ListPackages_FullMethodName = "github.com/go-kod/grpc-gateway/internal/server/GraphqlReflection.ListPackages"
 	// GraphqlQueryer_Query_FullMethodName is the full name of the method [graphqlQueryer.Query].
-	GraphqlQueryer_Query_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer.Query"
+	GraphqlQueryer_Query_FullMethodName = "github.com/go-kod/grpc-gateway/internal/server/GraphqlQueryer.Query"
 	// HttpUpstreamInvoker_Invoke_FullMethodName is the full name of the method [httpUpstreamInvoker.Invoke].
-	HttpUpstreamInvoker_Invoke_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstreamInvoker.Invoke"
+	HttpUpstreamInvoker_Invoke_FullMethodName = "github.com/go-kod/grpc-gateway/internal/server/HttpUpstreamInvoker.Invoke"
 	// HttpUpstream_Register_FullMethodName is the full name of the method [httpUpstream.Register].
-	HttpUpstream_Register_FullMethodName = "github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream.Register"
+	HttpUpstream_Register_FullMethodName = "github.com/go-kod/grpc-gateway/internal/server/HttpUpstream.Register"
 )
 
 func init() {
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway",
+		Name:      "github.com/go-kod/grpc-gateway/internal/server/Gateway",
 		Interface: reflect.TypeOf((*Gateway)(nil)).Elem(),
 		Impl:      reflect.TypeOf(server{}),
-		Refs: `⟦88a4dee9:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦03fef591:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller⟧,
-⟦48435518:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer⟧,
-⟦b5d756d3:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧,
-⟦1e218b19:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway→github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream⟧`,
+		Refs: `⟦08088651:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/Gateway→github.com/go-kod/grpc-gateway/internal/config/Config⟧,
+⟦1be0b044:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/Gateway→github.com/go-kod/grpc-gateway/internal/server/GraphqlCaller⟧,
+⟦c3524ed4:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/Gateway→github.com/go-kod/grpc-gateway/internal/server/GraphqlQueryer⟧,
+⟦d0ac0283:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/Gateway→github.com/go-kod/grpc-gateway/internal/server/GraphqlCallerRegistry⟧,
+⟦b40d358d:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/Gateway→github.com/go-kod/grpc-gateway/internal/server/HttpUpstream⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return gateway_local_stub{
 				impl:        info.Impl.(Gateway),
@@ -48,11 +48,11 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller",
+		Name:      "github.com/go-kod/grpc-gateway/internal/server/GraphqlCaller",
 		Interface: reflect.TypeOf((*GraphqlCaller)(nil)).Elem(),
 		Impl:      reflect.TypeOf(graphqlCaller{}),
-		Refs: `⟦8c0cf75c:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦0cbfe1a9:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧`,
+		Refs: `⟦4908c6e6:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/GraphqlCaller→github.com/go-kod/grpc-gateway/internal/config/Config⟧,
+⟦18d2bb35:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/GraphqlCaller→github.com/go-kod/grpc-gateway/internal/server/GraphqlCallerRegistry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return graphqlCaller_local_stub{
 				impl:        info.Impl.(GraphqlCaller),
@@ -61,11 +61,11 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry",
+		Name:      "github.com/go-kod/grpc-gateway/internal/server/GraphqlCallerRegistry",
 		Interface: reflect.TypeOf((*GraphqlCallerRegistry)(nil)).Elem(),
 		Impl:      reflect.TypeOf(graphqlCallerRegistry{}),
-		Refs: `⟦1277b0bc:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦f05fe066:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlReflection⟧`,
+		Refs: `⟦da87aa60:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/GraphqlCallerRegistry→github.com/go-kod/grpc-gateway/internal/config/Config⟧,
+⟦514cb4fe:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/GraphqlCallerRegistry→github.com/go-kod/grpc-gateway/internal/server/GraphqlReflection⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return graphqlCallerRegistry_local_stub{
 				impl:        info.Impl.(GraphqlCallerRegistry),
@@ -74,7 +74,7 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlReflection",
+		Name:      "github.com/go-kod/grpc-gateway/internal/server/GraphqlReflection",
 		Interface: reflect.TypeOf((*GraphqlReflection)(nil)).Elem(),
 		Impl:      reflect.TypeOf(graphqlReflection{}),
 		Refs:      ``,
@@ -86,12 +86,12 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer",
+		Name:      "github.com/go-kod/grpc-gateway/internal/server/GraphqlQueryer",
 		Interface: reflect.TypeOf((*GraphqlQueryer)(nil)).Elem(),
 		Impl:      reflect.TypeOf(graphqlQueryer{}),
-		Refs: `⟦858864af:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦83fcae6f:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCaller⟧,
-⟦b79d40cd:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlQueryer→github.com/sysulq/graphql-grpc-gateway/internal/server/GraphqlCallerRegistry⟧`,
+		Refs: `⟦6b17ad14:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/GraphqlQueryer→github.com/go-kod/grpc-gateway/internal/config/Config⟧,
+⟦0bd5a48c:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/GraphqlQueryer→github.com/go-kod/grpc-gateway/internal/server/GraphqlCaller⟧,
+⟦e28805f0:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/GraphqlQueryer→github.com/go-kod/grpc-gateway/internal/server/GraphqlCallerRegistry⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return graphqlQueryer_local_stub{
 				impl:        info.Impl.(GraphqlQueryer),
@@ -100,10 +100,10 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstreamInvoker",
+		Name:      "github.com/go-kod/grpc-gateway/internal/server/HttpUpstreamInvoker",
 		Interface: reflect.TypeOf((*HttpUpstreamInvoker)(nil)).Elem(),
 		Impl:      reflect.TypeOf(httpUpstreamInvoker{}),
-		Refs:      `⟦6d3e4bdc:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstreamInvoker→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧`,
+		Refs:      `⟦064c132d:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/HttpUpstreamInvoker→github.com/go-kod/grpc-gateway/internal/config/Config⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return httpUpstreamInvoker_local_stub{
 				impl:        info.Impl.(HttpUpstreamInvoker),
@@ -112,11 +112,11 @@ func init() {
 		},
 	})
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream",
+		Name:      "github.com/go-kod/grpc-gateway/internal/server/HttpUpstream",
 		Interface: reflect.TypeOf((*HttpUpstream)(nil)).Elem(),
 		Impl:      reflect.TypeOf(httpUpstream{}),
-		Refs: `⟦84ecd651:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream→github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstreamInvoker⟧,
-⟦d6dccb8c:KoDeDgE:github.com/sysulq/graphql-grpc-gateway/internal/server/HttpUpstream→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧`,
+		Refs: `⟦8e0a637a:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/HttpUpstream→github.com/go-kod/grpc-gateway/internal/server/HttpUpstreamInvoker⟧,
+⟦d1d5181e:KoDeDgE:github.com/go-kod/grpc-gateway/internal/server/HttpUpstream→github.com/go-kod/grpc-gateway/internal/config/Config⟧`,
 		LocalStubFn: func(ctx context.Context, info *kod.LocalStubFnInfo) any {
 			return httpUpstream_local_stub{
 				impl:        info.Impl.(HttpUpstream),

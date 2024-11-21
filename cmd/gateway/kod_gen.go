@@ -16,8 +16,8 @@ func init() {
 		Name:      "github.com/go-kod/kod/Main",
 		Interface: reflect.TypeOf((*kod.Main)(nil)).Elem(),
 		Impl:      reflect.TypeOf(app{}),
-		Refs: `⟦b38aa65d:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-grpc-gateway/internal/config/Config⟧,
-⟦040e1d89:KoDeDgE:github.com/go-kod/kod/Main→github.com/sysulq/graphql-grpc-gateway/internal/server/Gateway⟧`,
+		Refs: `⟦c03c7479:KoDeDgE:github.com/go-kod/kod/Main→github.com/go-kod/grpc-gateway/internal/config/Config⟧,
+⟦f4859030:KoDeDgE:github.com/go-kod/kod/Main→github.com/go-kod/grpc-gateway/internal/server/Gateway⟧`,
 		LocalStubFn: nil,
 	})
 }

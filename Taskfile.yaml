@@ -57,7 +57,7 @@ tasks:
 
   test:
     cmds:
-      - go test -race -cover -coverprofile=coverage.out -covermode=atomic ./...
+      - go test -race -cover -coverprofile=coverage.out -covermode=atomic ./... -v
     sources:
       - "**/**.go"
     generates:

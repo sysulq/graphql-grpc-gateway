@@ -11,7 +11,7 @@ import (
 	"github.com/nautilus/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
 
-	"github.com/sysulq/graphql-grpc-gateway/internal/config"
+	"github.com/go-kod/grpc-gateway/internal/config"
 )
 
 type anyMap = map[string]interface{}

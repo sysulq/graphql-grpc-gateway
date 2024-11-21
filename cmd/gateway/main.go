@@ -6,13 +6,13 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/go-kod/grpc-gateway/internal/config"
+	"github.com/go-kod/grpc-gateway/internal/server"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor/kmetric"
 	"github.com/go-kod/kod/interceptor/krecovery"
 	"github.com/go-kod/kod/interceptor/ktrace"
 	"github.com/samber/lo"
-	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 )
 
 type app struct {

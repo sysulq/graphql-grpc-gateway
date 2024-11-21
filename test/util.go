@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-kod/grpc-gateway/api/example/helloworld"
+	pb "github.com/go-kod/grpc-gateway/api/test"
+	"github.com/go-kod/grpc-gateway/internal/server"
 	"github.com/stretchr/testify/require"
-	"github.com/sysulq/graphql-grpc-gateway/api/example/helloworld"
-	pb "github.com/sysulq/graphql-grpc-gateway/api/test"
-	"github.com/sysulq/graphql-grpc-gateway/internal/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"

@@ -3,9 +3,9 @@ package protographql
 import (
 	"testing"
 
+	"github.com/go-kod/grpc-gateway/api/test"
 	"github.com/nautilus/graphql"
 	"github.com/stretchr/testify/require"
-	"github.com/sysulq/graphql-grpc-gateway/api/test"
 	"github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/proto"

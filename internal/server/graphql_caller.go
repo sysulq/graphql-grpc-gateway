@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-kod/grpc-gateway/internal/config"
+	"github.com/go-kod/grpc-gateway/pkg/header"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod/interceptor"
 	"github.com/go-kod/kod/interceptor/kcircuitbreaker"
-	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/header"
 	"golang.org/x/sync/singleflight"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"

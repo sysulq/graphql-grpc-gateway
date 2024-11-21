@@ -15,7 +15,7 @@ const ()
 
 func init() {
 	kod.Register(&kod.Registration{
-		Name:      "github.com/sysulq/graphql-grpc-gateway/internal/config/Config",
+		Name:      "github.com/go-kod/grpc-gateway/internal/config/Config",
 		Interface: reflect.TypeOf((*Config)(nil)).Elem(),
 		Impl:      reflect.TypeOf(config{}),
 		Refs:      ``,

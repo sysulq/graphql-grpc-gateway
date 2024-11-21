@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	graphqlv1 "github.com/sysulq/graphql-grpc-gateway/api/graphql/v1"
+	graphqlv1 "github.com/go-kod/grpc-gateway/api/graphql/v1"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"

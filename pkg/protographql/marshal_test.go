@@ -3,8 +3,8 @@ package protographql
 import (
 	"testing"
 
+	"github.com/go-kod/grpc-gateway/api/test"
 	"github.com/stretchr/testify/require"
-	"github.com/sysulq/graphql-grpc-gateway/api/test"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 

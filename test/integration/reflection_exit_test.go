@@ -5,13 +5,13 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/go-kod/grpc-gateway/internal/config"
+	"github.com/go-kod/grpc-gateway/internal/server"
+	"github.com/go-kod/grpc-gateway/test"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/client/kgrpc"
 	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"github.com/sysulq/graphql-grpc-gateway/internal/server"
-	"github.com/sysulq/graphql-grpc-gateway/test"
 	"go.uber.org/mock/gomock"
 )
 

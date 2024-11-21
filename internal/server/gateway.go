@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-kod/grpc-gateway/internal/config"
 	"github.com/go-kod/kod"
 	"github.com/grafana/pyroscope-go"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/nautilus/gateway"
 	"github.com/nautilus/graphql"
-	"github.com/sysulq/graphql-grpc-gateway/internal/config"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 

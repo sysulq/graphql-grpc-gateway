@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-kod/grpc-gateway/pkg/header"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/header"
 	"google.golang.org/grpc/metadata"
 )
 

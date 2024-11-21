@@ -3,12 +3,12 @@ package server
 import (
 	"context"
 
+	"github.com/go-kod/grpc-gateway/internal/config"
+	"github.com/go-kod/grpc-gateway/pkg/protographql"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/registry"
 	"github.com/jhump/protoreflect/v2/grpcdynamic"
 	"github.com/samber/lo"
-	"github.com/sysulq/graphql-grpc-gateway/internal/config"
-	"github.com/sysulq/graphql-grpc-gateway/pkg/protographql"
 	"github.com/vektah/gqlparser/v2/ast"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"

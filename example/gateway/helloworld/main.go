@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 
+	"github.com/go-kod/grpc-gateway/api/example/helloworld"
 	"github.com/go-kod/kod"
 	"github.com/go-kod/kod-ext/registry/etcdv3"
 	"github.com/go-kod/kod-ext/server/kgrpc"
 	"github.com/samber/lo"
-	"github.com/sysulq/graphql-grpc-gateway/api/example/helloworld"
 )
 
 type app struct {
