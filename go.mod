@@ -18,7 +18,7 @@ require (
 	github.com/nautilus/gateway v0.4.0
 	github.com/nautilus/graphql v0.0.26
 	github.com/samber/lo v1.47.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/vektah/gqlparser/v2 v2.5.19
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.57.0
 	go.uber.org/mock v0.5.0
