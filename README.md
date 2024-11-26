@@ -1,7 +1,7 @@
 # gRPC gateway
 
 [![Build and Test](https://github.com/go-kod/grpc-gateway/actions/workflows/go.yml/badge.svg)](https://github.com/go-kod/grpc-gateway/actions/workflows/go.yml)
-[![codecov](https://codecov.io/gh/sysulq/graphql-grpc-gateway/graph/badge.svg?token=UO18DMG15Z)](https://codecov.io/gh/sysulq/graphql-grpc-gateway)
+[![codecov](https://codecov.io/gh/go-kod/grpc-gateway/graph/badge.svg?token=UO18DMG15Z)](https://codecov.io/gh/go-kod/grpc-gateway)
 
 This is a simple gateway that can be used to expose multiple gRPC services as a GraphQL/HTTP server.
 

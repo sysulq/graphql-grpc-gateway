@@ -25,18 +25,14 @@ type app struct {
 func run(ctx context.Context, app *app) error {
 	cfg := app.config.Get().Config()
 
-	l, err := net.Listen("tcp", cfg.Server.GraphQL.Address)
-	lo.Must0(err)
+	l := lo.Must(net.Listen("tcp", cfg.Server.GraphQL.Address))
 	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
-	handler, err := app.server.Get().BuildServer()
-	lo.Must0(err)
+	handler := lo.Must(app.server.Get().BuildServer())
 	go func() { lo.Must0(http.Serve(l, handler)) }()
 
-	l, err = net.Listen("tcp", cfg.Server.HTTP.Address)
-	lo.Must0(err)
+	l = lo.Must(net.Listen("tcp", cfg.Server.HTTP.Address))
 	log.Printf("[INFO] Gateway listening on address: %s\n", l.Addr())
-	handler, err = app.server.Get().BuildHTTPServer()
-	lo.Must0(err)
+	handler = lo.Must(app.server.Get().BuildHTTPServer())
 	lo.Must0(http.Serve(l, handler))
 
 	return nil
