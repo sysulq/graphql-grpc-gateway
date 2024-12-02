@@ -6,7 +6,7 @@ toolchain go1.23.0
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
-	github.com/fullstorydev/grpcurl v1.9.1
+	github.com/fullstorydev/grpcurl v1.9.2
 	github.com/go-kod/kod v0.16.0
 	github.com/go-kod/kod-ext v0.3.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
@@ -19,7 +19,7 @@ require (
 	github.com/nautilus/graphql v0.0.26
 	github.com/samber/lo v1.47.0
 	github.com/stretchr/testify v1.10.0
-	github.com/vektah/gqlparser/v2 v2.5.19
+	github.com/vektah/gqlparser/v2 v2.5.20
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.57.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/sync v0.9.0
@@ -30,7 +30,7 @@ require (
 
 require (
 	github.com/99designs/gqlgen v0.17.49 // indirect
-	github.com/agnivade/levenshtein v1.1.1 // indirect
+	github.com/agnivade/levenshtein v1.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
